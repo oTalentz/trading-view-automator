@@ -14,7 +14,6 @@ declare global {
       chart?: () => any;
       activeChart?: () => any;
       _ready?: boolean;
-      onChartReady?: (callback: () => void) => void;
     };
   }
 }
@@ -40,6 +39,7 @@ export function TradingViewWidget({
 
   // Handler for when chart is ready
   const handleChartReady = () => {
+    console.log("Chart is ready - setting chartReadyRef to true");
     chartReadyRef.current = true;
   };
 

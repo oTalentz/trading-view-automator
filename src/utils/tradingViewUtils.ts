@@ -71,11 +71,13 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       "paneProperties.vertGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
       "paneProperties.horzGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
     },
-    // THIS IS THE FIX: Add the onChartReady callback directly to the widget configuration
-    // instead of trying to call it as a method on the widget instance later
+    // Fix: Add the onChartReady callback directly to the widget configuration
     onChartReady: function() {
       console.log("TradingView chart is ready!");
+      // Set ready flag on widget
       window.tvWidget._ready = true;
+      
+      // Add chart method for compatibility
       window.tvWidget.chart = function() {
         return window.tvWidget.activeChart();
       };
