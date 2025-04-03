@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { TimeframeAnalysis } from '@/hooks/useMultiTimeframeAnalysis';
+import { TimeframeAnalysis } from '@/types/timeframeAnalysis';
 import { ArrowUpCircle, ArrowDownCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { MarketCondition } from '@/utils/technicalAnalysis';
