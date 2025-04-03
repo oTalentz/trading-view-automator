@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
-import { analyzeMarket } from '@/utils/marketAnalysisUtils';
+import { analyzeMarket } from '@/utils/analysis/marketAnalyzer';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
 
