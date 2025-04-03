@@ -1,5 +1,5 @@
-import { useTheme } from '@/context/ThemeContext';
 
+// Define the Theme type locally instead of importing it
 type Theme = "dark" | "light";
 
 export interface TradingViewConfig {
