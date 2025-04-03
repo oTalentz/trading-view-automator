@@ -1,8 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { MultiTimeframeAnalysisResult, TimeframeAnalysis } from '@/types/timeframeAnalysis';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
 import { analyzeAllTimeframes } from '@/utils/confluenceCalculator';
+import { playAlertSound } from '@/utils/audioUtils';
+import { saveSignalToHistory } from '@/utils/signalHistoryUtils';
 
 // Fix: Change re-exports to use 'export type' syntax
 export type { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
@@ -11,7 +14,6 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
   const [analysis, setAnalysis] = useState<MultiTimeframeAnalysisResult | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
   const { t } = useLanguage();
-  
   
   const generateAnalysis = () => {
     // Gera nova análise
@@ -34,6 +36,20 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
         duration: 5000,
       }
     );
+    
+    // Play sound alert for new signal
+    playAlertSound(result.primarySignal.direction.toLowerCase() as 'call' | 'put');
+    
+    // Save signal to history
+    saveSignalToHistory({
+      symbol: symbol,
+      direction: result.primarySignal.direction,
+      confidence: result.primarySignal.confidence,
+      timestamp: result.primarySignal.timestamp,
+      entryTime: result.primarySignal.entryTime,
+      expiryTime: result.primarySignal.expiryTime,
+      timeframe: interval
+    });
   };
   
   // Inicia o contador regressivo e atualiza a cada segundo
@@ -53,6 +69,9 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
                 : `${t("executePut")} ${symbol}`,
               { description: t("preciseEntryNow") }
             );
+            
+            // Play entry sound alert
+            playAlertSound('entry');
           }
           
           return 0;

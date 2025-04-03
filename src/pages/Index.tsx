@@ -9,6 +9,9 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { LineChart, BarChart3 } from "lucide-react";
 
 const symbols = [
   // Cryptocurrencies
@@ -55,7 +58,15 @@ const IndexContent = () => {
       <Navbar />
       
       <main className="flex-1 container py-6">
-        <h1 className="text-2xl font-bold mb-6">{t("tradingViewAutomator")}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">{t("tradingViewAutomator")}</h1>
+          <Link to="/dashboard">
+            <Button variant="outline" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              {t("dashboard")}
+            </Button>
+          </Link>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2 space-y-4">
