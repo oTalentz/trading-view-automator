@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TimeframeAnalysis } from '@/types/timeframeAnalysis';
-import { ArrowUpCircle, ArrowDownCircle, AlertTriangle, BarChart3 } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, AlertTriangle, BarChart3, Hash } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { MarketCondition } from '@/utils/technicalAnalysis';
 import { Progress } from '@/components/ui/progress';
@@ -13,6 +13,12 @@ interface TimeframeConfluenceProps {
   currentTimeframe: string;
 }
 
+interface SignalCounts {
+  CALL: number;
+  PUT: number;
+  NEUTRAL: number;
+}
+
 export function TimeframeConfluence({ 
   timeframes,
   overallConfluence,
@@ -20,6 +26,30 @@ export function TimeframeConfluence({
   currentTimeframe 
 }: TimeframeConfluenceProps) {
   const { t, language } = useLanguage();
+  const [signalCounts, setSignalCounts] = useState<SignalCounts>({
+    CALL: 0,
+    PUT: 0,
+    NEUTRAL: 0
+  });
+
+  // Effect to count signals when timeframes change
+  useEffect(() => {
+    const counts: SignalCounts = {
+      CALL: 0,
+      PUT: 0,
+      NEUTRAL: 0
+    };
+    
+    // Count occurrences of each signal type
+    timeframes.forEach(tf => {
+      counts[tf.direction] = (counts[tf.direction] || 0) + 1;
+    });
+    
+    // Add the overall confluence direction
+    counts[confluenceDirection] = (counts[confluenceDirection] || 0) + 1;
+    
+    setSignalCounts(counts);
+  }, [timeframes, confluenceDirection]);
 
   // Traduz condições de mercado para exibição
   const getMarketConditionDisplay = (condition: MarketCondition): string => {
@@ -47,9 +77,14 @@ export function TimeframeConfluence({
   };
 
   // Função para obter o nome traduzido do ticket
-  const getTicketName = (direction: 'CALL' | 'PUT'): string => {
+  const getTicketName = (direction: 'CALL' | 'PUT' | 'NEUTRAL'): string => {
     if (language === 'pt-br') {
-      return direction === 'CALL' ? 'ALTA' : 'BAIXA';
+      switch (direction) {
+        case 'CALL': return 'ALTA';
+        case 'PUT': return 'BAIXA';
+        case 'NEUTRAL': return 'NEUTRO';
+        default: return direction;
+      }
     }
     return direction;
   };
@@ -83,6 +118,28 @@ export function TimeframeConfluence({
           confluenceDirection === 'PUT' ? 'bg-red-100 dark:bg-red-900/20' :
           'bg-amber-100 dark:bg-amber-900/20'
         } />
+      </div>
+      
+      {/* Signal count badges */}
+      <div className="flex justify-center gap-3 mb-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md">
+        <div className="flex items-center gap-1">
+          <Hash className="h-3.5 w-3.5 text-green-500" />
+          <span className="text-xs font-medium text-green-600 dark:text-green-400">
+            {getTicketName('CALL')}: {signalCounts.CALL || 0}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Hash className="h-3.5 w-3.5 text-red-500" />
+          <span className="text-xs font-medium text-red-600 dark:text-red-400">
+            {getTicketName('PUT')}: {signalCounts.PUT || 0}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Hash className="h-3.5 w-3.5 text-amber-500" />
+          <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+            {getTicketName('NEUTRAL')}: {signalCounts.NEUTRAL || 0}
+          </span>
+        </div>
       </div>
       
       <div className="grid grid-cols-2 gap-3">
