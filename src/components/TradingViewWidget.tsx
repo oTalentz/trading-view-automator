@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from "sonner";
+import { useMarketAnalysis } from '@/hooks/useMarketAnalysis';
 
 interface TradingViewWidgetProps {
   symbol?: string;
@@ -23,6 +24,7 @@ export function TradingViewWidget({
   const container = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const { language } = useLanguage();
+  const { analysis, countdown } = useMarketAnalysis(symbol, interval);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -42,107 +44,133 @@ export function TradingViewWidget({
     }
   }, [theme, symbol, interval, language]);
 
-  // Função para adicionar sinais de entrada precisos
+  // Função para adicionar sinais e análises ao gráfico
   useEffect(() => {
-    // Gera um sinal a cada 5 minutos
-    const signalTimer = setInterval(() => {
-      if (window.tvWidget && window.tvWidget._ready) {
-        try {
-          const now = new Date();
-          // Calcula o tempo exato para a próxima vela de 1 minuto
-          const secondsToNextMinute = 60 - now.getSeconds();
-          const entryTime = now.getTime() + (secondsToNextMinute * 1000);
-          
-          // Estratégias mais elaboradas para a geração de sinais
-          const strategies = [
-            "Moving Average Crossover",
-            "RSI Divergence",
-            "Support & Resistance Breakout",
-            "Pivot Point Bounce",
-            "Ichimoku Cloud Breakout"
-          ];
-          
-          // Seleciona uma estratégia baseada no símbolo atual
-          const strategyIdx = Math.floor(Math.random() * strategies.length);
-          const strategy = strategies[strategyIdx];
-          
-          // Confiança alta e estável
-          // Baseada na estratégia selecionada
-          const baseConfidence = 80; // Base alta
-          const maxVariation = 15; // Variação limitada
-          const confidence = baseConfidence + Math.floor(Math.random() * maxVariation);
-          
-          // Determina a direção com base em "análise técnica simulada"
-          const direction = Math.random() > 0.5 ? 'CALL' : 'PUT';
-          
-          // Em um ambiente real, a direção seria calculada com base em indicadores
-          const signalText = direction === 'CALL' 
-            ? `▲ ${language === 'pt-br' ? 'COMPRA' : 'BUY'} (${confidence}%)` 
-            : `▼ ${language === 'pt-br' ? 'VENDA' : 'SELL'} (${confidence}%)`;
-          
-          // Descrição da estratégia
-          const strategyText = strategy + (language === 'pt-br' ? ' - Entrada Precisa' : ' - Precise Entry');
-          
-          // Adiciona uma marca precisa no momento exato para entrada
-          // Em vez de em um momento aleatório
-          window.tvWidget.activeChart().createMultipointShape(
-            [
-              { time: window.tvWidget.activeChart().getVisibleRange().to - 5, price: 0 },
-              // Ponto de linha horizontal
-              { time: window.tvWidget.activeChart().getVisibleRange().to + 10, price: 0 }
-            ],
-            { 
-              shape: "trend_line",
-              text: signalText + "\n" + strategyText,
-              textcolor: direction === 'CALL' ? "#22c55e" : "#ef4444",
-              linewidth: 2,
-              linecolor: direction === 'CALL' ? "#22c55e" : "#ef4444",
-              linestyle: 2, // Linha tracejada para melhor visibilidade
-              overrides: { 
-                fontsize: 14,
-                bold: true
-              }
-            }
-          );
-          
-          // Adiciona também um marcador no ponto exato de entrada
-          // para maior precisão visual
+    // Quando temos uma análise e o widget está pronto
+    if (analysis && window.tvWidget && window.tvWidget._ready) {
+      try {
+        // Limpa desenhos anteriores
+        window.tvWidget.activeChart().clearAllDrawingTools();
+        
+        // Determina cores com base na direção
+        const signalColor = analysis.direction === 'CALL' ? "#22c55e" : "#ef4444";
+        
+        // Adiciona linha de suporte e resistência
+        if (analysis.supportResistance) {
+          // Linha de suporte
           window.tvWidget.activeChart().createShape(
+            { price: analysis.supportResistance.support },
             { 
-              time: window.tvWidget.activeChart().getVisibleRange().to + 1,
-              price: 0, 
-              channel: direction === 'CALL' ? "low" : "high"  
-            },
-            { 
-              shape: direction === 'CALL' ? "arrow_up" : "arrow_down",
-              text: language === 'pt-br' ? "ENTRADA AGORA" : "ENTRY NOW",
+              shape: "horizontal_line", 
+              lock: true,
+              disableSelection: true,
               overrides: { 
-                color: direction === 'CALL' ? "#22c55e" : "#ef4444",
-                fontsize: 12,
-                bold: true
+                linecolor: "#22c55e",
+                linestyle: 2, // linha tracejada
+                linewidth: 1,
+                showPriceLabel: true,
+                text: language === 'pt-br' ? "Suporte" : "Support"
               }
             }
           );
           
-          // Notificação para o usuário sobre o sinal gerado
-          toast.info(
-            language === 'pt-br' 
-              ? `Sinal ${direction} gerado para ${symbol}` 
-              : `${direction} signal generated for ${symbol}`,
-            {
-              description: `${strategy} - ${confidence}% - ${language === 'pt-br' ? 'Entrada em' : 'Entry in'} ${secondsToNextMinute}s`,
-              duration: 7000,
+          // Linha de resistência
+          window.tvWidget.activeChart().createShape(
+            { price: analysis.supportResistance.resistance },
+            { 
+              shape: "horizontal_line", 
+              lock: true,
+              disableSelection: true,
+              overrides: { 
+                linecolor: "#ef4444",
+                linestyle: 2, // linha tracejada
+                linewidth: 1,
+                showPriceLabel: true,
+                text: language === 'pt-br' ? "Resistência" : "Resistance"
+              }
             }
           );
-          
-        } catch (e) {
-          console.error("Erro ao criar sinal no gráfico:", e);
         }
+        
+        // Adiciona um indicador de direção preciso
+        const signalText = analysis.direction === 'CALL' 
+            ? `▲ ${language === 'pt-br' ? 'COMPRA' : 'BUY'} (${analysis.confidence}%)` 
+            : `▼ ${language === 'pt-br' ? 'VENDA' : 'SELL'} (${analysis.confidence}%)`;
+          
+        // Descrição da estratégia
+        const strategyText = analysis.strategy + (language === 'pt-br' ? ' - Entrada Precisa' : ' - Precise Entry');
+        
+        // Calcula o timestamp para a entrada
+        const currentTime = window.tvWidget.activeChart().getVisibleRange().to - 5;
+        const entryTime = currentTime + 10; // Tempo aproximado para entrada
+        
+        // Adiciona marca para o ponto de entrada
+        window.tvWidget.activeChart().createMultipointShape(
+          [
+            { time: currentTime, price: 0 },
+            { time: entryTime + 20, price: 0 }
+          ],
+          { 
+            shape: "trend_line",
+            text: signalText + "\n" + strategyText,
+            textcolor: signalColor,
+            linewidth: 2,
+            linecolor: signalColor,
+            linestyle: 2, // Linha tracejada para melhor visibilidade
+            overrides: { 
+              fontsize: 14,
+              bold: true
+            }
+          }
+        );
+          
+        // Adiciona também um marcador no ponto exato de entrada
+        window.tvWidget.activeChart().createShape(
+          { 
+            time: entryTime,
+            price: 0, 
+            channel: analysis.direction === 'CALL' ? "low" : "high"  
+          },
+          { 
+            shape: analysis.direction === 'CALL' ? "arrow_up" : "arrow_down",
+            text: language === 'pt-br' ? "ENTRADA AGORA" : "ENTRY NOW",
+            overrides: { 
+              color: signalColor,
+              fontsize: 12,
+              bold: true
+            }
+          }
+        );
+        
+        // Adiciona anotação com detalhes da análise técnica
+        const technicalText = `${analysis.strategy}\n${
+          language === 'pt-br' ? 'Confiança' : 'Confidence'
+        }: ${analysis.confidence}%\n${
+          language === 'pt-br' ? 'Força da Tendência' : 'Trend Strength'
+        }: ${analysis.trendStrength}%`;
+        
+        window.tvWidget.activeChart().createShape(
+          { 
+            time: currentTime - 10,
+            price: 0, 
+            channel: "high"  
+          },
+          { 
+            shape: "text",
+            text: technicalText,
+            overrides: { 
+              color: theme === "dark" ? "#ffffff" : "#000000",
+              fontsize: 12,
+              bold: false
+            }
+          }
+        );
+          
+      } catch (e) {
+        console.error("Erro ao criar sinal no gráfico:", e);
       }
-    }, 5 * 60 * 1000); // A cada 5 minutos
-    
-    return () => clearInterval(signalTimer);
-  }, [language, symbol]);
+    }
+  }, [analysis, language, theme]);
 
   const initWidget = () => {
     if (container.current && window.TradingView) {

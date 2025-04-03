@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TradingViewWidget } from "@/components/TradingViewWidget";
@@ -101,7 +100,7 @@ const IndexContent = () => {
           </div>
           
           <div className="space-y-6">
-            <SignalIndicator symbol={symbol} />
+            <SignalIndicator symbol={symbol} interval={interval} />
             <WebhookSetup />
           </div>
         </div>
