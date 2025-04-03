@@ -29,16 +29,16 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
     container_id: container,
     hide_side_toolbar: false,
     studies: [
-      // Indicadores mais avançados para melhor análise
-      "MASimple@tv-basicstudies", // Média móvel simples
-      "MAExp@tv-basicstudies",    // Média móvel exponencial
-      "RSI@tv-basicstudies",      // Índice de Força Relativa
-      "MACD@tv-basicstudies",     // MACD para tendências
-      "AwesomeOscillator@tv-basicstudies", // Awesome Oscillator para força de tendência
-      "PivotPointsStandard@tv-basicstudies", // Pontos de suporte e resistência
-      "IchimokuCloud@tv-basicstudies", // Nuvem de Ichimoku
-      "BB@tv-basicstudies",       // Bandas de Bollinger
-      "VolumeProfile@tv-basicstudies" // Perfil de Volume
+      // Advanced indicators for better analysis
+      "MASimple@tv-basicstudies", // Simple Moving Average
+      "MAExp@tv-basicstudies",    // Exponential Moving Average
+      "RSI@tv-basicstudies",      // Relative Strength Index
+      "MACD@tv-basicstudies",     // MACD for trends
+      "AwesomeOscillator@tv-basicstudies", // Awesome Oscillator for trend strength
+      "PivotPointsStandard@tv-basicstudies", // Support and resistance points
+      "IchimokuCloud@tv-basicstudies", // Ichimoku Cloud
+      "BB@tv-basicstudies",       // Bollinger Bands
+      "VolumeProfile@tv-basicstudies" // Volume Profile
     ],
     drawings_access: { 
       type: 'rectangle',
@@ -51,13 +51,13 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       }
     },
     saved_data: {
-      // Configuração salva para destacar tendências e pontos de entrada/saída
+      // Saved configuration to highlight trends and entry/exit points
       fibonacci_retracement: {
         levels: [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]
       }
     },
     overrides: {
-      // Customizações para destacar melhor os sinais e tendências
+      // Customizations to better highlight signals and trends
       "mainSeriesProperties.candleStyle.upColor": "#22c55e",
       "mainSeriesProperties.candleStyle.downColor": "#ef4444",
       "mainSeriesProperties.candleStyle.wickUpColor": "#22c55e",
@@ -69,5 +69,12 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       "paneProperties.vertGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
       "paneProperties.horzGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
     }
+  });
+  
+  // Add the chart method to the tvWidget for use in SignalDrawing
+  window.tvWidget.onChartReady(function() {
+    window.tvWidget.chart = function() {
+      return window.tvWidget.activeChart();
+    };
   });
 }

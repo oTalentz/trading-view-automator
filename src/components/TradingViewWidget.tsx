@@ -10,7 +10,12 @@ import { useLanguage } from '@/context/LanguageContext';
 declare global {
   interface Window {
     TradingView: any;
-    tvWidget: any;
+    tvWidget: any & {
+      chart?: () => any;
+      activeChart?: () => any;
+      _ready?: boolean;
+      onChartReady?: (callback: () => void) => void;
+    };
   }
 }
 
