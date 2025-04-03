@@ -6,6 +6,8 @@ import { findSupportResistanceLevels, generateSimulatedMarketData } from '@/util
 export const calculateExpiryMinutes = (interval: string): number => {
   switch(interval) {
     case '1': return 1; 
+    case '2': return 2;
+    case '3': return 3;
     case '5': return 5;
     case '15': return 15;
     case '30': return 30;
