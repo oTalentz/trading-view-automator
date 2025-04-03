@@ -1,11 +1,29 @@
 
 // Determine best entry time based on price action and volatility
-export const calculateOptimalEntryTiming = (): number => {
-  // In a real system, this would analyze recent price action and volatility
-  // For this implementation, we'll aim for a precise entry time at the start of a new minute
+export const calculateOptimalEntryTiming = (
+  prices: number[] = [],
+  volatility: number = 0,
+  marketCondition: string = '',
+  idealTimingSeconds: number = 45
+): number => {
+  // Primeiro obtemos o tempo até o próximo minuto exato
   const now = new Date();
-  const secondsToNextMinute = 60 - now.getSeconds();
+  let secondsToNextMinute = 60 - now.getSeconds();
   
-  // Add a small buffer to ensure we're at the very start of the new minute
-  return secondsToNextMinute <= 3 ? secondsToNextMinute + 60 : secondsToNextMinute;
+  // Se temos dados de preços e foi calculado um timing ideal, o usamos
+  if (prices.length > 0 && idealTimingSeconds > 0) {
+    // Ajusta o tempo com base no timing ideal calculado
+    if (idealTimingSeconds < 30) {
+      // Para entradas de alta precisão, usamos um timing mais próximo
+      secondsToNextMinute = Math.min(idealTimingSeconds, secondsToNextMinute);
+    } else if (secondsToNextMinute > 45) {
+      // Se falta muito para o próximo minuto e o timing não é crítico
+      // podemos entrar antes do próximo minuto exato
+      secondsToNextMinute = Math.min(idealTimingSeconds, secondsToNextMinute);
+    }
+  }
+  
+  // Impede tempos muito curtos, sempre garantindo pelo menos 5 segundos
+  // para o trader se preparar para a entrada
+  return secondsToNextMinute <= 5 ? secondsToNextMinute + 5 : secondsToNextMinute;
 };
