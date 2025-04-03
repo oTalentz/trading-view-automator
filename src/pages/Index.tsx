@@ -5,7 +5,9 @@ import { TradingViewWidget } from "@/components/TradingViewWidget";
 import { WebhookSetup } from "@/components/WebhookSetup";
 import { StrategyGuide } from "@/components/StrategyGuide";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/context/LanguageContext";
 
 const symbols = [
   { value: "BINANCE:BTCUSDT", label: "Bitcoin (BTCUSDT)" },
@@ -27,75 +29,84 @@ const timeframes = [
   { value: "W", label: "1 Week" },
 ];
 
-const Index = () => {
+const IndexContent = () => {
   const [symbol, setSymbol] = useState("BINANCE:BTCUSDT");
   const [interval, setInterval] = useState("D");
+  const { t } = useLanguage();
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
+      <main className="flex-1 container py-6">
+        <h1 className="text-2xl font-bold mb-6">{t("tradingViewAutomator")}</h1>
         
-        <main className="flex-1 container py-6">
-          <h1 className="text-2xl font-bold mb-6">TradingView Automator</h1>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="flex flex-wrap gap-3 mb-4">
-                <div className="w-full sm:w-auto flex-1">
-                  <Select
-                    value={symbol}
-                    onValueChange={setSymbol}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select symbol" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {symbols.map((sym) => (
-                        <SelectItem key={sym.value} value={sym.value}>
-                          {sym.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="w-full sm:w-[180px]">
-                  <Select
-                    value={interval}
-                    onValueChange={setInterval}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select timeframe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timeframes.map((tf) => (
-                        <SelectItem key={tf.value} value={tf.value}>
-                          {tf.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex flex-wrap gap-3 mb-4">
+              <div className="w-full sm:w-auto flex-1">
+                <Select
+                  value={symbol}
+                  onValueChange={setSymbol}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectSymbol")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {symbols.map((sym) => (
+                      <SelectItem key={sym.value} value={sym.value}>
+                        {sym.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
-              <TradingViewWidget symbol={symbol} interval={interval} />
+              <div className="w-full sm:w-[180px]">
+                <Select
+                  value={interval}
+                  onValueChange={setInterval}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectTimeframe")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeframes.map((tf) => (
+                      <SelectItem key={tf.value} value={tf.value}>
+                        {tf.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            <div>
-              <WebhookSetup />
-            </div>
+            <TradingViewWidget symbol={symbol} interval={interval} />
           </div>
           
-          <StrategyGuide />
-        </main>
-        
-        <footer className="border-t py-6">
-          <div className="container text-center text-sm text-muted-foreground">
-            <p>TradingView Automator - Trading made simple</p>
+          <div>
+            <WebhookSetup />
           </div>
-        </footer>
-      </div>
+        </div>
+        
+        <StrategyGuide />
+      </main>
+      
+      <footer className="border-t py-6">
+        <div className="container text-center text-sm text-muted-foreground">
+          <p>{t("tradingViewAutomator")} - {t("tradingMadeSimple")}</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <ThemeProvider>
+      <LanguageProvider>
+        <IndexContent />
+      </LanguageProvider>
     </ThemeProvider>
   );
 };
