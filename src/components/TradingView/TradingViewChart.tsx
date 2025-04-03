@@ -53,11 +53,12 @@ export function TradingViewChart({ symbol, interval, onChartReady }: TradingView
   };
 
   return (
-    <div className="w-full h-full min-h-[500px] rounded-lg overflow-hidden border">
+    <div className="w-full h-full min-h-[800px] rounded-lg overflow-hidden border">
       <div
         id="tradingview-widget-container"
         ref={container}
-        className="tradingview-widget-container"
+        className="tradingview-widget-container w-full h-full"
+        style={{ height: '800px' }}
       />
     </div>
   );

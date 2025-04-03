@@ -89,8 +89,8 @@ const IndexContent = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-6">
+          <div className="xl:col-span-3 space-y-4">
             <div className="flex flex-wrap gap-3 mb-4">
               <div className="w-full sm:w-auto flex-1">
                 <Select

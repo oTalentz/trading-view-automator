@@ -48,8 +48,8 @@ export function TradingViewWidget({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg overflow-hidden border bg-card">
+    <div className="space-y-6">
+      <div className="rounded-lg overflow-hidden border bg-card h-[800px]">
         <TradingViewChart 
           symbol={symbol} 
           interval={interval} 
@@ -65,7 +65,7 @@ export function TradingViewWidget({
       </div>
       
       {analysis && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <ConfluenceHeatmap analysis={analysis} />
           <VolumeAnalysis symbol={symbol} />
           <MachineLearningInsights symbol={symbol} interval={interval} />

@@ -30,6 +30,8 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
     allow_symbol_change: true,
     container_id: container,
     hide_side_toolbar: false,
+    height: "800",
+    fullscreen: false,
     studies: [
       // Advanced indicators for better analysis
       "MASimple@tv-basicstudies", // Simple Moving Average
