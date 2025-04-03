@@ -19,7 +19,8 @@ export const calculateExpiryMinutes = (interval: string): number => {
 
 export const analyzeAllTimeframes = (
   symbol: string, 
-  interval: string
+  interval: string,
+  realtimeUpdate: boolean = false
 ): MultiTimeframeAnalysisResult => {
   // Analisa cada timeframe
   const timeframeAnalyses = CONFLUENCE_TIMEFRAMES.map(tf => 
@@ -62,6 +63,20 @@ export const analyzeAllTimeframes = (
   // Calcula o índice de confluência (0-100)
   let overallConfluence = Math.abs(callVotes - putVotes) / totalConfidence * 100;
   overallConfluence = Math.min(Math.round(overallConfluence), 100);
+  
+  // Se for apenas uma atualização em tempo real, não gera um novo sinal principal
+  if (realtimeUpdate) {
+    // Não precisamos calcular a contagem regressiva, entradas, etc.
+    return {
+      primarySignal: selectedAnalysis.direction === 'CALL' 
+        ? generateSignalDetails(symbol, 'CALL', interval, overallConfluence, selectedAnalysis, timeframeAnalyses)
+        : generateSignalDetails(symbol, 'PUT', interval, overallConfluence, selectedAnalysis, timeframeAnalyses),
+      timeframes: timeframeAnalyses,
+      overallConfluence,
+      confluenceDirection,
+      countdown: 0 // Não altera o contador
+    };
+  }
   
   // Gera o sinal principal para o timeframe selecionado
   const { prices, volume } = generateSimulatedMarketData(symbol, 100);
@@ -120,5 +135,66 @@ export const analyzeAllTimeframes = (
     overallConfluence,
     confluenceDirection,
     countdown: secondsToNextMinute
+  };
+};
+
+// Função de utilidade para gerar detalhes de sinal consistentemente
+const generateSignalDetails = (
+  symbol: string,
+  direction: 'CALL' | 'PUT',
+  interval: string,
+  overallConfluence: number,
+  selectedAnalysis: TimeframeAnalysis,
+  timeframeAnalyses: TimeframeAnalysis[]
+) => {
+  const { prices } = generateSimulatedMarketData(symbol, 100);
+  const supportResistance = findSupportResistanceLevels(prices);
+  const now = new Date();
+  
+  // Ajusta a confiança baseada na confluência geral
+  let adjustedConfidence = selectedAnalysis.confidence;
+  if (selectedAnalysis.direction === direction) {
+    adjustedConfidence = Math.min(adjustedConfidence + (overallConfluence / 10), 98);
+  } else {
+    adjustedConfidence = Math.max(adjustedConfidence - (overallConfluence / 5), 65);
+  }
+  
+  // Calcula tempo ótimo de entrada (próximo minuto exato)
+  const secondsToNextMinute = 60 - now.getSeconds();
+  const entryTimeMillis = now.getTime() + (secondsToNextMinute * 1000);
+  const entryTime = new Date(entryTimeMillis);
+  
+  // A expiração depende do intervalo selecionado
+  const expiryMinutes = calculateExpiryMinutes(interval);
+  
+  // Tempo de expiração exato
+  const expiryTimeMillis = entryTimeMillis + (expiryMinutes * 60 * 1000);
+  const expiryTime = new Date(expiryTimeMillis);
+  
+  return {
+    direction,
+    confidence: Math.round(adjustedConfidence),
+    timestamp: now.toISOString(),
+    entryTime: entryTime.toISOString(),
+    expiryTime: expiryTime.toISOString(),
+    strategy: "Multi-Timeframe Confluence",
+    indicators: [
+      "RSI", "MACD", "Bollinger Bands", 
+      "Multi-Timeframe Confluence", "Trend Analysis"
+    ],
+    trendStrength: selectedAnalysis.strength,
+    marketCondition: selectedAnalysis.marketCondition,
+    supportResistance: {
+      support: Math.round(supportResistance.support * 100) / 100,
+      resistance: Math.round(supportResistance.resistance * 100) / 100
+    },
+    technicalScores: {
+      rsi: Math.round(70 + Math.random() * 15),
+      macd: Math.round(65 + Math.random() * 20),
+      bollingerBands: Math.round(60 + Math.random() * 25),
+      volumeTrend: Math.round(55 + Math.random() * 30),
+      priceAction: Math.round(75 + Math.random() * 15),
+      overallScore: Math.round(adjustedConfidence)
+    }
   };
 };

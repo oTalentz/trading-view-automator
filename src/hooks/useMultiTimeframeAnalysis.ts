@@ -6,6 +6,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { analyzeAllTimeframes } from '@/utils/confluenceCalculator';
 import { playAlertSound } from '@/utils/audioUtils';
 import { saveSignalToHistory } from '@/utils/signalHistoryUtils';
+import { sendNotification } from '@/utils/pushNotificationUtils';
+import { getNotificationSettings } from '@/utils/pushNotificationUtils';
 
 // Fix: Change re-exports to use 'export type' syntax
 export type { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
@@ -40,6 +42,18 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
     // Play sound alert for new signal
     playAlertSound(result.primarySignal.direction.toLowerCase() as 'call' | 'put');
     
+    // Envia notificação do navegador se habilitado
+    const notifSettings = getNotificationSettings();
+    if (notifSettings.enabled) {
+      sendNotification(
+        result.primarySignal.direction === 'CALL' ? 'Sinal de COMPRA' : 'Sinal de VENDA',
+        {
+          body: `${symbol} - Confiança: ${result.primarySignal.confidence}% - Entrada em: ${result.countdown}s`,
+          icon: '/favicon.ico',
+        }
+      );
+    }
+    
     // Save signal to history
     saveSignalToHistory({
       symbol: symbol,
@@ -50,6 +64,26 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
       expiryTime: result.primarySignal.expiryTime,
       timeframe: interval
     });
+  };
+  
+  // Realiza pequenas atualizações do sinal a cada 1 segundo para maior precisão
+  const updateAnalysisInRealtime = () => {
+    if (!analysis) return;
+    
+    // Atualiza somente a confluência sem alterar o sinal principal
+    const updatedResult = analyzeAllTimeframes(symbol, interval, true);
+    if (updatedResult) {
+      setAnalysis(prevAnalysis => {
+        if (!prevAnalysis) return updatedResult;
+        
+        return {
+          ...prevAnalysis,
+          overallConfluence: updatedResult.overallConfluence,
+          confluenceDirection: updatedResult.confluenceDirection,
+          timeframes: updatedResult.timeframes,
+        };
+      });
+    }
   };
   
   // Inicia o contador regressivo e atualiza a cada segundo
@@ -72,12 +106,28 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
             
             // Play entry sound alert
             playAlertSound('entry');
+            
+            // Envia notificação de entrada se habilitado
+            const notifSettings = getNotificationSettings();
+            if (notifSettings.enabled) {
+              sendNotification(
+                'Momento de Entrada!',
+                {
+                  body: `${symbol} - ${analysis.primarySignal.direction === 'CALL' ? 'COMPRA' : 'VENDA'} AGORA!`,
+                  icon: '/favicon.ico',
+                }
+              );
+            }
           }
           
           return 0;
         }
         return prev - 1;
       });
+      
+      // Atualiza análise em tempo real a cada segundo
+      updateAnalysisInRealtime();
+      
     }, 1000);
     
     return () => clearInterval(timer);

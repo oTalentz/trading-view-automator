@@ -1,8 +1,8 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { UserProfile as UserProfileType, defaultUserProfile, SoundSettings } from '@/types/userProfile';
-import { getSoundSettings, saveSoundSettings } from '@/utils/audioUtils';
+import { getSoundSettings, saveSoundSettings, initAudio, playAlertSound } from '@/utils/audioUtils';
+import { getNotificationSettings, saveNotificationSettings, requestNotificationPermission } from '@/utils/pushNotificationUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Bell, Volume2, VolumeX } from 'lucide-react';
+import { User, Bell, Volume2, VolumeX, MessageSquare } from 'lucide-react';
 
 export function UserProfile() {
   const { t } = useLanguage();
@@ -25,6 +25,20 @@ export function UserProfile() {
   });
   
   const [soundSettings, setSoundSettings] = useState<SoundSettings>(getSoundSettings());
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  
+  useEffect(() => {
+    const checkNotificationPermission = async () => {
+      if ('Notification' in window) {
+        setNotificationEnabled(Notification.permission === 'granted');
+      }
+    };
+    
+    checkNotificationPermission();
+    
+    const settings = getNotificationSettings();
+    setNotificationEnabled(settings.enabled);
+  }, []);
   
   const handleSaveProfile = () => {
     localStorage.setItem('trading-automator-user-profile', JSON.stringify({
@@ -33,7 +47,27 @@ export function UserProfile() {
       lastActive: new Date().toISOString()
     }));
     saveSoundSettings(soundSettings);
+    saveNotificationSettings({ enabled: notificationEnabled });
     toast.success(t("profileSaved"));
+  };
+  
+  const handleRequestNotificationPermission = async () => {
+    const granted = await requestNotificationPermission();
+    setNotificationEnabled(granted);
+    
+    if (granted) {
+      toast.success("Permissão de notificação concedida");
+      saveNotificationSettings({ enabled: true });
+    } else {
+      toast.error("Permissão de notificação negada");
+      saveNotificationSettings({ enabled: false });
+    }
+  };
+  
+  const handleTestSound = () => {
+    initAudio();
+    playAlertSound('notification');
+    toast.info("Teste de som executado");
   };
   
   return (
@@ -143,6 +177,46 @@ export function UserProfile() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />
+            <CardTitle>Notificações</CardTitle>
+          </div>
+          <CardDescription>Configurar as notificações do navegador</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="browser-notifications">Notificações do navegador</Label>
+                <p className="text-sm text-muted-foreground">
+                  Receba alertas mesmo quando o navegador estiver em segundo plano
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleRequestNotificationPermission}
+                >
+                  {notificationEnabled ? "Habilitado" : "Solicitar permissão"}
+                </Button>
+                <Switch 
+                  id="browser-notifications" 
+                  checked={notificationEnabled}
+                  disabled={Notification.permission !== 'granted'}
+                  onCheckedChange={(checked) => {
+                    setNotificationEnabled(checked);
+                    saveNotificationSettings({ enabled: checked });
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
             <CardTitle>{t("notificationSettings")}</CardTitle>
           </div>
@@ -238,7 +312,7 @@ export function UserProfile() {
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="sound-enabled">{t("enableSounds")}</Label>
+              <Label htmlFor="sound-enabled">Habilitar sons</Label>
               <Switch 
                 id="sound-enabled" 
                 checked={soundSettings.enabled}
@@ -253,7 +327,7 @@ export function UserProfile() {
               <>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <Label htmlFor="volume-slider">{t("volume")}</Label>
+                    <Label htmlFor="volume-slider">Volume</Label>
                     <span className="text-sm">{Math.round(soundSettings.volume * 100)}%</span>
                   </div>
                   <Slider
@@ -266,10 +340,19 @@ export function UserProfile() {
                       volume: value[0] / 100
                     })}
                   />
+                  <div className="flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleTestSound}
+                    >
+                      Testar som
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="signal-sounds">{t("signalSounds")}</Label>
+                  <Label htmlFor="signal-sounds">Sons de sinais</Label>
                   <Switch 
                     id="signal-sounds" 
                     checked={soundSettings.signalAlerts}
@@ -281,7 +364,7 @@ export function UserProfile() {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="entry-sounds">{t("entrySounds")}</Label>
+                  <Label htmlFor="entry-sounds">Sons de entrada</Label>
                   <Switch 
                     id="entry-sounds" 
                     checked={soundSettings.entryAlerts}
@@ -293,7 +376,7 @@ export function UserProfile() {
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="notification-sounds">{t("notificationSounds")}</Label>
+                  <Label htmlFor="notification-sounds">Sons de notificação</Label>
                   <Switch 
                     id="notification-sounds" 
                     checked={soundSettings.notificationAlerts}
