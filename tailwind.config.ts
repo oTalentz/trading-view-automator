@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        trading: {
+          blue: '#0EA5E9',
+          green: '#10B981',
+          red: '#EF4444',
+          yellow: '#F59E0B',
+          dark: '#0A1929',
+          light: '#F8FAFC'
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +93,26 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'pulse-glow': {
+          '0%, 100%': { 
+            boxShadow: '0 0 0 0 rgba(14, 165, 233, 0.4)',
+            opacity: 0.8
+          },
+          '50%': { 
+            boxShadow: '0 0 0 8px rgba(14, 165, 233, 0)',
+            opacity: 1
+          }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+			},
+      fontFamily: {
+        mono: ['JetBrains Mono', 'monospace']
+      }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
