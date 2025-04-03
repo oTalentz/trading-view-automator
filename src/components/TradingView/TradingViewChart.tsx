@@ -40,7 +40,7 @@ export function TradingViewChart({ symbol, interval, onChartReady }: TradingView
       // Clear the container before initializing a new widget
       container.current.innerHTML = '';
       
-      // Initialize the TradingView widget
+      // Initialize the TradingView widget with the correct configuration
       initTradingViewWidget({
         symbol,
         interval,

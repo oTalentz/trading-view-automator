@@ -16,6 +16,7 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
 
   const { symbol, interval, theme, language, container, onChartReady } = config;
   
+  // Create the TradingView widget with all configuration in one place
   window.tvWidget = new window.TradingView.widget({
     autosize: true,
     symbol: symbol,
