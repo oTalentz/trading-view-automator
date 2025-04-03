@@ -1,5 +1,6 @@
+import { useTheme } from '@/context/ThemeContext';
 
-import { Theme } from '@/context/ThemeContext';
+type Theme = "dark" | "light";
 
 export interface TradingViewConfig {
   symbol: string;

@@ -1,16 +1,17 @@
-
 import { useState, useEffect } from 'react';
 import { MultiTimeframeAnalysisResult, TimeframeAnalysis } from '@/types/timeframeAnalysis';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
 import { analyzeAllTimeframes } from '@/utils/confluenceCalculator';
 
+// Fix: Change re-exports to use 'export type' syntax
 export type { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
 
 export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1') {
   const [analysis, setAnalysis] = useState<MultiTimeframeAnalysisResult | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
   const { t } = useLanguage();
+  
   
   const generateAnalysis = () => {
     // Gera nova análise
