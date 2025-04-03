@@ -1,4 +1,3 @@
-
 // Utility functions for advanced technical analysis
 
 // Enum for market conditions
@@ -119,6 +118,14 @@ export const calculateMACD = (
     histogram: macdLine - signalLine
   };
 };
+
+// Interface for MACD data including previousHistogram for comparison
+export interface MACDData {
+  macdLine: number;
+  signalLine: number;
+  histogram: number;
+  previousHistogram?: number;
+}
 
 // Bollinger Bands
 export const calculateBollingerBands = (prices: number[], period: number = 20, multiplier: number = 2) => {

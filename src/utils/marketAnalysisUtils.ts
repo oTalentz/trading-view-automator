@@ -1,4 +1,3 @@
-
 import { 
   MarketCondition, 
   calculateRSI, 
@@ -144,9 +143,9 @@ export const determineSignalDirection = (
   }
   
   // MACD analysis
-  if (macdData.histogram > 0 && macdData.histogram > macdData.previousHistogram) {
+  if (macdData.histogram > 0 && macdData.previousHistogram && macdData.histogram > macdData.previousHistogram) {
     bullishFactors += 1; // Increasing positive histogram
-  } else if (macdData.histogram < 0 && macdData.histogram < macdData.previousHistogram) {
+  } else if (macdData.histogram < 0 && macdData.previousHistogram && macdData.histogram < macdData.previousHistogram) {
     bearishFactors += 1; // Decreasing negative histogram
   }
   
@@ -248,8 +247,14 @@ export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisR
   const { value: trendStrengthValue } = calculateTrendStrength(prices, volume);
   const supportResistance = findSupportResistanceLevels(prices);
   const rsiValue = calculateRSI(prices);
+  
+  // Calculate MACD for current and previous data points
   const macdData = calculateMACD(prices);
-  macdData.previousHistogram = calculateMACD(prices.slice(0, -1)).histogram;
+  // Calculate the previous histogram by using prices without the last element
+  const previousMacdData = calculateMACD(prices.slice(0, -1));
+  // Add the previous histogram to the current MACD data
+  macdData.previousHistogram = previousMacdData.histogram;
+  
   const bbands = calculateBollingerBands(prices);
   const volatility = calculateVolatility(prices);
   
