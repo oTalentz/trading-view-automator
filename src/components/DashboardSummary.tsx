@@ -155,15 +155,28 @@ export function DashboardSummary() {
                     outerRadius={90}
                     paddingAngle={2}
                     dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
+                    labelLine={true}
+                    label={({ name, percent }) => {
+                      // Only show label if percent is significant (>5%)
+                      return percent > 0.05 ? `${name}: ${(percent * 100).toFixed(0)}%` : '';
+                    }}
                   >
                     {resultData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend />
+                  <Legend 
+                    layout="horizontal" 
+                    verticalAlign="bottom" 
+                    align="center" 
+                    wrapperStyle={{ paddingTop: '20px' }}
+                  />
+                  <Tooltip 
+                    formatter={(value, name) => [
+                      `${value} ${t("signals")}`, 
+                      name
+                    ]}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -178,7 +191,7 @@ export function DashboardSummary() {
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={timeframeData}>
+                <BarChart data={timeframeData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <XAxis dataKey="timeframe" />
                   <YAxis />
                   <Tooltip labelFormatter={(value) => `${value} ${t("minute")}`} />
