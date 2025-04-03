@@ -100,6 +100,26 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
             }
           }
         );
+        
+        // Determinando o tipo de marcador baseado na confluência e confiança
+        let symbolType = "flag"; // Marcador padrão
+        let symbolText = "";
+        
+        // Determinando os valores de corte para os diferentes níveis
+        const isHighConfluence = analysis.overallConfluence >= 85 && primarySignal.confidence >= 90;
+        const isMediumConfluence = analysis.overallConfluence >= 70 && primarySignal.confidence >= 75;
+        
+        // Selecionando o tipo de marcador e texto baseado na confluência
+        if (isHighConfluence) {
+          symbolType = "emoji";
+          symbolText = "💀"; // Caveira para alta confluência
+        } else if (isMediumConfluence) {
+          symbolType = "emoji";
+          symbolText = "❤️"; // Coração para média confluência
+        } else {
+          symbolType = primarySignal.direction === 'CALL' ? "arrow_up" : "arrow_down";
+          symbolText = language === 'pt-br' ? "ENTRADA" : "ENTRY";
+        }
           
         // Adiciona também um marcador no ponto exato de entrada
         chart.createShape(
@@ -109,15 +129,60 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
             channel: primarySignal.direction === 'CALL' ? "low" : "high"  
           },
           { 
-            shape: primarySignal.direction === 'CALL' ? "arrow_up" : "arrow_down",
-            text: language === 'pt-br' ? "ENTRADA AGORA" : "ENTRY NOW",
+            shape: symbolType,
+            text: symbolText,
             overrides: { 
               color: signalColor,
-              fontsize: 12,
-              bold: true
+              fontsize: 16,
+              bold: true,
+              size: isHighConfluence ? 3 : isMediumConfluence ? 2 : 1 // Tamanho variável para diferentes níveis
             }
           }
         );
+        
+        // Adiciona mais marcadores nas velas anteriores com diferentes níveis de confluência
+        for (let i = 1; i <= 5; i++) {
+          // Simulamos diferentes pontos de entrada com diferentes níveis de confluência
+          const pastTime = currentTime - (i * 10);
+          
+          // Gerando valores simulados de confluência para pontos históricos
+          const historicalConfluence = Math.round(70 + Math.random() * 30);
+          const historicalConfidence = Math.round(70 + Math.random() * 30);
+          const isHistoricalHigh = historicalConfluence > 85 && historicalConfidence > 90;
+          const isHistoricalMedium = historicalConfluence > 70 && historicalConfidence > 75;
+          
+          let historicalSymbol = "flag";
+          let historicalText = "";
+          
+          if (isHistoricalHigh) {
+            historicalSymbol = "emoji";
+            historicalText = "💀";
+          } else if (isHistoricalMedium) {
+            historicalSymbol = "emoji";
+            historicalText = "❤️";
+          } else {
+            continue; // Pula pontos de baixa confluência
+          }
+          
+          // Adiciona marcador histórico
+          chart.createShape(
+            { 
+              time: pastTime,
+              price: 0, 
+              channel: i % 2 === 0 ? "high" : "low"  
+            },
+            { 
+              shape: historicalSymbol,
+              text: historicalText,
+              overrides: { 
+                color: i % 2 === 0 ? "#22c55e" : "#ef4444",
+                fontsize: 14,
+                bold: true,
+                size: isHistoricalHigh ? 2 : 1
+              }
+            }
+          );
+        }
         
         // Adiciona anotação com detalhes da análise técnica e confluência
         const technicalText = `${primarySignal.strategy}\n${
@@ -141,6 +206,28 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
               color: theme === "dark" ? "#ffffff" : "#000000",
               fontsize: 12,
               bold: false
+            }
+          }
+        );
+        
+        // Adiciona legenda para os símbolos
+        const legendText = language === 'pt-br' 
+          ? "💀 = Confluência Máxima\n❤️ = Confluência Média\n▲▼ = Confluência Regular" 
+          : "💀 = Maximum Confluence\n❤️ = Medium Confluence\n▲▼ = Regular Confluence";
+        
+        chart.createShape(
+          { 
+            time: currentTime - 25,
+            price: 0, 
+            channel: "high"  
+          },
+          { 
+            shape: "text",
+            text: legendText,
+            overrides: { 
+              color: theme === "dark" ? "#ffffff" : "#000000",
+              fontsize: 12,
+              bold: true
             }
           }
         );
