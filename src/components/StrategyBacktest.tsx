@@ -35,14 +35,14 @@ export function StrategyBacktest() {
   // Further filter by strategy if needed
   const strategyFilteredSignals = selectedStrategy === 'all' 
     ? filteredSignals 
-    : filteredSignals.filter(s => (s as any).strategy === selectedStrategy);
+    : filteredSignals.filter(s => s.strategy === selectedStrategy);
   
   const handleRunBacktest = () => {
     runBacktest(strategyFilteredSignals);
   };
   
   // Extract unique strategies from signals
-  const strategies = ['all', ...Array.from(new Set(signals.map(s => (s as any).strategy || 'Unknown')))];
+  const strategies = ['all', ...Array.from(new Set(signals.map(s => s.strategy || 'Unknown')))];
   
   // Generate monthly performance data
   const getMonthlyPerformanceData = () => {

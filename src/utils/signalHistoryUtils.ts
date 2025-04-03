@@ -10,6 +10,7 @@ export interface SignalHistoryEntry {
   entryTime: string;
   expiryTime: string;
   timeframe: string;
+  strategy?: string;
   result?: 'WIN' | 'LOSS' | 'DRAW' | null;
   profit?: number;
 }

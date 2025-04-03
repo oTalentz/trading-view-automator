@@ -41,9 +41,9 @@ export function MachineLearningInsights({ symbol, interval }: MachineLearningIns
       ];
       
       const timeframes = [
-        { timeframe: '1m', prediction: Math.random() > 0.5 ? 'CALL' : 'PUT', confidence: 60 + Math.random() * 30 },
-        { timeframe: '5m', prediction: Math.random() > 0.5 ? 'CALL' : 'PUT', confidence: 60 + Math.random() * 30 },
-        { timeframe: '15m', prediction: Math.random() > 0.5 ? 'CALL' : 'PUT', confidence: 60 + Math.random() * 30 }
+        { timeframe: '1m', prediction: Math.random() > 0.5 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 30 },
+        { timeframe: '5m', prediction: Math.random() > 0.5 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 30 },
+        { timeframe: '15m', prediction: Math.random() > 0.5 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 30 }
       ];
       
       setMlPrediction({
