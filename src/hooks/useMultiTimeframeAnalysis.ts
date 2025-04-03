@@ -15,74 +15,92 @@ export type { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/ti
 export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1') {
   const [analysis, setAnalysis] = useState<MultiTimeframeAnalysisResult | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t } = useLanguage();
   
   const generateAnalysis = () => {
-    // Gera nova análise
-    const result = analyzeAllTimeframes(symbol, interval);
+    // Define loading state
+    setIsLoading(true);
     
-    setAnalysis(result);
-    setCountdown(result.countdown);
-    
-    // Notifica o usuário sobre o sinal com informação de confluência
-    const confidenceText = result.confluenceDirection === result.primarySignal.direction ? 
-      `${t("highConfluence")} (${result.overallConfluence}%)` : 
-      `${t("mixedSignals")}`;
+    try {
+      // Gera nova análise
+      const result = analyzeAllTimeframes(symbol, interval);
       
-    toast.success(
-      result.primarySignal.direction === 'CALL' 
-        ? t("signalCallGenerated") 
-        : t("signalPutGenerated"), 
-      {
-        description: `${t("confidence")}: ${result.primarySignal.confidence}% - ${confidenceText} - ${symbol} - ${t("entryIn")}: ${result.countdown}s`,
-        duration: 5000,
-      }
-    );
-    
-    // Play sound alert for new signal
-    playAlertSound(result.primarySignal.direction.toLowerCase() as 'call' | 'put');
-    
-    // Envia notificação do navegador se habilitado
-    const notifSettings = getNotificationSettings();
-    if (notifSettings.enabled) {
-      sendNotification(
-        result.primarySignal.direction === 'CALL' ? 'Sinal de COMPRA' : 'Sinal de VENDA',
+      setAnalysis(result);
+      setCountdown(result.countdown);
+      
+      // Notifica o usuário sobre o sinal com informação de confluência
+      const confidenceText = result.confluenceDirection === result.primarySignal.direction ? 
+        `${t("highConfluence")} (${result.overallConfluence}%)` : 
+        `${t("mixedSignals")}`;
+        
+      toast.success(
+        result.primarySignal.direction === 'CALL' 
+          ? t("signalCallGenerated") 
+          : t("signalPutGenerated"), 
         {
-          body: `${symbol} - Confiança: ${result.primarySignal.confidence}% - Entrada em: ${result.countdown}s`,
-          icon: '/favicon.ico',
+          description: `${t("confidence")}: ${result.primarySignal.confidence}% - ${confidenceText} - ${symbol} - ${t("entryIn")}: ${result.countdown}s`,
+          duration: 5000,
         }
       );
+      
+      // Play sound alert for new signal
+      playAlertSound(result.primarySignal.direction.toLowerCase() as 'call' | 'put');
+      
+      // Envia notificação do navegador se habilitado
+      const notifSettings = getNotificationSettings();
+      if (notifSettings.enabled) {
+        sendNotification(
+          result.primarySignal.direction === 'CALL' ? 'Sinal de COMPRA' : 'Sinal de VENDA',
+          {
+            body: `${symbol} - Confiança: ${result.primarySignal.confidence}% - Entrada em: ${result.countdown}s`,
+            icon: '/favicon.ico',
+          }
+        );
+      }
+      
+      // Save signal to history
+      saveSignalToHistory({
+        symbol: symbol,
+        direction: result.primarySignal.direction,
+        confidence: result.primarySignal.confidence,
+        timestamp: result.primarySignal.timestamp,
+        entryTime: result.primarySignal.entryTime,
+        expiryTime: result.primarySignal.expiryTime,
+        timeframe: interval,
+        strategy: result.primarySignal.strategy || 'Multi-Timeframe Confluence'
+      });
+    } catch (error) {
+      console.error('Error generating analysis:', error);
+      toast.error(t("analysisError"), {
+        description: t("tryAgainLater"),
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Save signal to history
-    saveSignalToHistory({
-      symbol: symbol,
-      direction: result.primarySignal.direction,
-      confidence: result.primarySignal.confidence,
-      timestamp: result.primarySignal.timestamp,
-      entryTime: result.primarySignal.entryTime,
-      expiryTime: result.primarySignal.expiryTime,
-      timeframe: interval
-    });
   };
   
   // Realiza pequenas atualizações do sinal a cada 1 segundo para maior precisão
   const updateAnalysisInRealtime = () => {
     if (!analysis) return;
     
-    // Atualiza somente a confluência sem alterar o sinal principal
-    const updatedResult = analyzeAllTimeframes(symbol, interval, true);
-    if (updatedResult) {
-      setAnalysis(prevAnalysis => {
-        if (!prevAnalysis) return updatedResult;
-        
-        return {
-          ...prevAnalysis,
-          overallConfluence: updatedResult.overallConfluence,
-          confluenceDirection: updatedResult.confluenceDirection,
-          timeframes: updatedResult.timeframes,
-        };
-      });
+    try {
+      // Atualiza somente a confluência sem alterar o sinal principal
+      const updatedResult = analyzeAllTimeframes(symbol, interval, true);
+      if (updatedResult) {
+        setAnalysis(prevAnalysis => {
+          if (!prevAnalysis) return updatedResult;
+          
+          return {
+            ...prevAnalysis,
+            overallConfluence: updatedResult.overallConfluence,
+            confluenceDirection: updatedResult.confluenceDirection,
+            timeframes: updatedResult.timeframes,
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Error updating analysis:', error);
     }
   };
   
@@ -147,6 +165,7 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
   return {
     analysis,
     countdown,
+    isLoading,
     analyzeMarket: generateAnalysis
   };
 }

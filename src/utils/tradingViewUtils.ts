@@ -40,7 +40,10 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       "PivotPointsStandard@tv-basicstudies", // Support and resistance points
       "IchimokuCloud@tv-basicstudies", // Ichimoku Cloud
       "BB@tv-basicstudies",       // Bollinger Bands
-      "VolumeProfile@tv-basicstudies" // Volume Profile
+      "VolumeProfile@tv-basicstudies", // Volume Profile
+      "VWAP@tv-basicstudies",     // Volume Weighted Average Price
+      "ZigZag@tv-basicstudies",   // ZigZag pattern detection
+      "WilliamsR@tv-basicstudies" // Williams %R
     ],
     drawings_access: { 
       type: 'rectangle',
@@ -49,7 +52,13 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
         trend_line: true,
         fibonacci_retracement: true,
         horizontal_line: true,
-        vertical_line: true
+        vertical_line: true,
+        pitchfork: true,
+        elliott_wave: true,
+        fibonacci_fan: true,
+        fibonacci_arc: true,
+        fibonacci_timezone: true,
+        gann_fan: true
       }
     },
     saved_data: {
@@ -70,23 +79,48 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       "paneProperties.background": theme === "dark" ? "#1e1e2d" : "#ffffff",
       "paneProperties.vertGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
       "paneProperties.horzGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
+      "scalesProperties.lineColor": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
+      "scalesProperties.textColor": theme === "dark" ? "#fff" : "#333",
+      
+      // RSI settings
+      "RSI.upper_line.color": "#f43f5e",
+      "RSI.lower_line.color": "#0ea5e9",
+      "RSI.middle.color": "#9ca3af",
+      
+      // Bollinger Bands settings
+      "BB.upper.color": "#6366f1",
+      "BB.lower.color": "#6366f1",
+      "BB.background.color": theme === "dark" ? "#6366f112" : "#6366f108",
+      
+      // MACD settings
+      "MACD.histogram.color": "#22c55e",
+      "MACD.signal.color": "#ef4444",
+      "MACD.macd.color": "#60a5fa",
+      
+      // Moving Averages
+      "MA.color.0": "#f97316", // Orange
+      "MA.color.1": "#8b5cf6", // Purple
+      "MA.color.2": "#06b6d4", // Cyan
+      "MA.color.3": "#eab308", // Yellow
     },
-    // Fix: Add the onChartReady callback directly to the widget configuration
+    // Correct way to set the onChartReady callback
     onChartReady: function() {
       console.log("TradingView chart is ready!");
       // Set ready flag on widget
-      window.tvWidget._ready = true;
-      
-      // Add chart method for compatibility
-      window.tvWidget.chart = function() {
-        return window.tvWidget.activeChart();
-      };
-      
-      // Call the onChartReady callback if provided
-      if (onChartReady) {
-        setTimeout(() => {
-          onChartReady();
-        }, 1000); // Small delay to ensure chart is fully initialized
+      if (window.tvWidget) {
+        window.tvWidget._ready = true;
+        
+        // Add chart method for compatibility
+        window.tvWidget.chart = function() {
+          return window.tvWidget.activeChart();
+        };
+        
+        // Call the onChartReady callback if provided
+        if (onChartReady && typeof onChartReady === 'function') {
+          setTimeout(() => {
+            onChartReady();
+          }, 1000); // Small delay to ensure chart is fully initialized
+        }
       }
     }
   });

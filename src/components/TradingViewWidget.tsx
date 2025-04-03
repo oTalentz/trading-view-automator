@@ -5,6 +5,10 @@ import { TradingViewChart } from './TradingView/TradingViewChart';
 import { SignalDrawing } from './TradingView/SignalDrawing';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { ConfluenceHeatmap } from './ConfluenceHeatmap';
+import { VolumeAnalysis } from './VolumeAnalysis';
+import { MachineLearningInsights } from './MachineLearningInsights';
+import { AssetComparison } from './AssetComparison';
 
 // Update the TradingView types
 declare global {
@@ -44,19 +48,30 @@ export function TradingViewWidget({
   };
 
   return (
-    <>
-      <TradingViewChart 
-        symbol={symbol} 
-        interval={interval} 
-        onChartReady={handleChartReady} 
-      />
-      <SignalDrawing 
-        analysis={analysis} 
-        language={language} 
-        theme={theme} 
-        interval={interval} 
-        isChartReady={chartReadyRef.current}
-      />
-    </>
+    <div className="space-y-4">
+      <div className="rounded-lg overflow-hidden border bg-card">
+        <TradingViewChart 
+          symbol={symbol} 
+          interval={interval} 
+          onChartReady={handleChartReady} 
+        />
+        <SignalDrawing 
+          analysis={analysis} 
+          language={language} 
+          theme={theme} 
+          interval={interval} 
+          isChartReady={chartReadyRef.current}
+        />
+      </div>
+      
+      {analysis && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ConfluenceHeatmap analysis={analysis} />
+          <VolumeAnalysis symbol={symbol} />
+          <MachineLearningInsights symbol={symbol} interval={interval} />
+          <AssetComparison mainSymbol={symbol} />
+        </div>
+      )}
+    </div>
   );
 }

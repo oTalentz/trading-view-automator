@@ -1,18 +1,15 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
 import { Navbar } from "@/components/Navbar";
-import { DashboardSummary } from "@/components/DashboardSummary";
 import { SignalHistory } from "@/components/SignalHistory";
-import { AlertSettingsConfig } from "@/components/AlertSettingsConfig";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DashboardSummary } from "@/components/DashboardSummary";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { UserProfile } from "@/components/UserProfile";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StrategyBacktest } from "@/components/StrategyBacktest";
 
-const Dashboard = () => {
+const DashboardContent = () => {
   const { t } = useLanguage();
   
   return (
@@ -20,22 +17,13 @@ const Dashboard = () => {
       <Navbar />
       
       <main className="flex-1 container py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">{t("dashboard")}</h1>
-          <Link to="/">
-            <Button variant="outline" size="sm" className="gap-2">
-              <ArrowLeft size={16} />
-              {t("backToHome") || "Back to Home"}
-            </Button>
-          </Link>
-        </div>
+        <h1 className="text-2xl font-bold mb-6">{t("dashboard")}</h1>
         
-        <Tabs defaultValue="summary" className="w-full">
+        <Tabs defaultValue="summary">
           <TabsList className="mb-6">
-            <TabsTrigger value="summary">{t("summary")}</TabsTrigger>
-            <TabsTrigger value="history">{t("history")}</TabsTrigger>
-            <TabsTrigger value="alerts">{t("alerts")}</TabsTrigger>
-            <TabsTrigger value="profile">{t("profile")}</TabsTrigger>
+            <TabsTrigger value="summary">{t("overview")}</TabsTrigger>
+            <TabsTrigger value="history">{t("signalHistory")}</TabsTrigger>
+            <TabsTrigger value="backtest">{t("backtest")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="summary">
@@ -46,12 +34,8 @@ const Dashboard = () => {
             <SignalHistory />
           </TabsContent>
           
-          <TabsContent value="alerts">
-            <AlertSettingsConfig />
-          </TabsContent>
-          
-          <TabsContent value="profile">
-            <UserProfile />
+          <TabsContent value="backtest">
+            <StrategyBacktest />
           </TabsContent>
         </Tabs>
       </main>
@@ -62,6 +46,16 @@ const Dashboard = () => {
         </div>
       </footer>
     </div>
+  );
+};
+
+const Dashboard = () => {
+  return (
+    <ThemeProvider>
+      <LanguageProvider>
+        <DashboardContent />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 };
 
