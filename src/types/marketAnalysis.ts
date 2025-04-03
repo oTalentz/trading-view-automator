@@ -25,3 +25,17 @@ export interface MarketAnalysisResult {
   };
   countdownSeconds: number;
 }
+
+// Extended option to include strategy details for educational purposes
+export interface ExtendedMarketAnalysisResult extends MarketAnalysisResult {
+  strategyDetails?: {
+    description: string;
+    bestMarketConditions: string[];
+    recommendedTimeframes: string[];
+  };
+  alternativeStrategies?: Array<{
+    name: string;
+    confidence: number;
+    direction: 'CALL' | 'PUT';
+  }>;
+}

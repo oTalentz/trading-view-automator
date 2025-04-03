@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
 import { analyzeMarket } from '@/utils/marketAnalysisUtils';
 import { toast } from "sonner";
@@ -11,25 +11,41 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
   const { t } = useLanguage();
   
   // Função para analisar o mercado e gerar sinais de alta precisão
-  const handleAnalyzeMarket = () => {
-    // Gerar análise de mercado
-    const result = analyzeMarket(symbol, interval);
-    
-    // Atualizar estado
-    setAnalysis(result);
-    setCountdown(result.countdownSeconds);
-    
-    // Notifica o usuário com um toast
-    toast.success(
-      result.direction === 'CALL' 
-        ? t("signalCallGenerated") 
-        : t("signalPutGenerated"), 
-      {
-        description: `${t("confidence")}: ${result.confidence}% - ${symbol} - ${t("entryIn")}: ${result.countdownSeconds}s`,
-        duration: 5000,
-      }
-    );
-  };
+  const handleAnalyzeMarket = useCallback(() => {
+    try {
+      // Gerar análise de mercado
+      const result = analyzeMarket(symbol, interval);
+      
+      // Atualizar estado
+      setAnalysis(result);
+      setCountdown(result.countdownSeconds);
+      
+      // Notifica o usuário com um toast
+      toast.success(
+        result.direction === 'CALL' 
+          ? t("signalCallGenerated") 
+          : t("signalPutGenerated"), 
+        {
+          description: `${t("confidence")}: ${result.confidence}% - ${symbol} - ${t("entryIn")}: ${result.countdownSeconds}s`,
+          duration: 5000,
+        }
+      );
+      
+      return result;
+    } catch (error) {
+      console.error("Error analyzing market:", error);
+      
+      toast.error(
+        t("errorAnalyzingMarket"), 
+        {
+          description: t("tryAgainLater"),
+          duration: 3000,
+        }
+      );
+      
+      return null;
+    }
+  }, [symbol, interval, t]);
   
   // Inicia o contador regressivo e atualiza a cada segundo
   useEffect(() => {
@@ -68,7 +84,7 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
     }, 5 * 60 * 1000); // A cada 5 minutos
     
     return () => clearInterval(analysisInterval);
-  }, [symbol, interval]);
+  }, [symbol, interval, handleAnalyzeMarket]);
   
   return {
     analysis,
