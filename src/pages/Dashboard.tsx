@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Navbar } from "@/components/Navbar";
 import { DashboardSummary } from "@/components/DashboardSummary";
 import { SignalHistory } from "@/components/SignalHistory";
+import { AlertSettingsConfig } from "@/components/AlertSettingsConfig";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/context/LanguageContext";
@@ -33,6 +34,7 @@ const Dashboard = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="summary">{t("summary")}</TabsTrigger>
             <TabsTrigger value="history">{t("history")}</TabsTrigger>
+            <TabsTrigger value="alerts">{t("alerts")}</TabsTrigger>
             <TabsTrigger value="profile">{t("profile")}</TabsTrigger>
           </TabsList>
           
@@ -42,6 +44,10 @@ const Dashboard = () => {
           
           <TabsContent value="history">
             <SignalHistory />
+          </TabsContent>
+          
+          <TabsContent value="alerts">
+            <AlertSettingsConfig />
           </TabsContent>
           
           <TabsContent value="profile">

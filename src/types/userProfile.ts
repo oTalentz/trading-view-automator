@@ -9,6 +9,7 @@ export interface UserProfile {
   tradingPreferences: TradingPreferences;
   notificationSettings: NotificationSettings;
   soundSettings: SoundSettings;
+  alertSettings: AlertSettings;
   createdAt: string;
   lastActive: string;
 }
@@ -45,6 +46,28 @@ export interface SoundSettings {
   volume: number;
 }
 
+export interface AlertSettings {
+  customAlerts: AlertConfig[];
+  minConfluenceThreshold: number;
+  minConfidenceThreshold: number;
+  enableSkullAlerts: boolean; // Alerta para confluências máximas (caveira)
+  enableHeartAlerts: boolean; // Alerta para confluências médias (coração)
+  alertOnlyForFavorites: boolean;
+}
+
+export interface AlertConfig {
+  id: string;
+  name: string;
+  enabled: boolean;
+  confluenceThreshold: number;
+  confidenceThreshold: number;
+  timeframes: string[];
+  symbols: string[];
+  directions: ('CALL' | 'PUT' | 'BOTH')[];
+  notificationType: 'all' | 'sound' | 'push' | 'none';
+  createdAt: string;
+}
+
 export const defaultUserProfile: UserProfile = {
   id: 'default',
   name: 'Trader',
@@ -76,6 +99,14 @@ export const defaultUserProfile: UserProfile = {
     entryAlerts: true,
     notificationAlerts: true,
     volume: 0.7
+  },
+  alertSettings: {
+    customAlerts: [],
+    minConfluenceThreshold: 70,
+    minConfidenceThreshold: 75,
+    enableSkullAlerts: true,
+    enableHeartAlerts: true,
+    alertOnlyForFavorites: false
   },
   createdAt: new Date().toISOString(),
   lastActive: new Date().toISOString()
