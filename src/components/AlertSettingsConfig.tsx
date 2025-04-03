@@ -339,7 +339,6 @@ export function AlertSettingsConfig() {
                       <Switch 
                         checked={alert.enabled}
                         onCheckedChange={() => handleToggleAlert(alert.id)}
-                        size="sm"
                       />
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEditAlert(alert)}>
                         <span className="sr-only">{t("edit")}</span>
