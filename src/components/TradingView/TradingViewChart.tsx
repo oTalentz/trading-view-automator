@@ -7,9 +7,10 @@ import { initTradingViewWidget } from '@/utils/tradingViewUtils';
 interface TradingViewChartProps {
   symbol: string;
   interval: string;
+  onChartReady?: () => void;
 }
 
-export function TradingViewChart({ symbol, interval }: TradingViewChartProps) {
+export function TradingViewChart({ symbol, interval, onChartReady }: TradingViewChartProps) {
   const container = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const { language } = useLanguage();
@@ -40,7 +41,8 @@ export function TradingViewChart({ symbol, interval }: TradingViewChartProps) {
         interval,
         theme,
         language,
-        container: "tradingview-widget-container"
+        container: "tradingview-widget-container",
+        onChartReady
       });
     }
   };

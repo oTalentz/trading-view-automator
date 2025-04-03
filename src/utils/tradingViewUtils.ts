@@ -8,12 +8,13 @@ export interface TradingViewConfig {
   theme: Theme;
   language: string;
   container: string;
+  onChartReady?: () => void;
 }
 
 export function initTradingViewWidget(config: TradingViewConfig): void {
   if (!window.TradingView) return;
 
-  const { symbol, interval, theme, language, container } = config;
+  const { symbol, interval, theme, language, container, onChartReady } = config;
   
   window.tvWidget = new window.TradingView.widget({
     autosize: true,
@@ -73,8 +74,17 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
   
   // Add the chart method to the tvWidget for use in SignalDrawing
   window.tvWidget.onChartReady(function() {
+    console.log("TradingView chart is ready!");
+    window.tvWidget._ready = true;
     window.tvWidget.chart = function() {
       return window.tvWidget.activeChart();
     };
+    
+    // Call the onChartReady callback if provided
+    if (onChartReady) {
+      setTimeout(() => {
+        onChartReady();
+      }, 1000); // Small delay to ensure chart is fully initialized
+    }
   });
 }

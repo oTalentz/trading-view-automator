@@ -1,38 +1,62 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
+import { toast } from 'sonner';
 
 interface SignalDrawingProps {
   analysis: MultiTimeframeAnalysisResult | null;
   language: string;
   theme: string;
   interval: string;
+  isChartReady: boolean;
 }
 
-export function SignalDrawing({ analysis, language, theme, interval }: SignalDrawingProps) {
+export function SignalDrawing({ analysis, language, theme, interval, isChartReady }: SignalDrawingProps) {
+  const [lastDrawnAnalysis, setLastDrawnAnalysis] = useState<string | null>(null);
+
   useEffect(() => {
-    // When we have analysis and the widget is ready
-    if (analysis && window.tvWidget && window.tvWidget._ready) {
-      try {
-        // Get the chart instance correctly
-        if (!window.tvWidget.chart) {
-          console.error("TradingView chart not ready or not available");
-          return;
-        }
-        
-        const chart = window.tvWidget.chart();
-        
-        // Clear previous drawings
-        chart.clearAllDrawingTools && chart.clearAllDrawingTools();
-        
-        // Get the primary signal
-        const primarySignal = analysis.primarySignal;
-        
-        // Determine colors based on direction
-        const signalColor = primarySignal.direction === 'CALL' ? "#22c55e" : "#ef4444";
-        
-        // Add support and resistance lines
-        if (primarySignal.supportResistance) {
+    // Only proceed if we have analysis and the widget is ready
+    if (!analysis || !isChartReady || !window.tvWidget || !window.tvWidget._ready) {
+      return;
+    }
+
+    // Prevent redrawing the same analysis
+    const analysisKey = `${analysis.primarySignal.timestamp}-${analysis.primarySignal.direction}-${analysis.overallConfluence}`;
+    if (lastDrawnAnalysis === analysisKey) {
+      return;
+    }
+
+    console.log("Drawing signals on chart with analysis:", analysis);
+    
+    try {
+      // Get the chart instance
+      if (!window.tvWidget.chart || typeof window.tvWidget.chart !== 'function') {
+        console.error("TradingView chart function not available");
+        return;
+      }
+      
+      const chart = window.tvWidget.chart();
+      if (!chart) {
+        console.error("Failed to get chart from TradingView widget");
+        return;
+      }
+      
+      // Clear previous drawings
+      if (chart.clearAllDrawingTools) {
+        chart.clearAllDrawingTools();
+      } else {
+        console.warn("clearAllDrawingTools not available");
+      }
+      
+      // Get the primary signal
+      const primarySignal = analysis.primarySignal;
+      
+      // Determine colors based on direction
+      const signalColor = primarySignal.direction === 'CALL' ? "#22c55e" : "#ef4444";
+      
+      // Add support and resistance lines
+      if (primarySignal.supportResistance) {
+        try {
           // Support line
           chart.createShape(
             { price: primarySignal.supportResistance.support },
@@ -66,8 +90,14 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
               }
             }
           );
+          
+          console.log("Added support and resistance lines");
+        } catch (e) {
+          console.error("Error creating support/resistance lines:", e);
         }
-        
+      }
+      
+      try {
         // Add precise direction indicator
         const signalText = primarySignal.direction === 'CALL' 
             ? `▲ ${language === 'pt-br' ? 'COMPRA' : 'BUY'} (${primarySignal.confidence}%)` 
@@ -80,7 +110,8 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
         const strategyText = primarySignal.strategy + (language === 'pt-br' ? ' - Entrada Precisa ' : ' - Precise Entry ') + confluenceText;
         
         // Calculate timestamp for entry
-        const currentTime = chart.getVisibleRange().to - 5;
+        const visibleRange = chart.getVisibleRange();
+        const currentTime = visibleRange.to - 5;
         const entryTime = currentTime + 10; // Approximate time for entry
         
         // Add mark for entry point
@@ -103,6 +134,12 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           }
         );
         
+        console.log("Added trend line with signal text");
+      } catch (e) {
+        console.error("Error creating trend line:", e);
+      }
+      
+      try {
         // Determining marker type based on confluence and confidence
         let symbolType = "flag"; // Default marker
         let symbolText = "";
@@ -123,12 +160,17 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           symbolText = language === 'pt-br' ? "ENTRADA" : "ENTRY";
         }
           
-        // Also add a marker at the exact entry point
+        // Get visible range from chart for proper placement
+        const visibleRange = chart.getVisibleRange();
+        const currentTime = visibleRange.to - 5;
+        const entryTime = currentTime + 10;
+          
+        // Add a marker at the exact entry point
         chart.createShape(
           { 
             time: entryTime,
             price: 0, 
-            channel: primarySignal.direction === 'CALL' ? "low" : "high"  
+            channel: primarySignal.direction === 'CALL' ? "low" : "high"
           },
           { 
             shape: symbolType,
@@ -142,8 +184,18 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           }
         );
         
+        console.log(`Added entry marker: ${symbolType} with text: ${symbolText}`);
+      } catch (e) {
+        console.error("Error creating entry marker:", e);
+      }
+      
+      try {
         // Add more markers in previous candles with different confluence levels
         for (let i = 1; i <= 5; i++) {
+          // Get visible range for proper placement
+          const visibleRange = chart.getVisibleRange();
+          const currentTime = visibleRange.to - 5;
+          
           // Simulate different entry points with different confluence levels
           const pastTime = currentTime - (i * 10);
           
@@ -186,6 +238,12 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           );
         }
         
+        console.log("Added historical markers");
+      } catch (e) {
+        console.error("Error creating historical markers:", e);
+      }
+      
+      try {
         // Add annotation with technical analysis and confluence details
         const technicalText = `${primarySignal.strategy}\n${
           language === 'pt-br' ? 'Confiança' : 'Confidence'
@@ -195,9 +253,13 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           language === 'pt-br' ? 'Força da Tendência' : 'Trend Strength'
         }: ${primarySignal.trendStrength}%`;
         
+        // Get visible range for proper placement
+        const visibleRange = chart.getVisibleRange();
+        const currentTime = visibleRange.to - 15;
+        
         chart.createShape(
           { 
-            time: currentTime - 10,
+            time: currentTime,
             price: 0, 
             channel: "high"  
           },
@@ -212,14 +274,24 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           }
         );
         
+        console.log("Added technical analysis annotation");
+      } catch (e) {
+        console.error("Error creating technical analysis annotation:", e);
+      }
+      
+      try {
         // Add legend for symbols
         const legendText = language === 'pt-br' 
           ? "💀 = Confluência Máxima\n❤️ = Confluência Média\n▲▼ = Confluência Regular" 
           : "💀 = Maximum Confluence\n❤️ = Medium Confluence\n▲▼ = Regular Confluence";
         
+        // Get visible range for proper placement
+        const visibleRange = chart.getVisibleRange();
+        const currentTime = visibleRange.to - 25;
+        
         chart.createShape(
           { 
-            time: currentTime - 25,
+            time: currentTime,
             price: 0, 
             channel: "high"  
           },
@@ -234,13 +306,24 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
           }
         );
         
+        console.log("Added legend for symbols");
+      } catch (e) {
+        console.error("Error creating legend:", e);
+      }
+      
+      try {
         // Add timeframes information
         analysis.timeframes.forEach((tf, index) => {
           if (tf.timeframe !== interval) { // Don't repeat the main timeframe
             const tfText = `${tf.label}: ${tf.direction} (${tf.confidence}%)`;
+            
+            // Get visible range for proper placement
+            const visibleRange = chart.getVisibleRange();
+            const currentTime = visibleRange.to - 10 - (index * 5);
+            
             chart.createShape(
               { 
-                time: currentTime - 10 - (index * 5),
+                time: currentTime,
                 price: 0, 
                 channel: index % 2 === 0 ? "low" : "high"
               },
@@ -256,12 +339,29 @@ export function SignalDrawing({ analysis, language, theme, interval }: SignalDra
             );
           }
         });
-          
+        
+        console.log("Added timeframes information");
       } catch (e) {
-        console.error("Erro ao criar sinal no gráfico:", e);
+        console.error("Error creating timeframes information:", e);
       }
+
+      // Mark this analysis as drawn
+      setLastDrawnAnalysis(analysisKey);
+      
+      // Notify that signals were drawn successfully
+      toast.success(
+        language === 'pt-br' ? "Sinais desenhados no gráfico" : "Signals drawn on chart",
+        { duration: 2000 }
+      );
+          
+    } catch (e) {
+      console.error("Erro ao criar sinal no gráfico:", e);
+      toast.error(
+        language === 'pt-br' ? "Erro ao desenhar sinais no gráfico" : "Error drawing signals on chart", 
+        { duration: 3000 }
+      );
     }
-  }, [analysis, language, theme, interval]);
+  }, [analysis, language, theme, interval, isChartReady, lastDrawnAnalysis]);
 
   return null; // This is a utility component that only has side effects
 }
