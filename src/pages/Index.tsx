@@ -1,107 +1,91 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '@/context/LanguageContext';
-import { 
-  LineChart, BarChart, PieChart, 
-  BookOpen, MessageSquare, ArrowRight, 
-  Bell, History, Zap, ChevronRight, 
-  Settings as SettingsIcon, BookMarked
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Navbar } from "@/components/Navbar";
+import { TradingViewWidget } from "@/components/TradingViewWidget";
+import { WebhookSetup } from "@/components/WebhookSetup";
+import { StrategyGuide } from "@/components/StrategyGuide";
+import { SignalIndicator } from "@/components/SignalIndicator";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { TradingViewWidget } from '@/components/TradingViewWidget';
-import { DashboardSummary } from '@/components/DashboardSummary';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SignalIndicator } from '@/components/SignalIndicator';
-import { SignalHistory } from '@/components/SignalHistory';
-import { StrategyGuide } from '@/components/StrategyGuide';
-import { toast } from "sonner";
-import { useTheme } from '@/context/ThemeContext';
-import { CONFLUENCE_TIMEFRAMES } from '@/types/timeframeAnalysis';
+import { LineChart, BarChart3 } from "lucide-react";
 
-export function Index() {
-  const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState("chart");
+const symbols = [
+  // Criptomoedas
+  { value: "BINANCE:BTCUSDT", label: "Bitcoin (BTCUSDT)" },
+  { value: "BINANCE:ETHUSDT", label: "Ethereum (ETHUSDT)" },
+  { value: "BINANCE:SOLUSDT", label: "Solana (SOLUSDT)" },
+  { value: "BINANCE:BNBUSDT", label: "Binance Coin (BNBUSDT)" },
+  { value: "BINANCE:ADAUSDT", label: "Cardano (ADAUSDT)" },
+  { value: "BINANCE:DOGEUSDT", label: "Dogecoin (DOGEUSDT)" },
+  
+  // Pares de Moedas Forex - Major
+  { value: "FX:EURUSD", label: "EUR/USD - Euro / Dólar" },
+  { value: "FX:GBPUSD", label: "GBP/USD - Libra / Dólar" },
+  { value: "FX:USDJPY", label: "USD/JPY - Dólar / Iene" },
+  { value: "FX:AUDUSD", label: "AUD/USD - Dólar Australiano / Dólar" },
+  { value: "FX:USDCAD", label: "USD/CAD - Dólar / Dólar Canadense" },
+  { value: "FX:NZDUSD", label: "NZD/USD - Dólar Neo-Zelandês / Dólar" },
+  { value: "FX:USDCHF", label: "USD/CHF - Dólar / Franco Suíço" },
+  
+  // Pares de Moedas Forex - Cross
+  { value: "FX:EURGBP", label: "EUR/GBP - Euro / Libra" },
+  { value: "FX:EURJPY", label: "EUR/JPY - Euro / Iene" },
+  { value: "FX:GBPJPY", label: "GBP/JPY - Libra / Iene" },
+  { value: "FX:CADJPY", label: "CAD/JPY - Dólar Canadense / Iene" },
+  { value: "FX:AUDNZD", label: "AUD/NZD - Dólar Australiano / Dólar NZ" },
+  { value: "FX:AUDCAD", label: "AUD/CAD - Dólar Australiano / Dólar Canadense" },
+  { value: "FX:EURAUD", label: "EUR/AUD - Euro / Dólar Australiano" },
+  { value: "FX:GBPCAD", label: "GBP/CAD - Libra / Dólar Canadense" },
+  
+  // Pares de Moedas Forex - Exóticos
+  { value: "FX:USDBRL", label: "USD/BRL - Dólar / Real Brasileiro" },
+  { value: "FX:EURBRL", label: "EUR/BRL - Euro / Real Brasileiro" },
+  { value: "FX:USDMXN", label: "USD/MXN - Dólar / Peso Mexicano" },
+  { value: "FX:USDZAR", label: "USD/ZAR - Dólar / Rand Sul-Africano" },
+  { value: "FX:USDTRY", label: "USD/TRY - Dólar / Lira Turca" },
+  { value: "FX:EURPLN", label: "EUR/PLN - Euro / Zloty Polonês" },
+  
+  // Ações
+  { value: "NASDAQ:AAPL", label: "Apple (AAPL)" },
+  { value: "NASDAQ:MSFT", label: "Microsoft (MSFT)" },
+  { value: "NASDAQ:AMZN", label: "Amazon (AMZN)" },
+  { value: "NASDAQ:GOOGL", label: "Google (GOOGL)" },
+  { value: "NASDAQ:META", label: "Meta / Facebook (META)" },
+  { value: "NYSE:TSLA", label: "Tesla (TSLA)" },
+];
+
+const timeframes = [
+  { value: "1", label: "1 Minuto" },
+  { value: "5", label: "5 Minutos" },
+  { value: "15", label: "15 Minutos" },
+  { value: "30", label: "30 Minutos" },
+  { value: "60", label: "1 Hora" },
+  { value: "240", label: "4 Horas" },
+  { value: "D", label: "1 Dia" },
+  { value: "W", label: "1 Semana" },
+];
+
+const IndexContent = () => {
   const [symbol, setSymbol] = useState("BINANCE:BTCUSDT");
   const [interval, setInterval] = useState("1");
-  const { theme } = useTheme();
-  
-  const popularAssets = [
-    { symbol: "BINANCE:BTCUSDT", name: "Bitcoin" },
-    { symbol: "BINANCE:ETHUSDT", name: "Ethereum" },
-    { symbol: "BINANCE:XRPUSDT", name: "Ripple" },
-    { symbol: "BINANCE:ADAUSDT", name: "Cardano" },
-    { symbol: "BINANCE:DOGEUSDT", name: "Dogecoin" },
-    { symbol: "BINANCE:SOLUSDT", name: "Solana" },
-    { symbol: "BINANCE:AVAXUSDT", name: "Avalanche" },
-    { symbol: "BINANCE:LUNAUSDT", name: "Luna" },
-    { symbol: "BINANCE:SANDUSDT", name: "The Sandbox" },
-  ];
-  
-  const handleSymbolChange = (value: string) => {
-    setSymbol(value);
-    toast.info(t("assetChanged"), {
-      description: popularAssets.find(asset => asset.symbol === value)?.name || value,
-    });
-  };
-  
-  const handleIntervalChange = (value: string) => {
-    setInterval(value);
-    toast.info(t("timeframeChanged"), {
-      description: `${value}m`,
-    });
-  };
-  
-  const handleAssetClick = (asset: { symbol: string, name: string }) => {
-    setSymbol(asset.symbol);
-    toast.info(t("assetChanged"), {
-      description: asset.name,
-    });
-  };
+  const { t } = useLanguage();
 
   return (
-    <div className="container py-6">
-      <div className="flex flex-col gap-2 mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">{t("dashboard")}</h1>
-        <p className="text-muted-foreground">
-          {t("dashboardDescription")}
-        </p>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 md:w-auto md:inline-flex">
-          <TabsTrigger value="chart" className="flex items-center gap-2">
-            <LineChart className="h-4 w-4" />
-            <span className="hidden md:inline">{t("chart")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="signals" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            <span className="hidden md:inline">{t("signals")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
-            <span className="hidden md:inline">{t("history")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="education" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            <span className="hidden md:inline">{t("education")}</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <div className="flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
-            <BarChart className="h-4 w-4" />
-            {t("viewFullDashboard")}
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-          
-          <Link to="/settings" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
-            <SettingsIcon className="h-4 w-4" />
-            {t("settings")}
-            <ChevronRight className="h-4 w-4" />
+      <main className="flex-1 container py-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">{t("tradingViewAutomator")}</h1>
+          <Link to="/dashboard">
+            <Button variant="outline" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              {t("dashboard")}
+            </Button>
           </Link>
         </div>
         
@@ -109,124 +93,125 @@ export function Index() {
           <div className="xl:col-span-3 space-y-4">
             <div className="flex flex-wrap gap-3 mb-4">
               <div className="w-full sm:w-auto flex-1">
-                <Select value={symbol} onValueChange={handleSymbolChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("selectAsset")} />
+                <Select
+                  value={symbol}
+                  onValueChange={setSymbol}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectSymbol")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {popularAssets.map(asset => (
-                      <SelectItem key={asset.symbol} value={asset.symbol}>
-                        {asset.name} ({asset.symbol.split(':')[1]})
-                      </SelectItem>
-                    ))}
+                    <div className="max-h-[300px] overflow-y-auto">
+                      <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Criptomoedas</div>
+                      {symbols
+                        .filter(s => s.value.includes('BINANCE:'))
+                        .map((sym) => (
+                          <SelectItem key={sym.value} value={sym.value}>
+                            {sym.label}
+                          </SelectItem>
+                        ))
+                      }
+                      <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Major</div>
+                      {symbols
+                        .filter(s => s.value.includes('FX:') && 
+                          ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'NZDUSD', 'USDCHF'].some(
+                            pair => s.value.includes(pair)
+                          )
+                        )
+                        .map((sym) => (
+                          <SelectItem key={sym.value} value={sym.value}>
+                            {sym.label}
+                          </SelectItem>
+                        ))
+                      }
+                      <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Cross</div>
+                      {symbols
+                        .filter(s => s.value.includes('FX:') && 
+                          ['EURGBP', 'EURJPY', 'GBPJPY', 'CADJPY', 'AUDNZD', 'AUDCAD', 'EURAUD', 'GBPCAD'].some(
+                            pair => s.value.includes(pair)
+                          )
+                        )
+                        .map((sym) => (
+                          <SelectItem key={sym.value} value={sym.value}>
+                            {sym.label}
+                          </SelectItem>
+                        ))
+                      }
+                      <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Exóticos</div>
+                      {symbols
+                        .filter(s => s.value.includes('FX:') && 
+                          ['USDBRL', 'EURBRL', 'USDMXN', 'USDZAR', 'USDTRY', 'EURPLN'].some(
+                            pair => s.value.includes(pair)
+                          )
+                        )
+                        .map((sym) => (
+                          <SelectItem key={sym.value} value={sym.value}>
+                            {sym.label}
+                          </SelectItem>
+                        ))
+                      }
+                      <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Ações</div>
+                      {symbols
+                        .filter(s => s.value.includes('NASDAQ:') || s.value.includes('NYSE:'))
+                        .map((sym) => (
+                          <SelectItem key={sym.value} value={sym.value}>
+                            {sym.label}
+                          </SelectItem>
+                        ))
+                      }
+                    </div>
                   </SelectContent>
                 </Select>
               </div>
               
-              <div className="w-full sm:w-32">
-                <Select value={interval} onValueChange={handleIntervalChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("interval")} />
+              <div className="w-full sm:w-[180px]">
+                <Select
+                  value={interval}
+                  onValueChange={setInterval}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("selectTimeframe")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {CONFLUENCE_TIMEFRAMES.map(tf => (
+                    {timeframes.map((tf) => (
                       <SelectItem key={tf.value} value={tf.value}>
                         {tf.label}
                       </SelectItem>
                     ))}
-                    <SelectItem value="30">30m</SelectItem>
-                    <SelectItem value="60">1h</SelectItem>
-                    <SelectItem value="240">4h</SelectItem>
-                    <SelectItem value="D">1d</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="w-full sm:w-auto">
-                <div className="relative">
-                  <Input 
-                    placeholder={t("searchAssets")} 
-                    className="pl-8" 
-                  />
-                  <div className="absolute left-2.5 top-2.5 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-                  </div>
-                </div>
-              </div>
             </div>
             
-            <TabsContent value="chart" className="mt-0 space-y-4">
-              <TradingViewWidget symbol={symbol} interval={interval} />
-            </TabsContent>
-            
-            <TabsContent value="signals" className="mt-0 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SignalIndicator symbol={symbol} interval={interval} />
-                <DashboardSummary />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="history" className="mt-0">
-              <SignalHistory />
-            </TabsContent>
-            
-            <TabsContent value="education" className="mt-0">
-              <StrategyGuide />
-            </TabsContent>
+            <TradingViewWidget symbol={symbol} interval={interval} />
           </div>
           
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Bell className="h-4 w-4" />
-                  {t("latestSignals")}
-                </CardTitle>
-                <CardDescription>{t("recentSignalsAlert")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {popularAssets.slice(0, 5).map((asset, index) => (
-                    <Button 
-                      key={asset.symbol}
-                      variant="outline" 
-                      className="w-full justify-between"
-                      onClick={() => handleAssetClick(asset)}
-                    >
-                      <span>{asset.name}</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  ))}
-                </div>
-                  
-                <div className="pt-2 border-t">
-                  <div className="text-sm flex justify-between mb-2">
-                    <span>{t("winRate")}</span>
-                    <span className="font-medium">76%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div className="bg-green-600 h-2 rounded-full" style={{ width: "76%" }}></div>
-                  </div>
-                </div>
-                
-                <Link to="/signals">
-                  <Button variant="outline" className="w-full mt-2">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    {t("allSignals")}
-                  </Button>
-                </Link>
-                
-                <Link to="/strategies">
-                  <Button variant="outline" className="w-full">
-                    <BookMarked className="mr-2 h-4 w-4" />
-                    {t("tradingStrategies")}
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="space-y-6">
+            <SignalIndicator symbol={symbol} interval={interval} />
+            <WebhookSetup />
           </div>
         </div>
-      </Tabs>
+        
+        <StrategyGuide />
+      </main>
+      
+      <footer className="border-t py-6">
+        <div className="container text-center text-sm text-muted-foreground">
+          <p>{t("tradingViewAutomator")} - {t("tradingMadeSimple")}</p>
+        </div>
+      </footer>
     </div>
   );
-}
+};
+
+const Index = () => {
+  return (
+    <ThemeProvider>
+      <LanguageProvider>
+        <IndexContent />
+      </LanguageProvider>
+    </ThemeProvider>
+  );
+};
+
+export default Index;
