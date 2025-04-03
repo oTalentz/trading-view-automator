@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TradingViewWidget } from "@/components/TradingViewWidget";

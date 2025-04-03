@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from "sonner";
-import { useMarketAnalysis } from '@/hooks/useMarketAnalysis';
+import { useMultiTimeframeAnalysis } from '@/hooks/useMultiTimeframeAnalysis';
 
 interface TradingViewWidgetProps {
   symbol?: string;
@@ -19,12 +19,12 @@ declare global {
 
 export function TradingViewWidget({ 
   symbol = "BINANCE:BTCUSDT", 
-  interval = "1D" 
+  interval = "1" 
 }: TradingViewWidgetProps) {
   const container = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const { language } = useLanguage();
-  const { analysis, countdown } = useMarketAnalysis(symbol, interval);
+  const { analysis } = useMultiTimeframeAnalysis(symbol, interval);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -52,14 +52,17 @@ export function TradingViewWidget({
         // Limpa desenhos anteriores
         window.tvWidget.activeChart().clearAllDrawingTools();
         
+        // Obter o sinal principal
+        const primarySignal = analysis.primarySignal;
+        
         // Determina cores com base na direção
-        const signalColor = analysis.direction === 'CALL' ? "#22c55e" : "#ef4444";
+        const signalColor = primarySignal.direction === 'CALL' ? "#22c55e" : "#ef4444";
         
         // Adiciona linha de suporte e resistência
-        if (analysis.supportResistance) {
+        if (primarySignal.supportResistance) {
           // Linha de suporte
           window.tvWidget.activeChart().createShape(
-            { price: analysis.supportResistance.support },
+            { price: primarySignal.supportResistance.support },
             { 
               shape: "horizontal_line", 
               lock: true,
@@ -76,7 +79,7 @@ export function TradingViewWidget({
           
           // Linha de resistência
           window.tvWidget.activeChart().createShape(
-            { price: analysis.supportResistance.resistance },
+            { price: primarySignal.supportResistance.resistance },
             { 
               shape: "horizontal_line", 
               lock: true,
@@ -93,12 +96,15 @@ export function TradingViewWidget({
         }
         
         // Adiciona um indicador de direção preciso
-        const signalText = analysis.direction === 'CALL' 
-            ? `▲ ${language === 'pt-br' ? 'COMPRA' : 'BUY'} (${analysis.confidence}%)` 
-            : `▼ ${language === 'pt-br' ? 'VENDA' : 'SELL'} (${analysis.confidence}%)`;
+        const signalText = primarySignal.direction === 'CALL' 
+            ? `▲ ${language === 'pt-br' ? 'COMPRA' : 'BUY'} (${primarySignal.confidence}%)` 
+            : `▼ ${language === 'pt-br' ? 'VENDA' : 'SELL'} (${primarySignal.confidence}%)`;
+        
+        // Texto de confluência
+        const confluenceText = `[${language === 'pt-br' ? 'Confluência' : 'Confluence'}: ${analysis.overallConfluence}%]`;
           
         // Descrição da estratégia
-        const strategyText = analysis.strategy + (language === 'pt-br' ? ' - Entrada Precisa' : ' - Precise Entry');
+        const strategyText = primarySignal.strategy + (language === 'pt-br' ? ' - Entrada Precisa ' : ' - Precise Entry ') + confluenceText;
         
         // Calcula o timestamp para a entrada
         const currentTime = window.tvWidget.activeChart().getVisibleRange().to - 5;
@@ -129,10 +135,10 @@ export function TradingViewWidget({
           { 
             time: entryTime,
             price: 0, 
-            channel: analysis.direction === 'CALL' ? "low" : "high"  
+            channel: primarySignal.direction === 'CALL' ? "low" : "high"  
           },
           { 
-            shape: analysis.direction === 'CALL' ? "arrow_up" : "arrow_down",
+            shape: primarySignal.direction === 'CALL' ? "arrow_up" : "arrow_down",
             text: language === 'pt-br' ? "ENTRADA AGORA" : "ENTRY NOW",
             overrides: { 
               color: signalColor,
@@ -142,12 +148,14 @@ export function TradingViewWidget({
           }
         );
         
-        // Adiciona anotação com detalhes da análise técnica
-        const technicalText = `${analysis.strategy}\n${
+        // Adiciona anotação com detalhes da análise técnica e confluência
+        const technicalText = `${primarySignal.strategy}\n${
           language === 'pt-br' ? 'Confiança' : 'Confidence'
-        }: ${analysis.confidence}%\n${
+        }: ${primarySignal.confidence}%\n${
+          language === 'pt-br' ? 'Confluência' : 'Confluence'
+        }: ${analysis.overallConfluence}%\n${
           language === 'pt-br' ? 'Força da Tendência' : 'Trend Strength'
-        }: ${analysis.trendStrength}%`;
+        }: ${primarySignal.trendStrength}%`;
         
         window.tvWidget.activeChart().createShape(
           { 
@@ -165,12 +173,35 @@ export function TradingViewWidget({
             }
           }
         );
+        
+        // Adicionando informações de timeframes
+        analysis.timeframes.forEach((tf, index) => {
+          if (tf.timeframe !== interval) { // Não repetir o timeframe principal
+            const tfText = `${tf.label}: ${tf.direction} (${tf.confidence}%)`;
+            window.tvWidget.activeChart().createShape(
+              { 
+                time: currentTime - 10 - (index * 5),
+                price: 0, 
+                channel: index % 2 === 0 ? "low" : "high"
+              },
+              { 
+                shape: "text",
+                text: tfText,
+                overrides: { 
+                  color: tf.direction === 'CALL' ? "#22c55e" : "#ef4444",
+                  fontsize: 11,
+                  bold: false
+                }
+              }
+            );
+          }
+        });
           
       } catch (e) {
         console.error("Erro ao criar sinal no gráfico:", e);
       }
     }
-  }, [analysis, language, theme]);
+  }, [analysis, language, theme, interval]);
 
   const initWidget = () => {
     if (container.current && window.TradingView) {

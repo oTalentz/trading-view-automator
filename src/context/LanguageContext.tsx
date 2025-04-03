@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 type Language = "en" | "pt-br";
@@ -45,7 +44,16 @@ const translations: Translations = {
     "sellSignal": "SELL SIGNAL for next candle",
     "disclaimer": "Trading signals are for informational purposes only",
     "signalCallGenerated": "BUY Signal Generated",
-    "signalPutGenerated": "SELL Signal Generated"
+    "signalPutGenerated": "SELL Signal Generated",
+    "timeframeConfluence": "Timeframe Confluence",
+    "confluenceLevel": "Confluence Level",
+    "confluenceScore": "Confluence Score",
+    "confluenceDisclaimer": "Multi-timeframe analysis provides additional confirmation but does not guarantee results.",
+    "bullish": "Bullish",
+    "bearish": "Bearish",
+    "neutral": "Neutral",
+    "highConfluence": "High Confluence",
+    "mixedSignals": "Mixed Signals",
   },
   "pt-br": {
     "appTitle": "Automatizador TradingView",
@@ -81,9 +89,18 @@ const translations: Translations = {
     "sellSignal": "SINAL DE VENDA para próxima vela",
     "disclaimer": "Sinais de trading são apenas para fins informativos",
     "signalCallGenerated": "Sinal de COMPRA Gerado",
-    "signalPutGenerated": "Sinal de VENDA Gerado"
+    "signalPutGenerated": "Sinal de VENDA Gerado",
+    "timeframeConfluence": "Confluência de Timeframes",
+    "confluenceLevel": "Nível de Confluência",
+    "confluenceScore": "Pontuação de Confluência",
+    "confluenceDisclaimer": "A análise de múltiplos timeframes fornece confirmação adicional, mas não garante resultados.",
+    "bullish": "Alta",
+    "bearish": "Baixa",
+    "neutral": "Neutro",
+    "highConfluence": "Alta Confluência",
+    "mixedSignals": "Sinais Mistos",
   }
-};
+} as const;
 
 interface LanguageContextProps {
   language: Language;
