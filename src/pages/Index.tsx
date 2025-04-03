@@ -11,9 +11,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLanguage } from "@/context/LanguageContext";
 
 const symbols = [
+  // Cryptocurrencies
   { value: "BINANCE:BTCUSDT", label: "Bitcoin (BTCUSDT)" },
   { value: "BINANCE:ETHUSDT", label: "Ethereum (ETHUSDT)" },
   { value: "BINANCE:SOLUSDT", label: "Solana (SOLUSDT)" },
+  
+  // Forex Currency Pairs
+  { value: "FX:EURUSD", label: "EUR/USD" },
+  { value: "FX:GBPUSD", label: "GBP/USD" },
+  { value: "FX:USDJPY", label: "USD/JPY" },
+  { value: "FX:AUDUSD", label: "AUD/USD" },
+  { value: "FX:USDCAD", label: "USD/CAD" },
+  { value: "FX:NZDUSD", label: "NZD/USD" },
+  { value: "FX:USDCHF", label: "USD/CHF" },
+  { value: "FX:EURGBP", label: "EUR/GBP" },
+  { value: "FX:EURJPY", label: "EUR/JPY" },
+  { value: "FX:GBPJPY", label: "GBP/JPY" },
+  
+  // Stocks
   { value: "NASDAQ:AAPL", label: "Apple (AAPL)" },
   { value: "NASDAQ:MSFT", label: "Microsoft (MSFT)" },
   { value: "NASDAQ:AMZN", label: "Amazon (AMZN)" },
