@@ -32,7 +32,20 @@ const translations: Translations = {
     "gettingStarted": "Getting Started",
     "followSteps": "Follow these steps to set up TradingView automations:",
     "requirements": "Requirements",
-    "requirementsDescription": "To use webhook alerts, you need a TradingView Pro account or higher. Basic accounts don't support webhook notifications."
+    "requirementsDescription": "To use webhook alerts, you need a TradingView Pro account or higher. Basic accounts don't support webhook notifications.",
+    "entrySignal": "Entry Signal",
+    "analyzingMarket": "Analyzing market...",
+    "symbol": "Symbol",
+    "expiryTime": "Expiry Time",
+    "timeLeft": "Time Left",
+    "confidence": "Confidence",
+    "strategy": "Strategy",
+    "basedOn": "Based on indicators",
+    "buySignal": "BUY SIGNAL for next candle",
+    "sellSignal": "SELL SIGNAL for next candle",
+    "disclaimer": "Trading signals are for informational purposes only",
+    "signalCallGenerated": "BUY Signal Generated",
+    "signalPutGenerated": "SELL Signal Generated"
   },
   "pt-br": {
     "appTitle": "Automatizador TradingView",
@@ -55,7 +68,20 @@ const translations: Translations = {
     "gettingStarted": "Primeiros Passos",
     "followSteps": "Siga estes passos para configurar automações no TradingView:",
     "requirements": "Requisitos",
-    "requirementsDescription": "Para usar alertas webhook, você precisa de uma conta TradingView Pro ou superior. Contas básicas não suportam notificações webhook."
+    "requirementsDescription": "Para usar alertas webhook, você precisa de uma conta TradingView Pro ou superior. Contas básicas não suportam notificações webhook.",
+    "entrySignal": "Sinal de Entrada",
+    "analyzingMarket": "Analisando mercado...",
+    "symbol": "Ativo",
+    "expiryTime": "Tempo de Expiração",
+    "timeLeft": "Tempo Restante",
+    "confidence": "Confiança",
+    "strategy": "Estratégia",
+    "basedOn": "Baseado nos indicadores",
+    "buySignal": "SINAL DE COMPRA para próxima vela",
+    "sellSignal": "SINAL DE VENDA para próxima vela",
+    "disclaimer": "Sinais de trading são apenas para fins informativos",
+    "signalCallGenerated": "Sinal de COMPRA Gerado",
+    "signalPutGenerated": "Sinal de VENDA Gerado"
   }
 };
 

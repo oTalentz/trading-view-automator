@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { TradingViewWidget } from "@/components/TradingViewWidget";
 import { WebhookSetup } from "@/components/WebhookSetup";
 import { StrategyGuide } from "@/components/StrategyGuide";
+import { SignalIndicator } from "@/components/SignalIndicator";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,7 +32,7 @@ const timeframes = [
 
 const IndexContent = () => {
   const [symbol, setSymbol] = useState("BINANCE:BTCUSDT");
-  const [interval, setInterval] = useState("D");
+  const [interval, setInterval] = useState("1");  // Alterado para 1 minuto por padrão
   const { t } = useLanguage();
 
   return (
@@ -84,7 +85,8 @@ const IndexContent = () => {
             <TradingViewWidget symbol={symbol} interval={interval} />
           </div>
           
-          <div>
+          <div className="space-y-6">
+            <SignalIndicator symbol={symbol} />
             <WebhookSetup />
           </div>
         </div>

@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { toast } from "sonner";
 
 interface TradingViewWidgetProps {
   symbol?: string;
@@ -40,10 +41,51 @@ export function TradingViewWidget({
     }
   }, [theme, symbol, interval, language]);
 
+  // Função para demonstrar sinal diretamente no gráfico
+  // Em um caso real, isso seria conectado a uma API de sinais
+  useEffect(() => {
+    // Gera um sinal a cada 5 minutos
+    const signalTimer = setInterval(() => {
+      if (window.tvWidget && window.tvWidget._ready) {
+        try {
+          const direction = Math.random() > 0.5 ? 'CALL' : 'PUT';
+          const confidence = Math.floor(65 + Math.random() * 30);
+          
+          // Em um ambiente real, você conectaria isso a alguma API de sinais de trading
+          const signalText = direction === 'CALL' 
+            ? `▲ ${language === 'pt-br' ? 'COMPRA' : 'BUY'} (${confidence}%)` 
+            : `▼ ${language === 'pt-br' ? 'VENDA' : 'SELL'} (${confidence}%)`;
+          
+          // Adiciona uma marca no gráfico
+          window.tvWidget.activeChart().createShape(
+            { 
+              time: window.tvWidget.activeChart().getVisibleRange().to - 5,
+              price: 0, 
+              channel: "high" 
+            },
+            { 
+              shape: direction === 'CALL' ? "arrow_up" : "arrow_down",
+              text: signalText,
+              overrides: { 
+                color: direction === 'CALL' ? "#22c55e" : "#ef4444",
+                fontsize: 14,
+                bold: true
+              }
+            }
+          );
+        } catch (e) {
+          console.error("Erro ao criar sinal no gráfico:", e);
+        }
+      }
+    }, 5 * 60 * 1000); // A cada 5 minutos
+    
+    return () => clearInterval(signalTimer);
+  }, [language]);
+
   const initWidget = () => {
     if (container.current && window.TradingView) {
       container.current.innerHTML = '';
-      new window.TradingView.widget({
+      window.tvWidget = new window.TradingView.widget({
         autosize: true,
         symbol: symbol,
         interval: interval,
@@ -76,6 +118,13 @@ export function TradingViewWidget({
           fibonacci_retracement: {
             levels: [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]
           }
+        },
+        overrides: {
+          // Customizações para destacar melhor os sinais e tendências
+          "mainSeriesProperties.candleStyle.upColor": "#22c55e",
+          "mainSeriesProperties.candleStyle.downColor": "#ef4444",
+          "mainSeriesProperties.candleStyle.wickUpColor": "#22c55e",
+          "mainSeriesProperties.candleStyle.wickDownColor": "#ef4444",
         }
       });
     }
