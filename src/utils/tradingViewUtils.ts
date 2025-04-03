@@ -69,22 +69,22 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       "paneProperties.background": theme === "dark" ? "#1e1e2d" : "#ffffff",
       "paneProperties.vertGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
       "paneProperties.horzGridProperties.color": theme === "dark" ? "#2a2a3c" : "#f0f0f0",
-    }
-  });
-  
-  // Add the chart method to the tvWidget for use in SignalDrawing
-  window.tvWidget.onChartReady(function() {
-    console.log("TradingView chart is ready!");
-    window.tvWidget._ready = true;
-    window.tvWidget.chart = function() {
-      return window.tvWidget.activeChart();
-    };
-    
-    // Call the onChartReady callback if provided
-    if (onChartReady) {
-      setTimeout(() => {
-        onChartReady();
-      }, 1000); // Small delay to ensure chart is fully initialized
+    },
+    // THIS IS THE FIX: Add the onChartReady callback directly to the widget configuration
+    // instead of trying to call it as a method on the widget instance later
+    onChartReady: function() {
+      console.log("TradingView chart is ready!");
+      window.tvWidget._ready = true;
+      window.tvWidget.chart = function() {
+        return window.tvWidget.activeChart();
+      };
+      
+      // Call the onChartReady callback if provided
+      if (onChartReady) {
+        setTimeout(() => {
+          onChartReady();
+        }, 1000); // Small delay to ensure chart is fully initialized
+      }
     }
   });
 }

@@ -23,7 +23,9 @@ export function TradingViewChart({ symbol, interval, onChartReady }: TradingView
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
@@ -35,7 +37,10 @@ export function TradingViewChart({ symbol, interval, onChartReady }: TradingView
 
   const initWidget = () => {
     if (container.current && window.TradingView) {
+      // Clear the container before initializing a new widget
       container.current.innerHTML = '';
+      
+      // Initialize the TradingView widget
       initTradingViewWidget({
         symbol,
         interval,
