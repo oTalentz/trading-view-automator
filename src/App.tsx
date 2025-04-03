@@ -27,6 +27,9 @@ const App: React.FC = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/signals" element={<Index />} />
+                  <Route path="/strategies" element={<Index />} />
+                  <Route path="/settings" element={<Index />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
