@@ -16,6 +16,9 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
 
   const { symbol, interval, theme, language, container, onChartReady } = config;
   
+  // Check if this is a Pocket Option OTC symbol
+  const isPocketOptionOTC = symbol.includes("POCKETOPTION:") && symbol.includes("-OTC");
+
   // Create the TradingView widget with all configuration in one place
   window.tvWidget = new window.TradingView.widget({
     autosize: true,
@@ -104,6 +107,13 @@ export function initTradingViewWidget(config: TradingViewConfig): void {
       "MA.color.1": "#8b5cf6", // Purple
       "MA.color.2": "#06b6d4", // Cyan
       "MA.color.3": "#eab308", // Yellow
+      
+      // OTC specific settings
+      ...(isPocketOptionOTC ? {
+        "mainSeriesProperties.priceAxisProperties.autoScale": true,
+        "mainSeriesProperties.priceAxisProperties.percentage": false,
+        "mainSeriesProperties.priceAxisProperties.log": false,
+      } : {})
     },
     // Correct way to set the onChartReady callback
     onChartReady: function() {

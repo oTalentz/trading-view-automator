@@ -8,6 +8,7 @@ export interface TimeframeAnalysis {
   timeframe: string;
   label: string;
   marketCondition: MarketCondition;
+  isOTCMarket?: boolean; // New field for OTC markets
 }
 
 export interface MultiTimeframeAnalysisResult {
@@ -21,6 +22,7 @@ export interface MultiTimeframeAnalysisResult {
     indicators: string[];
     trendStrength: number;
     marketCondition: MarketCondition;
+    isOTCMarket?: boolean; // New field for OTC markets
     supportResistance: {
       support: number;
       resistance: number;
