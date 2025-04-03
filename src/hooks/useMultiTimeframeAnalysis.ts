@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
 import { analyzeAllTimeframes } from '@/utils/confluenceCalculator';
 
-export { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
+export type { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
 
 export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1') {
   const [analysis, setAnalysis] = useState<MultiTimeframeAnalysisResult | null>(null);
