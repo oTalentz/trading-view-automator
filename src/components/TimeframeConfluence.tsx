@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TimeframeAnalysis } from '@/types/timeframeAnalysis';
 import { ArrowUpCircle, ArrowDownCircle, AlertTriangle, BarChart3 } from 'lucide-react';
@@ -43,6 +44,14 @@ export function TimeframeConfluence({
         default: return "Unknown";
       }
     }
+  };
+
+  // Função para obter o nome traduzido do ticket
+  const getTicketName = (direction: 'CALL' | 'PUT'): string => {
+    if (language === 'pt-br') {
+      return direction === 'CALL' ? 'ALTA' : 'BAIXA';
+    }
+    return direction;
   };
 
   return (
@@ -114,6 +123,17 @@ export function TimeframeConfluence({
               ? 'bg-green-100 dark:bg-green-900/20' 
               : 'bg-red-100 dark:bg-red-900/20'
             }`} />
+            
+            {/* Ticket label at bottom */}
+            <div className="mt-2 py-1 text-center border-t">
+              <span className={`text-xs font-medium px-2 py-1 rounded ${
+                tf.direction === 'CALL'
+                ? 'bg-green-100 dark:bg-green-800/20 text-green-700 dark:text-green-400'
+                : 'bg-red-100 dark:bg-red-800/20 text-red-700 dark:text-red-400'
+              }`}>
+                {getTicketName(tf.direction)}
+              </span>
+            </div>
           </div>
         ))}
       </div>
