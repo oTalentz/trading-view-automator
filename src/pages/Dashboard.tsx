@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Navbar } from "@/components/Navbar";
 import { DashboardSummary } from "@/components/DashboardSummary";
 import { SignalHistory } from "@/components/SignalHistory";
@@ -7,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/context/LanguageContext";
 import { UserProfile } from "@/components/UserProfile";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const Dashboard = () => {
   const { t } = useLanguage();
@@ -16,7 +19,15 @@ const Dashboard = () => {
       <Navbar />
       
       <main className="flex-1 container py-6">
-        <h1 className="text-2xl font-bold mb-6">{t("dashboard")}</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">{t("dashboard")}</h1>
+          <Link to="/">
+            <Button variant="outline" size="sm" className="gap-2">
+              <ArrowLeft size={16} />
+              {t("backToHome") || "Back to Home"}
+            </Button>
+          </Link>
+        </div>
         
         <Tabs defaultValue="summary" className="w-full">
           <TabsList className="mb-6">
