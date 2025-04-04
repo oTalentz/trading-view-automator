@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ArrowUpCircle, ArrowDownCircle, AlertCircle, Clock, BarChart3, Layers, LineChart, TimerIcon, Target, ShieldAlert } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, AlertCircle, Clock, BarChart3, Layers, LineChart, TimerIcon } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from "sonner";
 import { useMultiTimeframeAnalysis } from '@/hooks/useMultiTimeframeAnalysis';
@@ -50,18 +51,6 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
     }
   };
 
-  // Retorna a cor para a qualidade de entrada
-  const getEntryQualityColor = (quality: string | undefined) => {
-    if (!quality) return 'text-gray-600 dark:text-gray-400';
-    
-    switch (quality) {
-      case 'Excelente': return 'text-green-600 dark:text-green-400 font-bold';
-      case 'Muito Bom': return 'text-emerald-600 dark:text-emerald-400 font-semibold';
-      case 'Bom': return 'text-blue-600 dark:text-blue-400';
-      default: return 'text-gray-600 dark:text-gray-400';
-    }
-  };
-
   // Se não houver análise, mostre um indicador de carregamento
   if (!analysis) {
     return (
@@ -97,12 +86,6 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
           <span className="font-medium">
             {primarySignal.direction === 'CALL' ? t("buySignal") : t("sellSignal")}
           </span>
-          
-          {primarySignal.entryQuality && (
-            <span className={`ml-1 ${getEntryQualityColor(primarySignal.entryQuality)}`}>
-              ({primarySignal.entryQuality})
-            </span>
-          )}
         </div>
         
         <div className="space-y-1 mb-3">
@@ -157,25 +140,6 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
               'text-gray-600 dark:text-gray-400'
             }`}>{analysis.overallConfluence}%</span>
           </div>
-          
-          {primarySignal.priceTargets && (
-            <div className="pt-2 border-t mt-2">
-              <div className="text-sm font-medium flex items-center gap-1 mb-1">
-                <Target className="h-4 w-4" />
-                {t("priceTargets")}:
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                  <Target className="h-3 w-3" />
-                  {t("target")}: {primarySignal.priceTargets.target}
-                </span>
-                <span className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                  <ShieldAlert className="h-3 w-3" />
-                  {t("stopLoss")}: {primarySignal.priceTargets.stopLoss}
-                </span>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="border-t pt-2 mt-2">
@@ -263,6 +227,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
         </div>
       </div>
       
+      {/* Componente de confluência de timeframes */}
       <TimeframeConfluence 
         timeframes={analysis.timeframes}
         overallConfluence={analysis.overallConfluence}

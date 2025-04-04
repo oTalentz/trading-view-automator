@@ -2,7 +2,6 @@
 import { TimeframeAnalysis, MultiTimeframeAnalysisResult, CONFLUENCE_TIMEFRAMES } from '@/types/timeframeAnalysis';
 import { analyzeTimeframe } from './timeframeAnalysisUtils';
 import { findSupportResistanceLevels, generateSimulatedMarketData } from '@/utils/technicalAnalysis';
-import { calculatePreciseEntryPoint } from './technical/precisionEntryPoints';
 
 export const calculateExpiryMinutes = (interval: string): number => {
   switch(interval) {
@@ -84,17 +83,8 @@ export const analyzeAllTimeframes = (
   const supportResistance = findSupportResistanceLevels(prices);
   const now = new Date();
   
-  // Analisa o ponto de entrada preciso usando o novo utilitário
-  const entryPointAnalysis = calculatePreciseEntryPoint(
-    prices,
-    volume,
-    selectedAnalysis.marketCondition,
-    selectedAnalysis.strength,
-    selectedAnalysis.direction
-  );
-  
-  // Calcula tempo ótimo de entrada com base na análise de precisão
-  const secondsToNextMinute = entryPointAnalysis.idealTimingSeconds;
+  // Calcula tempo ótimo de entrada (próximo minuto exato)
+  const secondsToNextMinute = 60 - now.getSeconds();
   const entryTimeMillis = now.getTime() + (secondsToNextMinute * 1000);
   const entryTime = new Date(entryTimeMillis);
   
@@ -105,12 +95,8 @@ export const analyzeAllTimeframes = (
   const expiryTimeMillis = entryTimeMillis + (expiryMinutes * 60 * 1000);
   const expiryTime = new Date(expiryTimeMillis);
   
-  // Ajusta a confiança baseada na confluência geral e na análise de ponto de entrada
-  let adjustedConfidence = Math.max(
-    selectedAnalysis.confidence,
-    entryPointAnalysis.confidenceScore
-  );
-  
+  // Ajusta a confiança baseada na confluência geral
+  let adjustedConfidence = selectedAnalysis.confidence;
   if (selectedAnalysis.direction === confluenceDirection) {
     adjustedConfidence = Math.min(adjustedConfidence + (overallConfluence / 10), 98);
   } else if (confluenceDirection !== 'NEUTRAL') {
@@ -128,8 +114,7 @@ export const analyzeAllTimeframes = (
       strategy: "Multi-Timeframe Confluence",
       indicators: [
         "RSI", "MACD", "Bollinger Bands", 
-        "Multi-Timeframe Confluence", "Trend Analysis",
-        "Advanced Entry Point Analysis"  // Novo indicador
+        "Multi-Timeframe Confluence", "Trend Analysis"
       ],
       trendStrength: selectedAnalysis.strength,
       marketCondition: selectedAnalysis.marketCondition,
@@ -137,7 +122,6 @@ export const analyzeAllTimeframes = (
         support: Math.round(supportResistance.support * 100) / 100,
         resistance: Math.round(supportResistance.resistance * 100) / 100
       },
-      entryQuality: entryPointAnalysis.entryQuality, // Nova propriedade
       technicalScores: {
         rsi: Math.round(70 + Math.random() * 15),
         macd: Math.round(65 + Math.random() * 20),
@@ -145,10 +129,6 @@ export const analyzeAllTimeframes = (
         volumeTrend: Math.round(55 + Math.random() * 30),
         priceAction: Math.round(75 + Math.random() * 15),
         overallScore: Math.round(adjustedConfidence)
-      },
-      priceTargets: {  // Nova propriedade
-        target: Math.round(entryPointAnalysis.priceTarget * 100) / 100,
-        stopLoss: Math.round(entryPointAnalysis.stopLoss * 100) / 100,
       }
     },
     timeframes: timeframeAnalyses,
@@ -167,33 +147,20 @@ const generateSignalDetails = (
   selectedAnalysis: TimeframeAnalysis,
   timeframeAnalyses: TimeframeAnalysis[]
 ) => {
-  const { prices, volume } = generateSimulatedMarketData(symbol, 100);
+  const { prices } = generateSimulatedMarketData(symbol, 100);
   const supportResistance = findSupportResistanceLevels(prices);
   const now = new Date();
   
-  // Analisa o ponto de entrada preciso
-  const entryPointAnalysis = calculatePreciseEntryPoint(
-    prices,
-    volume,
-    selectedAnalysis.marketCondition,
-    selectedAnalysis.strength,
-    direction
-  );
-  
-  // Ajusta a confiança baseada na confluência geral e na análise de ponto de entrada
-  let adjustedConfidence = Math.max(
-    selectedAnalysis.confidence,
-    entryPointAnalysis.confidenceScore
-  );
-  
+  // Ajusta a confiança baseada na confluência geral
+  let adjustedConfidence = selectedAnalysis.confidence;
   if (selectedAnalysis.direction === direction) {
     adjustedConfidence = Math.min(adjustedConfidence + (overallConfluence / 10), 98);
   } else {
     adjustedConfidence = Math.max(adjustedConfidence - (overallConfluence / 5), 65);
   }
   
-  // Calcula tempo ótimo de entrada com base na análise de precisão
-  const secondsToNextMinute = entryPointAnalysis.idealTimingSeconds;
+  // Calcula tempo ótimo de entrada (próximo minuto exato)
+  const secondsToNextMinute = 60 - now.getSeconds();
   const entryTimeMillis = now.getTime() + (secondsToNextMinute * 1000);
   const entryTime = new Date(entryTimeMillis);
   
@@ -213,12 +180,10 @@ const generateSignalDetails = (
     strategy: "Multi-Timeframe Confluence",
     indicators: [
       "RSI", "MACD", "Bollinger Bands", 
-      "Multi-Timeframe Confluence", "Trend Analysis",
-      "Advanced Entry Point Analysis"  // Novo indicador
+      "Multi-Timeframe Confluence", "Trend Analysis"
     ],
     trendStrength: selectedAnalysis.strength,
     marketCondition: selectedAnalysis.marketCondition,
-    entryQuality: entryPointAnalysis.entryQuality, // Nova propriedade
     supportResistance: {
       support: Math.round(supportResistance.support * 100) / 100,
       resistance: Math.round(supportResistance.resistance * 100) / 100
@@ -230,10 +195,6 @@ const generateSignalDetails = (
       volumeTrend: Math.round(55 + Math.random() * 30),
       priceAction: Math.round(75 + Math.random() * 15),
       overallScore: Math.round(adjustedConfidence)
-    },
-    priceTargets: {  // Nova propriedade
-      target: Math.round(entryPointAnalysis.priceTarget * 100) / 100,
-      stopLoss: Math.round(entryPointAnalysis.stopLoss * 100) / 100,
     }
   };
 };

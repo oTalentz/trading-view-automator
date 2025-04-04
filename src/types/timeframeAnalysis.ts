@@ -25,7 +25,6 @@ export interface MultiTimeframeAnalysisResult {
       support: number;
       resistance: number;
     };
-    entryQuality?: string; // Nova propriedade opcional
     technicalScores: {
       rsi: number;
       macd: number;
@@ -33,10 +32,6 @@ export interface MultiTimeframeAnalysisResult {
       volumeTrend: number;
       priceAction: number;
       overallScore: number;
-    };
-    priceTargets?: {  // Nova propriedade opcional
-      target: number;
-      stopLoss: number;
     };
   };
   timeframes: TimeframeAnalysis[];
@@ -52,3 +47,4 @@ export const CONFLUENCE_TIMEFRAMES = [
   { value: "15", label: "15m" },
   { value: "60", label: "1h" }
 ];
+
