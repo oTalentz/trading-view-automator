@@ -9,11 +9,6 @@ import { ConfluenceHeatmap } from './ConfluenceHeatmap';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load components for better performance
-const VolumeAnalysis = lazy(() => import('./VolumeAnalysis').then(mod => ({ default: mod.VolumeAnalysis })));
-const MachineLearningInsights = lazy(() => import('./MachineLearningInsights').then(mod => ({ default: mod.MachineLearningInsights })));
-const AssetComparison = lazy(() => import('./AssetComparison').then(mod => ({ default: mod.AssetComparison })));
-const AIStrategyInsights = lazy(() => import('./AIStrategyInsights').then(mod => ({ default: mod.AIStrategyInsights })));
-const AdvancedBacktesting = lazy(() => import('./backtest/AdvancedBacktesting').then(mod => ({ default: mod.AdvancedBacktesting })));
 const CustomAlerts = lazy(() => import('./alerts/CustomAlerts').then(mod => ({ default: mod.CustomAlerts })));
 
 // Update the TradingView types

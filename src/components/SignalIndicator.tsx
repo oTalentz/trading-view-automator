@@ -83,6 +83,10 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
 
   return (
     <div className="space-y-4">
+      {/* Machine Learning and AI Insights Cards - Now positioned at the top */}
+      <MachineLearningInsights symbol={symbol} interval={interval} />
+      <AIStrategyInsights symbol={symbol} />
+      
       <Card className={`shadow-lg overflow-hidden border-t-4 ${
         primarySignal.direction === 'CALL' 
           ? 'border-t-green-500 dark:border-t-green-600' 
@@ -124,12 +128,6 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
           />
         </CardContent>
       </Card>
-      
-      {/* Machine Learning Insights */}
-      <MachineLearningInsights symbol={symbol} interval={interval} />
-      
-      {/* AI Insights Card - Now placed below Machine Learning Insights */}
-      <AIStrategyInsights symbol={symbol} />
     </div>
   );
 }
