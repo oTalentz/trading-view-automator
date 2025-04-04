@@ -93,7 +93,7 @@ export function StrategyPerformance({
         strategy: data.strategy,
         accuracy: data.accuracy,
         samples: data.samples,
-        description: t("bestStrategyForTimeframe", { timeframe })
+        description: t("bestStrategyForTimeframe") // Fixed: only pass one argument
       });
     });
     
