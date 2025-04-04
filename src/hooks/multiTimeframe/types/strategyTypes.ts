@@ -11,12 +11,15 @@ export interface StrategyOptimizationResult {
   preferredMarketConditions: string[];
   avoidedMarketConditions: string[];
   lastUpdated: string;
+  performanceByTimeframe?: Record<string, number>;
+  winRateHistory?: { date: string; rate: number }[];
 }
 
 export interface TimeframePerformance {
   timeframe: string;
   winRate: number;
   sampleSize: number;
+  confidence?: number;
 }
 
 export interface UseAIStrategyOptimizerReturn {
