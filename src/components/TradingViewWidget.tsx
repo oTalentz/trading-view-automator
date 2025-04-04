@@ -7,9 +7,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { ConfluenceHeatmap } from './ConfluenceHeatmap';
 import { VolumeAnalysis } from './VolumeAnalysis';
-import { MachineLearningInsights } from './MachineLearningInsights';
 import { AssetComparison } from './AssetComparison';
-import { AIStrategyInsights } from './AIStrategyInsights';
 
 // Update the TradingView types
 declare global {
@@ -67,9 +65,6 @@ export function TradingViewWidget({
       
       {analysis && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {/* Reordered to place ML and AI insights first */}
-          <MachineLearningInsights symbol={symbol} interval={interval} />
-          <AIStrategyInsights symbol={symbol} />
           <ConfluenceHeatmap analysis={analysis} />
           <VolumeAnalysis symbol={symbol} />
           <AssetComparison mainSymbol={symbol} />
