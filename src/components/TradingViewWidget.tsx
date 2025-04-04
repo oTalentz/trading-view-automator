@@ -8,6 +8,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { ConfluenceHeatmap } from './ConfluenceHeatmap';
 import { VolumeAnalysis } from './VolumeAnalysis';
 import { AssetComparison } from './AssetComparison';
+import { AIStrategyInsights } from './AIStrategyInsights';
+import { MachineLearningInsights } from './MachineLearningInsights';
 
 // Update the TradingView types
 declare global {
@@ -48,19 +50,26 @@ export function TradingViewWidget({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg overflow-hidden border bg-card h-[800px]">
-        <TradingViewChart 
-          symbol={symbol} 
-          interval={interval} 
-          onChartReady={handleChartReady} 
-        />
-        <SignalDrawing 
-          analysis={analysis} 
-          language={language} 
-          theme={theme} 
-          interval={interval} 
-          isChartReady={chartReadyRef.current}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="md:col-span-1 space-y-4">
+          <AIStrategyInsights symbol={symbol} />
+          <MachineLearningInsights symbol={symbol} interval={interval} />
+        </div>
+        
+        <div className="md:col-span-3 rounded-lg overflow-hidden border bg-card h-[800px]">
+          <TradingViewChart 
+            symbol={symbol} 
+            interval={interval} 
+            onChartReady={handleChartReady} 
+          />
+          <SignalDrawing 
+            analysis={analysis} 
+            language={language} 
+            theme={theme} 
+            interval={interval} 
+            isChartReady={chartReadyRef.current}
+          />
+        </div>
       </div>
       
       {analysis && (
