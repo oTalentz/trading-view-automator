@@ -1,5 +1,11 @@
 
-import { SupportResistance } from '../technicalAnalysis';
+// Define the SupportResistance interface directly to avoid import issues
+export interface SupportResistance {
+  support: number;
+  resistance: number;
+  supportLevels?: Array<{ price: number; strength: number }>;
+  resistanceLevels?: Array<{ price: number; strength: number }>;
+}
 
 export interface DrawSupportResistanceParams {
   chart: any;

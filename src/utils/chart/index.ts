@@ -9,8 +9,4 @@ export * from './technicalAnalysis';
 export * from './legendInfo';
 export * from './utility';
 
-// Re-export the SupportResistance type for backward compatibility
-export interface SupportResistance {
-  support: number;
-  resistance: number;
-}
+// We don't need to re-export SupportResistance here anymore since it's coming from types.ts

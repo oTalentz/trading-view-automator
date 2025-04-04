@@ -1,6 +1,6 @@
 
 import { toast } from 'sonner';
-import { DrawSupportResistanceParams } from './types';
+import { DrawSupportResistanceParams, SupportResistance } from './types';
 
 export function drawSupportResistanceLines({ 
   chart, 
