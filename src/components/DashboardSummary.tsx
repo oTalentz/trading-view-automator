@@ -8,6 +8,7 @@ import { UpcomingEventsCard } from './dashboard/UpcomingEventsCard';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { ConfluenceSection } from './dashboard/ConfluenceSection';
 import { AnalyticsTabs } from './dashboard/AnalyticsTabs';
+import { MLStrategySelector } from './MLStrategySelector';
 import { 
   filterSignalsByTimeRange, 
   getWinRateByConfidence, 
@@ -19,6 +20,7 @@ export function DashboardSummary() {
   const { t } = useLanguage();
   const signals = getSignalHistory();
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('all');
+  const [selectedSymbol, setSelectedSymbol] = useState<string>("BTCUSDT");
   
   // Filter signals by time range
   const filteredSignals = filterSignalsByTimeRange(signals, timeRange);
@@ -92,9 +94,13 @@ export function DashboardSummary() {
         putSignalsPercentage={putSignalsPercentage}
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <ConfluenceSection mockAnalysis={mockAnalysis} />
-        <UpcomingEventsCard />
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="col-span-2">
+          <ConfluenceSection mockAnalysis={mockAnalysis} />
+        </div>
+        <div>
+          <MLStrategySelector symbol={selectedSymbol} interval="1" />
+        </div>
       </div>
       
       <AnalyticsTabs 
