@@ -59,42 +59,51 @@ export function useAnalysisGenerator(
         `${t("highConfluence")} (${result.overallConfluence}%)` : 
         `${t("mixedSignals")}`;
         
-      toast.success(
-        result.primarySignal.direction === 'CALL' 
-          ? t("signalCallGenerated") 
-          : t("signalPutGenerated"), 
-        {
-          description: `${t("confidence")}: ${result.primarySignal.confidence}% - ${confidenceText} - ${symbol} - ${t("entryIn")}: ${result.countdown}s`,
-          duration: 5000,
-        }
-      );
-      
-      // Play sound alert for new signal
-      playAlertSound(result.primarySignal.direction.toLowerCase() as 'call' | 'put');
-      
-      // Envia notificação do navegador se habilitado
-      const notifSettings = getNotificationSettings();
-      if (notifSettings.enabled) {
-        sendNotification(
-          result.primarySignal.direction === 'CALL' ? 'Sinal de COMPRA' : 'Sinal de VENDA',
+      // Only show toast notification for actionable signals (CALL or PUT)
+      if (result.primarySignal.direction !== 'NEUTRAL') {
+        toast.success(
+          result.primarySignal.direction === 'CALL' 
+            ? t("signalCallGenerated") 
+            : t("signalPutGenerated"), 
           {
-            body: `${symbol} - Confiança: ${result.primarySignal.confidence}% - Entrada em: ${result.countdown}s`,
-            icon: '/favicon.ico',
+            description: `${t("confidence")}: ${result.primarySignal.confidence}% - ${confidenceText} - ${symbol} - ${t("entryIn")}: ${result.countdown}s`,
+            duration: 5000,
           }
         );
+        
+        // Play sound alert for new signal
+        playAlertSound(result.primarySignal.direction.toLowerCase() as 'call' | 'put');
+        
+        // Envia notificação do navegador se habilitado
+        const notifSettings = getNotificationSettings();
+        if (notifSettings.enabled) {
+          sendNotification(
+            result.primarySignal.direction === 'CALL' ? 'Sinal de COMPRA' : 'Sinal de VENDA',
+            {
+              body: `${symbol} - Confiança: ${result.primarySignal.confidence}% - Entrada em: ${result.countdown}s`,
+              icon: '/favicon.ico',
+            }
+          );
+        }
+        
+        // Save signal to history only for CALL or PUT signals
+        saveSignalToHistory({
+          symbol: symbol,
+          direction: result.primarySignal.direction,
+          confidence: result.primarySignal.confidence,
+          timestamp: result.primarySignal.timestamp,
+          entryTime: result.primarySignal.entryTime,
+          expiryTime: result.primarySignal.expiryTime,
+          timeframe: interval,
+          strategy: result.primarySignal.strategy || 'Multi-Timeframe Confluence'
+        });
+      } else {
+        // Show neutral signal toast
+        toast.info(t("neutralSignalGenerated") || "Neutral signal generated", {
+          description: `${symbol} - ${t("noTradeRecommended") || "No trade recommended"}`,
+          duration: 3000,
+        });
       }
-      
-      // Save signal to history
-      saveSignalToHistory({
-        symbol: symbol,
-        direction: result.primarySignal.direction,
-        confidence: result.primarySignal.confidence,
-        timestamp: result.primarySignal.timestamp,
-        entryTime: result.primarySignal.entryTime,
-        expiryTime: result.primarySignal.expiryTime,
-        timeframe: interval,
-        strategy: result.primarySignal.strategy || 'Multi-Timeframe Confluence'
-      });
       
       // Armazena no cache por 2 minutos
       cacheService.set(cacheKey, result, 120);

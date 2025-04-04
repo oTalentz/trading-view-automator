@@ -56,7 +56,7 @@ export function DashboardSummary() {
       return acc;
     }, {})
   )
-  .map(([timeframe, count]) => ({ timeframe, count }))
+  .map(([timeframe, count]) => ({ timeframe, count: count as number }))
   .sort((a, b) => {
     // Sort by numeric value (1, 5, 15, etc.)
     const numA = parseInt(a.timeframe);
