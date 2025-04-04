@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { MultiTimeframeAnalysisResult, TimeframeAnalysis } from '@/types/timeframeAnalysis';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
-import { analyzeAllTimeframes } from '@/utils/confluenceCalculator';
+import { analyzeAllTimeframes } from '@/utils/confluence'; // Updated import path
 import { playAlertSound } from '@/utils/audioUtils';
 import { saveSignalToHistory } from '@/utils/signalHistoryUtils';
 import { sendNotification } from '@/utils/pushNotificationUtils';
