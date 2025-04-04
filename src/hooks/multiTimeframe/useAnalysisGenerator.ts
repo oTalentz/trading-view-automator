@@ -27,7 +27,7 @@ export function useAnalysisGenerator(
       // Apply AI optimizations to cached result if available
       const optimizationResult = optimizeStrategy(symbol);
       if (optimizationResult) {
-        return enhanceAnalysisWithAI(cachedResult, optimizationResult);
+        return enhanceAnalysisWithAI(cachedResult);
       }
       return cachedResult;
     }
@@ -42,7 +42,7 @@ export function useAnalysisGenerator(
       // Apply AI optimizations if available
       const optimizationResult = optimizeStrategy(symbol);
       if (optimizationResult) {
-        const enhancedResult = enhanceAnalysisWithAI(result, optimizationResult);
+        const enhancedResult = enhanceAnalysisWithAI(result);
         if (enhancedResult) {
           result = enhancedResult;
           

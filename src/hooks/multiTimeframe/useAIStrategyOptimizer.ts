@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
@@ -89,12 +88,10 @@ export function useAIStrategyOptimizer() {
   /**
    * Apply AI optimizations to the current analysis
    * @param analysis The current analysis result
-   * @param optimizationResult The AI optimization result
    * @returns Enhanced analysis with AI optimizations
    */
   const enhanceAnalysisWithAI = (
-    analysis: MultiTimeframeAnalysisResult | null,
-    optimizationResult: StrategyOptimizationResult | null
+    analysis: MultiTimeframeAnalysisResult | null
   ): MultiTimeframeAnalysisResult | null => {
     if (!analysis || !optimizationResult) return analysis;
 
