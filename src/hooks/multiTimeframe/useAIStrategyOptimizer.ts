@@ -92,7 +92,7 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   return {
     optimizeStrategy,
     enhanceAnalysisWithAI,
-    isOptimizing,
+    isLoading: isOptimizing,
     optimizationResult
   };
 }
