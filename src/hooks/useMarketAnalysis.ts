@@ -14,7 +14,7 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
   // Função para analisar o mercado e gerar sinais de alta precisão
   const handleAnalyzeMarket = useCallback(() => {
     // Verificar cache primeiro
-    const cacheKey = cacheService.static.generateKey('market-analysis', { symbol, interval });
+    const cacheKey = cacheService.generateKey('market-analysis', { symbol, interval });
     const cachedResult = cacheService.get<MarketAnalysisResult>(cacheKey);
     
     if (cachedResult) {

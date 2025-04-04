@@ -21,7 +21,7 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
   
   const generateAnalysis = () => {
     // Verificar cache primeiro
-    const cacheKey = cacheService.static.generateKey('analysis', { symbol, interval });
+    const cacheKey = cacheService.generateKey('analysis', { symbol, interval });
     const cachedResult = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
     
     if (cachedResult) {
@@ -100,7 +100,7 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
     if (!analysis) return;
     
     // Verificar cache para atualizações em tempo real
-    const cacheKey = cacheService.static.generateKey('realtime-update', { symbol, interval });
+    const cacheKey = cacheService.generateKey('realtime-update', { symbol, interval });
     const cachedUpdate = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
     
     if (cachedUpdate) {

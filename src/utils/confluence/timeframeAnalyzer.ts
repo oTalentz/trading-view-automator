@@ -23,7 +23,7 @@ export const analyzeAllTimeframes = (
 ): MultiTimeframeAnalysisResult => {
   // Verificar cache para atualizações em tempo real
   if (realtimeUpdate) {
-    const cacheKey = cacheService.static.generateKey('realtime-analysis', { symbol, interval });
+    const cacheKey = cacheService.generateKey('realtime-analysis', { symbol, interval });
     const cachedResult = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
     
     if (cachedResult) {
@@ -32,7 +32,7 @@ export const analyzeAllTimeframes = (
   }
   
   // Para análises completas, usar cache com validade menor
-  const cacheKey = cacheService.static.generateKey('full-analysis', { symbol, interval });
+  const cacheKey = cacheService.generateKey('full-analysis', { symbol, interval });
   const cachedResult = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
   
   if (cachedResult && !realtimeUpdate) {

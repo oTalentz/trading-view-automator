@@ -9,7 +9,7 @@ type CacheEntry<T> = {
   expiresAt: number;
 };
 
-class CacheService {
+export class CacheService {
   private cache: Map<string, CacheEntry<any>> = new Map();
   
   // Armazena dados no cache com tempo de expiração
@@ -71,7 +71,7 @@ class CacheService {
   }
   
   // Gera uma chave de cache baseada em parâmetros
-  static generateKey(base: string, params: Record<string, any>): string {
+  generateKey(base: string, params: Record<string, any>): string {
     const sortedParams = Object.keys(params)
       .sort()
       .map(key => `${key}:${params[key]}`)
