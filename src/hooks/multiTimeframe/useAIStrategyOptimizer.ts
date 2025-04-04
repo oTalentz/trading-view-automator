@@ -31,7 +31,7 @@ export function useAIStrategyOptimizer() {
    * @param minSampleSize Minimum number of signals required for optimization
    * @returns Optimization result with strategy adjustments
    */
-  const optimizeStrategy = (symbol: string, minSampleSize: number = 10): StrategyOptimizationResult | null => {
+  const optimizeStrategy = (symbol: string, minSampleSize = 10): StrategyOptimizationResult | null => {
     setIsOptimizing(true);
 
     try {
