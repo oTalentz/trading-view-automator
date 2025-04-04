@@ -25,6 +25,6 @@ export interface TimeframePerformance {
 export interface UseAIStrategyOptimizerReturn {
   optimizeStrategy: (symbol: string) => StrategyOptimizationResult | null;
   enhanceAnalysisWithAI: (analysis: MultiTimeframeAnalysisResult | null) => MultiTimeframeAnalysisResult | null;
-  isOptimizing: boolean;
+  isLoading: boolean;
   optimizationResult: StrategyOptimizationResult | null;
 }
