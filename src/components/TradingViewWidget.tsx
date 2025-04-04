@@ -78,20 +78,26 @@ export function TradingViewWidget({
       </div>
       
       {analysis && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          <ConfluenceHeatmap analysis={analysis} />
+        <>
+          {/* ConfluenceHeatmap - First */}
+          <div className="mt-6">
+            <ConfluenceHeatmap analysis={analysis} />
+          </div>
           
-          <Suspense fallback={<AnalyticsSkeleton />}>
-            <CustomAlerts symbol={symbol} interval={interval} />
-          </Suspense>
-        </div>
+          {/* Machine Learning and AI Strategy Insights - After ConfluenceHeatmap */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <MachineLearningInsights symbol={symbol} interval={interval} />
+            <AIStrategyInsights symbol={symbol} />
+          </div>
+          
+          {/* CustomAlerts - Last */}
+          <div className="mt-6">
+            <Suspense fallback={<AnalyticsSkeleton />}>
+              <CustomAlerts symbol={symbol} interval={interval} />
+            </Suspense>
+          </div>
+        </>
       )}
-      
-      {/* Machine Learning and AI Strategy Insights - Positioned between heatmap and alerts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <MachineLearningInsights symbol={symbol} interval={interval} />
-        <AIStrategyInsights symbol={symbol} />
-      </div>
     </div>
   );
 }
