@@ -23,7 +23,7 @@ export function useAIInsights(symbol: string) {
     setIsLoading(true);
     
     try {
-      // Get signal history
+      // Obter histórico de sinais
       const signalHistory = getSignalHistory();
       const symbolSignals = signalHistory.filter(s => s.symbol === symbol);
       
@@ -39,23 +39,23 @@ export function useAIInsights(symbol: string) {
         return;
       }
       
-      // Run AI optimization if not already done
+      // Executar otimização de IA se ainda não estiver feita
       if (!optimizationResult) {
-        // Corrigido para passar apenas o símbolo
+        // Passando apenas o símbolo como parâmetro
         optimizeStrategy(symbol);
       }
       
-      // Calculate general metrics
+      // Calcular métricas gerais
       const completedSignals = symbolSignals.filter(s => s.result);
       const winningSignals = symbolSignals.filter(s => s.result === 'WIN');
       const winRate = completedSignals.length > 0 
         ? (winningSignals.length / completedSignals.length) * 100 
         : 0;
       
-      // Generate insights based on data
+      // Gerar insights baseados nos dados
       const newInsights: AIInsight[] = [];
       
-      // Win rate insight
+      // Insight de taxa de acerto
       if (winRate >= 70) {
         newInsights.push({
           key: 'win-rate-excellent',
@@ -90,7 +90,7 @@ export function useAIInsights(symbol: string) {
         });
       }
       
-      // Confidence correlation insight
+      // Insight de correlação de confiança
       const highConfidenceSignals = completedSignals.filter(s => s.confidence >= 85);
       const highConfidenceWins = highConfidenceSignals.filter(s => s.result === 'WIN').length;
       const highConfidenceWinRate = highConfidenceSignals.length > 0 
@@ -117,7 +117,7 @@ export function useAIInsights(symbol: string) {
         }
       }
       
-      // Timeframe insights
+      // Insights de timeframe
       if (optimizationResult && optimizationResult.recommendedTimeframes.length > 0) {
         newInsights.push({
           key: 'optimal-timeframes',
@@ -130,12 +130,12 @@ export function useAIInsights(symbol: string) {
         });
       }
       
-      // Sort insights by score (highest first)
+      // Ordenar insights por pontuação (maior primeiro)
       newInsights.sort((a, b) => b.score - a.score);
       
       setInsights(newInsights);
     } catch (error) {
-      console.error('Error generating AI insights:', error);
+      console.error('Erro ao gerar insights de IA:', error);
       toast.error(t("insightsGenerationError"), {
         description: t("tryAgainLater"),
       });
@@ -144,7 +144,7 @@ export function useAIInsights(symbol: string) {
     }
   };
   
-  // Initialize insights when symbol changes
+  // Inicializar insights quando o símbolo muda
   useEffect(() => {
     if (symbol) {
       generateInsights();

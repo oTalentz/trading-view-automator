@@ -10,7 +10,7 @@ import { enhanceAnalysisWithAI as enhanceAnalysis } from './utils/analysisEnhanc
 import { StrategyOptimizationResult, UseAIStrategyOptimizerReturn } from './types/strategyTypes';
 
 /**
- * Hook that uses AI to analyze past performance and optimize trading strategies
+ * Hook que usa IA para analisar desempenho passado e otimizar estratégias de trading
  */
 export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
@@ -18,16 +18,16 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   const { t } = useLanguage();
 
   /**
-   * Analyzes historical signals to detect patterns and optimize strategy parameters
-   * @param symbol The symbol to optimize for (e.g. 'EUR/USD')
-   * @returns Optimization result with strategy adjustments
+   * Analisa sinais históricos para detectar padrões e otimizar parâmetros de estratégia
+   * @param symbol O símbolo para otimizar (ex: 'EUR/USD')
+   * @returns Resultado de otimização com ajustes de estratégia
    */
   const optimizeStrategy = (symbol: string): StrategyOptimizationResult | null => {
-    const minSampleSize = 10; // Default value moved here
+    const minSampleSize = 10; // Valor padrão movido para cá
     setIsOptimizing(true);
 
     try {
-      // Check cache first to avoid unnecessary recalculations
+      // Verificar cache primeiro para evitar recálculos desnecessários
       const cacheKey = cacheService.generateKey('ai-optimization', { symbol });
       const cachedResult = cacheService.get<StrategyOptimizationResult>(cacheKey);
       
@@ -37,11 +37,11 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
         return cachedResult;
       }
 
-      // Get historical signal data
+      // Obter dados históricos de sinais
       const signalHistory = getSignalHistory();
       const symbolSignals = signalHistory.filter(signal => signal.symbol === symbol);
       
-      // Only proceed if we have enough data
+      // Só continuar se tivermos dados suficientes
       if (symbolSignals.length < minSampleSize) {
         toast.warning(t("insufficientData"), {
           description: t("needMoreSignals", { count: minSampleSize }),
@@ -50,18 +50,18 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
         return null;
       }
 
-      // Split signals into winning and losing trades
+      // Dividir sinais em trades ganhadoras e perdedoras
       const winningSignals = symbolSignals.filter(signal => signal.result === 'WIN');
       const losingSignals = symbolSignals.filter(signal => signal.result === 'LOSS');
       
-      // Calculate win rate
+      // Calcular taxa de acerto
       const completedSignals = winningSignals.length + losingSignals.length;
       const winRate = completedSignals > 0 ? (winningSignals.length / completedSignals) * 100 : 0;
       
-      // Analyze patterns in winning vs losing trades
+      // Analisar padrões em trades ganhadoras vs perdedoras
       const optimizedResult = analyzePatterns(winningSignals, losingSignals, winRate);
       
-      // Cache the result for 24 hours (optimization doesn't need to run frequently)
+      // Armazenar em cache por 24 horas (otimização não precisa rodar com frequência)
       cacheService.set(cacheKey, optimizedResult, 24 * 60 * 60);
       
       setOptimizationResult(optimizedResult);
@@ -69,7 +69,7 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
       
       return optimizedResult;
     } catch (error) {
-      console.error('Error in AI strategy optimization:', error);
+      console.error('Erro na otimização de estratégia com IA:', error);
       toast.error(t("optimizationError"), {
         description: t("tryAgainLater"),
       });
@@ -79,9 +79,9 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   };
 
   /**
-   * Apply AI optimizations to the current analysis
-   * @param analysis The current analysis result
-   * @returns Enhanced analysis with AI optimizations
+   * Aplicar otimizações de IA na análise atual
+   * @param analysis O resultado da análise atual
+   * @returns Análise aprimorada com otimizações de IA
    */
   const enhanceAnalysisWithAI = (
     analysis: MultiTimeframeAnalysisResult | null
