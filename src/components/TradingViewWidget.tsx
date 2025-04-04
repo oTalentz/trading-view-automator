@@ -66,8 +66,13 @@ export function TradingViewWidget({
       </div>
       
       {analysis && (
-        <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          {/* Reordered to place ML and AI insights first */}
+          <MachineLearningInsights symbol={symbol} interval={interval} />
+          <AIStrategyInsights symbol={symbol} />
           <ConfluenceHeatmap analysis={analysis} />
+          <VolumeAnalysis symbol={symbol} />
+          <AssetComparison mainSymbol={symbol} />
         </div>
       )}
     </div>
