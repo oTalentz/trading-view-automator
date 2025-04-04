@@ -50,7 +50,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
     volatility: primarySignal.technicalScores.volumeTrend || 0
   };
   
-  // Handle trendStrength properly with defaults and type safety
+  // Properly handle trendStrength with correct type definition
   let trendStrengthValue = 0;
   let trendStrengthDirection: 'bullish' | 'bearish' | 'neutral' = 'neutral';
   
@@ -63,9 +63,10 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
           ? 'bearish' 
           : 'neutral';
     } else if (typeof primarySignal.trendStrength === 'object' && primarySignal.trendStrength !== null) {
-      // Handle object with value property
-      trendStrengthValue = primarySignal.trendStrength.value || 0;
-      trendStrengthDirection = primarySignal.trendStrength.direction || 
+      // Handle object with value property - make sure we check if the properties exist
+      const trendObj = primarySignal.trendStrength as { value?: number; direction?: 'bullish' | 'bearish' | 'neutral' };
+      trendStrengthValue = trendObj.value || 0;
+      trendStrengthDirection = trendObj.direction || 
         (trendStrengthValue > 60 
           ? 'bullish' 
           : trendStrengthValue < 40 
@@ -74,7 +75,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
     }
   }
   
-  // Create structured trendStrength object
+  // Create structured trendStrength object with the correct types
   const trendStrength = {
     value: trendStrengthValue,
     direction: trendStrengthDirection
