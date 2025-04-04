@@ -7,6 +7,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { ConfluenceHeatmap } from './ConfluenceHeatmap';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MachineLearningInsights } from './MachineLearningInsights';
+import { AIStrategyInsights } from './AIStrategyInsights';
 
 // Lazy load components for better performance
 const CustomAlerts = lazy(() => import('./alerts/CustomAlerts').then(mod => ({ default: mod.CustomAlerts })));
@@ -84,6 +86,12 @@ export function TradingViewWidget({
           </Suspense>
         </div>
       )}
+      
+      {/* Machine Learning and AI Strategy Insights - Positioned between heatmap and alerts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <MachineLearningInsights symbol={symbol} interval={interval} />
+        <AIStrategyInsights symbol={symbol} />
+      </div>
     </div>
   );
 }

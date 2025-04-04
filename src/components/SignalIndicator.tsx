@@ -7,8 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, AlertTriangle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAIInsights } from '@/hooks/useAIInsights';
-import { MachineLearningInsights } from './MachineLearningInsights';
-import { AIStrategyInsights } from './AIStrategyInsights';
 
 // Import refactored components
 import { SignalHeader } from './signal/SignalHeader';
@@ -83,10 +81,6 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
 
   return (
     <div className="space-y-4">
-      {/* Machine Learning and AI Insights Cards - Now positioned at the top */}
-      <MachineLearningInsights symbol={symbol} interval={interval} />
-      <AIStrategyInsights symbol={symbol} />
-      
       <Card className={`shadow-lg overflow-hidden border-t-4 ${
         primarySignal.direction === 'CALL' 
           ? 'border-t-green-500 dark:border-t-green-600' 
