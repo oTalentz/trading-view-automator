@@ -27,111 +27,115 @@ export const calculateSignalQuality = (
   if (direction === 'CALL' && 
       (marketCondition === MarketCondition.TREND_UP || 
        marketCondition === MarketCondition.STRONG_TREND_UP)) {
-    score += 20; // Increased from 15 for stronger alignment
+    score += 20; // Strong alignment with uptrend
   } else if (direction === 'PUT' && 
              (marketCondition === MarketCondition.TREND_DOWN || 
               marketCondition === MarketCondition.STRONG_TREND_DOWN)) {
-    score += 20; // Increased from 15 for stronger alignment
+    score += 20; // Strong alignment with downtrend
   } else if (marketCondition === MarketCondition.VOLATILE) {
-    score -= 15; // Increased penalty for volatile markets to reduce noise
-  } else if (marketCondition === MarketCondition.SIDEWAYS && (rsi > 65 || rsi < 35)) {
+    score -= 18; // Higher penalty for volatile markets
+  } else if (marketCondition === MarketCondition.SIDEWAYS && (rsi > 68 || rsi < 32)) {
     // In sideways markets, only take extreme RSI values
-    score += 10;
+    score += 12;
   } else if (marketCondition === MarketCondition.SIDEWAYS) {
-    score -= 10; // Reduce confidence in sideways markets without clear signals
+    score -= 12; // Reduce confidence in sideways markets without clear signals
   }
   
   // Factor 2: RSI confirmation with more nuanced ranges
   if (direction === 'CALL') {
-    if (rsi > 50 && rsi < 70) {
-      score += 10;
-    } else if (rsi >= 30 && rsi <= 50) {
+    if (rsi > 50 && rsi < 68) {
+      score += 12; // Bullish RSI zone
+    } else if (rsi >= 32 && rsi <= 50) {
       // Potential reversal zone for CALL
-      score += 5;
-    } else if (rsi < 30) {
+      score += 6;
+    } else if (rsi < 32) {
       // Oversold, potential strong reversal
-      score += 15;
-    } else if (rsi > 75) {
+      score += 17;
+    } else if (rsi > 78) {
       // Extremely overbought, reduce confidence
-      score -= 10;
+      score -= 12;
     }
   } else if (direction === 'PUT') {
-    if (rsi < 50 && rsi > 30) {
-      score += 10;
-    } else if (rsi >= 50 && rsi <= 70) {
+    if (rsi < 50 && rsi > 32) {
+      score += 12; // Bearish RSI zone
+    } else if (rsi >= 50 && rsi <= 68) {
       // Potential reversal zone for PUT
-      score += 5;
-    } else if (rsi > 70) {
+      score += 6;
+    } else if (rsi > 68) {
       // Overbought, potential strong reversal
-      score += 15;
-    } else if (rsi < 25) {
+      score += 17;
+    } else if (rsi < 22) {
       // Extremely oversold, reduce confidence
-      score -= 10;
+      score -= 12;
     }
   }
   
   // Factor 3: MACD confirmation with histogram strength
   if (direction === 'CALL') {
     if (histogram > 0 && macdLine > signalLine) {
-      score += 10 + Math.min(Math.abs(histogram) * 20, 5); // Add strength factor
-    } else if (histogram < 0 && histogram > -0.05 && macdLine > macdLine * 0.95) {
+      score += 12 + Math.min(Math.abs(histogram) * 25, 6); // Add strength factor
+    } else if (histogram < 0 && histogram > -0.04 && macdLine > macdLine * 0.97) {
       // About to cross, potential setup
-      score += 5;
-    } else if (histogram < -0.1) {
+      score += 7;
+    } else if (histogram < -0.08) {
       // Strong negative histogram, reduce confidence
-      score -= 5;
+      score -= 8;
     }
   } else if (direction === 'PUT') {
     if (histogram < 0 && macdLine < signalLine) {
-      score += 10 + Math.min(Math.abs(histogram) * 20, 5); // Add strength factor
-    } else if (histogram > 0 && histogram < 0.05 && macdLine < macdLine * 1.05) {
+      score += 12 + Math.min(Math.abs(histogram) * 25, 6); // Add strength factor
+    } else if (histogram > 0 && histogram < 0.04 && macdLine < macdLine * 1.03) {
       // About to cross, potential setup
-      score += 5;
-    } else if (histogram > 0.1) {
+      score += 7;
+    } else if (histogram > 0.08) {
       // Strong positive histogram, reduce confidence
-      score -= 5;
+      score -= 8;
     }
   }
   
-  // Factor 4: Bollinger Bands position with increased weight
+  // Factor 4: Bollinger Bands position with more precise thresholds
   if (direction === 'CALL') {
-    if (currentPrice < bollingerBands.lower * 1.01) {
-      score += 15; // Strong bounce potential from lower band
-    } else if (currentPrice < bollingerBands.middle) {
-      score += 8; // Potential bounce up from below the middle band
-    } else if (currentPrice > bollingerBands.upper * 0.99) {
-      score -= 15; // Reduce score if price is near upper band for CALL
+    if (currentPrice < bollingerBands.lower * 1.005) {
+      score += 18; // Strong bounce potential from lower band
+    } else if (currentPrice < bollingerBands.middle * 0.985) {
+      score += 10; // Potential bounce up from below the middle band
+    } else if (currentPrice > bollingerBands.upper * 0.995) {
+      score -= 18; // Reduce score if price is near upper band for CALL
     }
   } else if (direction === 'PUT') {
-    if (currentPrice > bollingerBands.upper * 0.99) {
-      score += 15; // Strong drop potential from upper band
-    } else if (currentPrice > bollingerBands.middle) {
-      score += 8; // Potential drop from above the middle band
-    } else if (currentPrice < bollingerBands.lower * 1.01) {
-      score -= 15; // Reduce score if price is near lower band for PUT
+    if (currentPrice > bollingerBands.upper * 0.995) {
+      score += 18; // Strong drop potential from upper band
+    } else if (currentPrice > bollingerBands.middle * 1.015) {
+      score += 10; // Potential drop from above the middle band
+    } else if (currentPrice < bollingerBands.lower * 1.005) {
+      score -= 18; // Reduce score if price is near lower band for PUT
     }
   }
   
-  // Factor 5: Trend strength adjustment with more weight
-  score += (trendStrength - 50) / 4;
-  
-  // Factor 6: Volatility filter to reduce false signals
-  if (volatility > 0.015) { // High volatility threshold
-    const volatilityPenalty = Math.min(volatility * 400, 20);
-    score -= volatilityPenalty; // Penalize high volatility
-  } else if (volatility < 0.005) { // Low volatility, more predictable
-    score += 5;
+  // Factor 5: Trend strength adjustment with more weight for strong trends
+  if (trendStrength > 75) {
+    score += (trendStrength - 75) / 2.5; // Extra boost for very strong trends
+  } else {
+    score += (trendStrength - 50) / 4; // Regular adjustment
   }
   
-  // Factor 7: Price position relative to recent prices
-  const last5Prices = prices.slice(-5);
-  const avgPrice = last5Prices.reduce((sum, p) => sum + p, 0) / 5;
-  if (direction === 'CALL' && currentPrice < avgPrice * 0.995) {
-    score += 5; // Price pulled back, good entry
-  } else if (direction === 'PUT' && currentPrice > avgPrice * 1.005) {
-    score += 5; // Price pushed up, good entry
+  // Factor 6: Volatility filter with more precise thresholds
+  if (volatility > 0.014) { // High volatility threshold
+    const volatilityPenalty = Math.min(volatility * 450, 22);
+    score -= volatilityPenalty; // Penalize high volatility more aggressively
+  } else if (volatility < 0.004) { // Low volatility, more predictable
+    score += 7; // Reward low volatility more
   }
   
-  // Ensure score is within 0-100 range with a more moderate cap
-  return Math.min(Math.max(score, 25), 95); // Cap between 25-95 for realism
+  // Factor 7: Price position relative to recent prices with shorter lookback
+  const last3Prices = prices.slice(-3);
+  const avgPrice = last3Prices.reduce((sum, p) => sum + p, 0) / 3;
+  if (direction === 'CALL' && currentPrice < avgPrice * 0.997) {
+    score += 7; // Price pulled back, good entry
+  } else if (direction === 'PUT' && currentPrice > avgPrice * 1.003) {
+    score += 7; // Price pushed up, good entry
+  }
+  
+  // Ensure score is within 0-100 range
+  return Math.min(Math.max(score, 25), 95);
 };

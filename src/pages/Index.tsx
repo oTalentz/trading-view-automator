@@ -1,9 +1,6 @@
-
 import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TradingViewWidget } from "@/components/TradingViewWidget";
-import { WebhookSetup } from "@/components/WebhookSetup";
-import { StrategyGuide } from "@/components/StrategyGuide";
 import { SignalIndicator } from "@/components/SignalIndicator";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -11,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLanguage } from "@/context/LanguageContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LineChart, BarChart3 } from "lucide-react";
+import { BarChart3, Settings } from "lucide-react";
 
 const symbols = [
   // Criptomoedas
@@ -81,12 +78,20 @@ const IndexContent = () => {
       <main className="flex-1 container py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">{t("tradingViewAutomator")}</h1>
-          <Link to="/dashboard">
-            <Button variant="outline" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              {t("dashboard")}
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link to="/configuration">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                {t("configuration")}
+              </Button>
+            </Link>
+            <Link to="/dashboard">
+              <Button variant="outline" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                {t("dashboard")}
+              </Button>
+            </Link>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-6">
@@ -97,7 +102,7 @@ const IndexContent = () => {
                   value={symbol}
                   onValueChange={setSymbol}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={t("selectSymbol")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -111,6 +116,7 @@ const IndexContent = () => {
                           </SelectItem>
                         ))
                       }
+                      
                       <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Major</div>
                       {symbols
                         .filter(s => s.value.includes('FX:') && 
@@ -124,6 +130,7 @@ const IndexContent = () => {
                           </SelectItem>
                         ))
                       }
+                      
                       <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Cross</div>
                       {symbols
                         .filter(s => s.value.includes('FX:') && 
@@ -137,6 +144,7 @@ const IndexContent = () => {
                           </SelectItem>
                         ))
                       }
+                      
                       <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Exóticos</div>
                       {symbols
                         .filter(s => s.value.includes('FX:') && 
@@ -150,6 +158,7 @@ const IndexContent = () => {
                           </SelectItem>
                         ))
                       }
+                      
                       <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Ações</div>
                       {symbols
                         .filter(s => s.value.includes('NASDAQ:') || s.value.includes('NYSE:'))
@@ -188,11 +197,8 @@ const IndexContent = () => {
           
           <div className="space-y-6">
             <SignalIndicator symbol={symbol} interval={interval} />
-            <WebhookSetup />
           </div>
         </div>
-        
-        <StrategyGuide />
       </main>
       
       <footer className="border-t py-6">

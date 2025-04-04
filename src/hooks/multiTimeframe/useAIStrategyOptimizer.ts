@@ -41,12 +41,12 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   };
   
   // Function to enhance analysis with AI insights
-  const enhanceAnalysisWithAI = (analysis: MultiTimeframeAnalysisResult): MultiTimeframeAnalysisResult => {
+  const enhanceWithAI = (analysis: MultiTimeframeAnalysisResult): MultiTimeframeAnalysisResult => {
     if (!analysis) return analysis;
     
     try {
-      // Apply simulated AI enhancements to the analysis
-      return enhanceAnalysisWithAI(analysis, null);
+      // Apply enhanced AI optimizations to the analysis
+      return enhanceAnalysisWithAI(analysis);
     } catch (error) {
       console.error("Error enhancing analysis with AI:", error);
       return analysis;
@@ -55,7 +55,7 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   
   return {
     optimizeStrategy,
-    enhanceAnalysisWithAI,
+    enhanceAnalysisWithAI: enhanceWithAI,
     isLoading
   };
 }
