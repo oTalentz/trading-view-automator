@@ -35,7 +35,7 @@ export function OverviewTab({ resultData, timeframeData }: OverviewTabProps) {
   
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-3 gap-4 mb-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardDescription>{t("popularTimeframe")}</CardDescription>
@@ -82,10 +82,11 @@ export function OverviewTab({ resultData, timeframeData }: OverviewTabProps) {
         </Card>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-6">
         <SignalResultsChart resultData={resultData} />
         <TimeframeBarChart timeframeData={timeframeData} />
       </div>
     </div>
   );
 }
+

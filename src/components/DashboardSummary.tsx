@@ -1,17 +1,18 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { getSignalHistory } from '@/utils/signalHistoryUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Import our new component
+// Import our components
 import { EmptyState } from './dashboard/EmptyState';
 import { SummaryCards } from './dashboard/SummaryCards';
 import { OverviewTab } from './dashboard/OverviewTab';
 import { PerformanceHistoryChart } from './dashboard/PerformanceHistoryChart';
 import { ConfidenceAnalysisChart } from './dashboard/ConfidenceAnalysisChart';
 import { UpcomingEventsCard } from './dashboard/UpcomingEventsCard';
+import { ConfluenceHeatmap } from './ConfluenceHeatmap';
+import { TimeframeConfluence } from './TimeframeConfluence';
 
 export function DashboardSummary() {
   const { t } = useLanguage();
@@ -146,6 +147,18 @@ export function DashboardSummary() {
   
   const confidenceData = getWinRateByConfidence();
   
+  // For ConfluenceHeatmap component
+  const mockAnalysis = {
+    overallConfluence: 78,
+    confluenceDirection: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL',
+    timeframes: [
+      { label: '1m', confidence: 65, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL' },
+      { label: '5m', confidence: 82, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL' },
+      { label: '15m', confidence: 75, direction: 'NEUTRAL' as 'CALL' | 'PUT' | 'NEUTRAL' },
+      { label: '1h', confidence: 90, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL' },
+    ]
+  };
+  
   // If no signals, show empty state
   if (totalSignals === 0) {
     return <EmptyState />;
@@ -177,6 +190,31 @@ export function DashboardSummary() {
         putSignalsPercentage={putSignalsPercentage}
       />
       
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <ConfluenceHeatmap analysis={mockAnalysis} />
+          
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <TimeframeConfluence 
+              timeframes={
+                mockAnalysis.timeframes.map(t => ({
+                  timeframe: t.label,
+                  label: t.label,
+                  confidence: t.confidence,
+                  direction: t.direction,
+                  marketCondition: 'UPTREND'
+                }))
+              } 
+              overallConfluence={mockAnalysis.overallConfluence}
+              confluenceDirection={mockAnalysis.confluenceDirection}
+              currentTimeframe="5m"
+            />
+          </div>
+        </div>
+        
+        <UpcomingEventsCard />
+      </div>
+      
       <Tabs defaultValue="overview" className="w-full mb-6">
         <TabsList className="mb-4">
           <TabsTrigger value="overview">{t("overview")}</TabsTrigger>
@@ -199,8 +237,6 @@ export function DashboardSummary() {
           <ConfidenceAnalysisChart confidenceData={confidenceData} />
         </TabsContent>
       </Tabs>
-      
-      <UpcomingEventsCard />
     </>
   );
 }

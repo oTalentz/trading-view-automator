@@ -33,78 +33,79 @@ export function SummaryCards({
   const avgSignalsPerDay = Math.round(totalSignals / (totalSignals > 30 ? 30 : Math.max(1, totalSignals / 3)));
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardDescription>{t("totalSignals")}</CardDescription>
-          <CardTitle className="text-3xl flex items-center gap-2">
-            <LineChart className="h-5 w-5 text-primary" />
-            {totalSignals}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-muted-foreground">
-            {completedSignals} {t("completed")}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col space-y-4 mb-6">
+      <div className="grid grid-cols-4 gap-4">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardDescription>{t("totalSignals")}</CardDescription>
+            <CardTitle className="text-3xl flex items-center gap-2">
+              <LineChart className="h-5 w-5 text-primary" />
+              {totalSignals}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              {completedSignals} {t("completed")}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardDescription>{t("winRate")}</CardDescription>
+            <CardTitle className="text-3xl flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-amber-500" />
+              {winRate}%
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              {winningSignals} {t("wins")} / {completedSignals} {t("completed")}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardDescription>{t("bestTimeframe")}</CardDescription>
+            <CardTitle className="text-3xl flex items-center gap-2">
+              <Clock className="h-5 w-5 text-blue-500" />
+              {timeframeData.length > 0 ? timeframeData[0].timeframe : '-'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              {timeframeData.length > 0 ? `${timeframeData[0].count} ${t("signals")}` : t("noData")}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardDescription>{t("direction")}</CardDescription>
+            <CardTitle className="text-3xl flex items-center gap-2">
+              {callDominant ? (
+                <>
+                  <TrendingUp className="h-5 w-5 text-green-500" /> 
+                  CALL
+                </>
+              ) : (
+                <>
+                  <TrendingDown className="h-5 w-5 text-red-500" /> 
+                  PUT
+                </>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xs text-muted-foreground">
+              {callSignalsPercentage}% CALL / {putSignalsPercentage}% PUT
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       
       <Card className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardDescription>{t("winRate")}</CardDescription>
-          <CardTitle className="text-3xl flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-amber-500" />
-            {winRate}%
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-muted-foreground">
-            {winningSignals} {t("wins")} / {completedSignals} {t("completed")}
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardDescription>{t("bestTimeframe")}</CardDescription>
-          <CardTitle className="text-3xl flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
-            {timeframeData.length > 0 ? timeframeData[0].timeframe : '-'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-muted-foreground">
-            {timeframeData.length > 0 ? `${timeframeData[0].count} ${t("signals")}` : t("noData")}
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardDescription>{t("direction")}</CardDescription>
-          <CardTitle className="text-3xl flex items-center gap-2">
-            {callDominant ? (
-              <>
-                <TrendingUp className="h-5 w-5 text-green-500" /> 
-                CALL
-              </>
-            ) : (
-              <>
-                <TrendingDown className="h-5 w-5 text-red-500" /> 
-                PUT
-              </>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-muted-foreground">
-            {callSignalsPercentage}% CALL / {putSignalsPercentage}% PUT
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* New card to fill the empty space - Average Signals per Day */}
-      <Card className="hover:shadow-md transition-shadow lg:col-span-4">
         <CardHeader className="pb-2">
           <CardDescription>{t("averageActivity")}</CardDescription>
           <CardTitle className="text-xl flex items-center gap-2">
@@ -127,3 +128,4 @@ export function SummaryCards({
     </div>
   );
 }
+
