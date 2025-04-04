@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
 import { MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
-import { simulateAIEnhancements } from './utils/analysisEnhancer';
-import { analyzeMarketPatterns } from './utils/patternAnalyzer';
+import { enhanceAnalysisWithAI } from './utils/analysisEnhancer';
+import { analyzePatterns } from './utils/patternAnalyzer';
 
-// Definir interface para o retorno do hook
+// Define interface for the hook return
 export interface UseAIStrategyOptimizerReturn {
   optimizeStrategy: (symbol: string) => any;
   enhanceAnalysisWithAI: (analysis: MultiTimeframeAnalysisResult) => MultiTimeframeAnalysisResult;
@@ -12,20 +12,20 @@ export interface UseAIStrategyOptimizerReturn {
 }
 
 /**
- * Hook para otimização de estratégias utilizando IA
+ * Hook for strategy optimization using AI
  */
 export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   const [isLoading, setIsLoading] = useState(false);
   
-  // Função para otimizar estratégia com base no símbolo
+  // Function to optimize strategy based on symbol
   const optimizeStrategy = (symbol: string) => {
     try {
       setIsLoading(true);
       
-      // Simula análise de padrões avançados com IA
-      const patterns = analyzeMarketPatterns(symbol);
+      // Simulate advanced pattern analysis with AI
+      const patterns = analyzePatterns([], [], 65); // Using default values until we have real data
       
-      // Simula processamento de IA (poderia conectar a uma API externa)
+      // Simulate AI processing (could connect to an external API)
       const delay = Math.random() * 500 + 500;
       setTimeout(() => {
         setIsLoading(false);
@@ -40,13 +40,13 @@ export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
     }
   };
   
-  // Função para aprimorar análise com insights de IA
+  // Function to enhance analysis with AI insights
   const enhanceAnalysisWithAI = (analysis: MultiTimeframeAnalysisResult): MultiTimeframeAnalysisResult => {
     if (!analysis) return analysis;
     
     try {
-      // Aplica aprimoramentos de IA simulados à análise
-      return simulateAIEnhancements(analysis);
+      // Apply simulated AI enhancements to the analysis
+      return enhanceAnalysisWithAI(analysis, null);
     } catch (error) {
       console.error("Error enhancing analysis with AI:", error);
       return analysis;

@@ -12,10 +12,19 @@ export const enhanceAnalysisWithAI = (
   analysis: MultiTimeframeAnalysisResult | null,
   optimizationResult: StrategyOptimizationResult | null
 ): MultiTimeframeAnalysisResult | null => {
-  if (!analysis || !optimizationResult) return analysis;
+  if (!analysis) return analysis;
 
   // Clone the analysis to avoid mutating the original
   const enhancedAnalysis = JSON.parse(JSON.stringify(analysis)) as MultiTimeframeAnalysisResult;
+  
+  // If no optimization result, just apply minimal enhancements
+  if (!optimizationResult) {
+    // Add AI optimization indicator if not already present
+    if (!enhancedAnalysis.primarySignal.indicators.includes('AI Optimization')) {
+      enhancedAnalysis.primarySignal.indicators.push('AI Optimization');
+    }
+    return enhancedAnalysis;
+  }
   
   // Apply confidence adjustment based on AI optimization
   const adjustedConfidence = Math.min(

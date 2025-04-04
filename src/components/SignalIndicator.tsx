@@ -25,7 +25,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
   const { insights, isLoading: insightsLoading, generateInsights } = useAIInsights(symbol);
   const { t } = useLanguage();
 
-  // Se não houver análise, mostre um indicador de carregamento
+  // If no analysis, show a loading indicator
   if (!analysis) {
     return (
       <Card className="border-2 border-dashed border-gray-200 dark:border-gray-800">
@@ -37,10 +37,10 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
     );
   }
 
-  // Extrair o sinal principal da análise
+  // Extract the primary signal from the analysis
   const { primarySignal } = analysis;
   
-  // Convertendo o formato das pontuações técnicas para compatibilidade
+  // Convert technical scores format for compatibility
   const technicalScores = {
     overall: primarySignal.technicalScores.overallScore || 0,
     trend: primarySignal.technicalScores.priceAction || 0,
@@ -48,19 +48,28 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
     volatility: primarySignal.technicalScores.volumeTrend || 0
   };
   
-  // Convertendo o formato da força da tendência para compatibilidade
+  // Handle trendStrength properly, checking its type and providing defaults
+  const trendStrengthValue = typeof primarySignal.trendStrength === 'number' 
+    ? primarySignal.trendStrength 
+    : typeof primarySignal.trendStrength === 'object' && primarySignal.trendStrength !== null
+      ? primarySignal.trendStrength.value || 0
+      : 0;
+      
+  const trendStrengthDirection = typeof primarySignal.trendStrength === 'object' && 
+                               primarySignal.trendStrength !== null && 
+                               'direction' in primarySignal.trendStrength
+    ? primarySignal.trendStrength.direction
+    : trendStrengthValue > 60 
+      ? 'bullish' 
+      : trendStrengthValue < 40 
+        ? 'bearish' 
+        : 'neutral';
+  
+  // Create structured trendStrength object
   const trendStrength = {
-    value: typeof primarySignal.trendStrength === 'number' 
-      ? primarySignal.trendStrength 
-      : primarySignal.trendStrength?.value || 0,
-    direction: typeof primarySignal.trendStrength === 'object' && primarySignal.trendStrength?.direction
-      ? primarySignal.trendStrength.direction 
-      : primarySignal.trendStrength > 60 
-        ? 'bullish' 
-        : primarySignal.trendStrength < 40 
-          ? 'bearish' 
-          : 'neutral'
-  } as { value: number; direction: 'bullish' | 'bearish' | 'neutral' };
+    value: trendStrengthValue,
+    direction: trendStrengthDirection as 'bullish' | 'bearish' | 'neutral'
+  };
 
   return (
     <div className="space-y-4">
@@ -94,7 +103,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
         </CardContent>
       </Card>
       
-      {/* Componente de confluência de timeframes */}
+      {/* Multi-timeframe confluence component */}
       <Card className="shadow-sm overflow-hidden">
         <CardContent className="p-4">
           <TimeframeConfluence 
@@ -106,7 +115,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
         </CardContent>
       </Card>
       
-      {/* Card de Insights de IA */}
+      {/* AI Insights Card */}
       <Card className="shadow-sm border-t-4 border-t-indigo-400 dark:border-t-indigo-600">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
