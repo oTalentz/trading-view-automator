@@ -2,4 +2,5 @@
 /**
  * Re-export from the refactored module structure
  */
-export { validateSignal, ValidationResult } from './validator';
+export { validateSignal } from './validator';
+export type { ValidationResult } from './validator';
