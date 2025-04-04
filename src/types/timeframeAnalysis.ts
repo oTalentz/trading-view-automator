@@ -2,7 +2,7 @@
 import { MarketCondition } from '@/utils/technicalAnalysis';
 
 export interface TimeframeAnalysis {
-  direction: 'CALL' | 'PUT';
+  direction: 'CALL' | 'PUT' | 'NEUTRAL';
   confidence: number;
   strength: number;
   timeframe: string;
@@ -47,4 +47,3 @@ export const CONFLUENCE_TIMEFRAMES = [
   { value: "15", label: "15m" },
   { value: "60", label: "1h" }
 ];
-
