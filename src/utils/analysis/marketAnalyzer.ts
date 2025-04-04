@@ -19,6 +19,7 @@ import { calculateOptimalEntryTiming, calculateExpiryMinutes } from '@/utils/tim
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
 import { validateSignal } from '@/utils/signals/signalValidator';
 import { SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
+import { StrategyWithDetails } from '@/utils/strategy/types';
 
 /**
  * Análise de mercado abrangente que combina todos os indicadores técnicos,
@@ -56,7 +57,7 @@ export const analyzeMarket = (
   const bbands = calculateBollingerBands(prices);
   
   // Selecionar estratégia ideal com base nas condições atuais do mercado e sentimento
-  const selectedStrategy = selectStrategy(
+  const selectedStrategy: StrategyWithDetails = selectStrategy(
     marketCondition, 
     prices, 
     volume,

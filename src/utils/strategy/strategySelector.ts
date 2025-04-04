@@ -1,13 +1,13 @@
-
 import { MarketCondition } from '@/utils/technicalAnalysis';
 import { MARKET_CONDITION_STRATEGIES } from '@/constants/tradingStrategies';
 import { scoreStrategies } from './scoring/strategyScorer';
 import { optimizeStrategySelection } from '@/utils/ml/strategyOptimizer';
 import { SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
 import { cacheService } from '@/utils/cacheSystem';
+import { StrategyDetails, StrategyWithDetails, AlternativeStrategy } from './types';
 
 // Define the ADVANCED_STRATEGIES constant that was missing
-const ADVANCED_STRATEGIES = {
+const ADVANCED_STRATEGIES: Record<string, StrategyDetails> = {
   'RSI_DIVERGENCE': {
     name: 'RSI Divergence',
     indicators: ['RSI', 'Price Action', 'Trend Analysis'],
@@ -88,7 +88,7 @@ export const selectStrategy = (
   trendStrength: number = 50,
   sentimentData: SentimentAnalysisResult | null = null,
   useML: boolean = true
-) => {
+): StrategyWithDetails => {
   // Obtem estratégias compatíveis para a condição atual de mercado
   const compatibleStrategies = MARKET_CONDITION_STRATEGIES[marketCondition] || 
     MARKET_CONDITION_STRATEGIES.SIDEWAYS; // Default para lateral se condição não encontrada
@@ -179,7 +179,7 @@ const getStrategyWithDetails = (
   strategyKey: string, 
   confidenceScore: number, 
   reasons: string[]
-) => {
+): StrategyWithDetails => {
   const strategyDetails = ADVANCED_STRATEGIES[strategyKey as keyof typeof ADVANCED_STRATEGIES];
   
   return {
@@ -193,7 +193,9 @@ const getStrategyWithDetails = (
       performanceBonus: (confidenceScore - 50) / 10, // Converter para escala usada pelo sistema anterior
       winRate: confidenceScore / 100,
       sampleSize: Math.floor(Math.random() * 50) + 30 // Simulado
-    }
+    },
+    // Initialize alternativeStrategies as empty array by default
+    alternativeStrategies: []
   };
 };
 
