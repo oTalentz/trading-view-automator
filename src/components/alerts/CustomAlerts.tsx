@@ -45,6 +45,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
+// Import the available symbols and timeframes from alertUtils
+import { availableTimeframes, availableSymbols } from '@/utils/alertUtils';
+
 // Types for alerts
 export interface AlertCondition {
   id: string;
@@ -396,6 +399,42 @@ function AlertForm({
     });
   };
 
+  // Function to group and organize symbols
+  const getSymbolGroups = () => {
+    const cryptoSymbols = availableSymbols.filter(s => s.includes('BINANCE:'));
+    const forexMajorSymbols = availableSymbols.filter(s => 
+      s.includes('FX:') && 
+      ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'NZDUSD', 'USDCHF'].some(
+        pair => s.includes(pair)
+      )
+    );
+    const forexCrossSymbols = availableSymbols.filter(s => 
+      s.includes('FX:') && 
+      ['EURGBP', 'EURJPY', 'GBPJPY', 'CADJPY', 'AUDNZD', 'AUDCAD', 'EURAUD', 'GBPCAD'].some(
+        pair => s.includes(pair)
+      )
+    );
+    const forexExoticSymbols = availableSymbols.filter(s => 
+      s.includes('FX:') && 
+      ['USDBRL', 'EURBRL', 'USDMXN', 'USDZAR', 'USDTRY', 'EURPLN'].some(
+        pair => s.includes(pair)
+      )
+    );
+    const stockSymbols = availableSymbols.filter(s => 
+      s.includes('NASDAQ:') || s.includes('NYSE:')
+    );
+
+    return {
+      crypto: cryptoSymbols,
+      forexMajor: forexMajorSymbols,
+      forexCross: forexCrossSymbols,
+      forexExotic: forexExoticSymbols,
+      stocks: stockSymbols
+    };
+  };
+
+  const symbolGroups = getSymbolGroups();
+
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-2">
@@ -418,11 +457,42 @@ function AlertForm({
             <SelectValue placeholder={t("selectSymbol")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="BINANCE:BTCUSDT">BTCUSDT</SelectItem>
-            <SelectItem value="BINANCE:ETHUSDT">ETHUSDT</SelectItem>
-            <SelectItem value="BINANCE:BNBUSDT">BNBUSDT</SelectItem>
-            <SelectItem value="BINANCE:ADAUSDT">ADAUSDT</SelectItem>
-            <SelectItem value="BINANCE:SOLUSDT">SOLUSDT</SelectItem>
+            <div className="max-h-[300px] overflow-y-auto">
+              <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Criptomoedas</div>
+              {symbolGroups.crypto.map((sym) => (
+                <SelectItem key={sym} value={sym}>
+                  {sym.split(':')[1]}
+                </SelectItem>
+              ))}
+              
+              <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Major</div>
+              {symbolGroups.forexMajor.map((sym) => (
+                <SelectItem key={sym} value={sym}>
+                  {sym.split(':')[1]}
+                </SelectItem>
+              ))}
+              
+              <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Cross</div>
+              {symbolGroups.forexCross.map((sym) => (
+                <SelectItem key={sym} value={sym}>
+                  {sym.split(':')[1]}
+                </SelectItem>
+              ))}
+              
+              <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Forex - Exóticos</div>
+              {symbolGroups.forexExotic.map((sym) => (
+                <SelectItem key={sym} value={sym}>
+                  {sym.split(':')[1]}
+                </SelectItem>
+              ))}
+              
+              <div className="py-2 px-2 text-xs font-medium text-muted-foreground">Ações</div>
+              {symbolGroups.stocks.map((sym) => (
+                <SelectItem key={sym} value={sym}>
+                  {sym.split(':')[1]}
+                </SelectItem>
+              ))}
+            </div>
           </SelectContent>
         </Select>
       </div>
@@ -534,13 +604,11 @@ function AlertForm({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1">1m</SelectItem>
-                            <SelectItem value="5">5m</SelectItem>
-                            <SelectItem value="15">15m</SelectItem>
-                            <SelectItem value="30">30m</SelectItem>
-                            <SelectItem value="60">1h</SelectItem>
-                            <SelectItem value="240">4h</SelectItem>
-                            <SelectItem value="D">1d</SelectItem>
+                            {availableTimeframes.map(tf => (
+                              <SelectItem key={tf} value={tf}>
+                                {tf === 'D' ? '1d' : tf === 'W' ? '1w' : `${tf}m`}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>

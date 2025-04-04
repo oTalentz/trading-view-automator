@@ -35,6 +35,42 @@ export function AlertDialog({
   const { t } = useLanguage();
 
   if (!currentAlert) return null;
+  
+  // Function to group and organize symbols
+  const getSymbolGroups = () => {
+    const cryptoSymbols = availableSymbols.filter(s => s.includes('BINANCE:'));
+    const forexMajorSymbols = availableSymbols.filter(s => 
+      s.includes('FX:') && 
+      ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'NZDUSD', 'USDCHF'].some(
+        pair => s.includes(pair)
+      )
+    );
+    const forexCrossSymbols = availableSymbols.filter(s => 
+      s.includes('FX:') && 
+      ['EURGBP', 'EURJPY', 'GBPJPY', 'CADJPY', 'AUDNZD', 'AUDCAD', 'EURAUD', 'GBPCAD'].some(
+        pair => s.includes(pair)
+      )
+    );
+    const forexExoticSymbols = availableSymbols.filter(s => 
+      s.includes('FX:') && 
+      ['USDBRL', 'EURBRL', 'USDMXN', 'USDZAR', 'USDTRY', 'EURPLN'].some(
+        pair => s.includes(pair)
+      )
+    );
+    const stockSymbols = availableSymbols.filter(s => 
+      s.includes('NASDAQ:') || s.includes('NYSE:')
+    );
+    
+    return {
+      crypto: cryptoSymbols,
+      forexMajor: forexMajorSymbols,
+      forexCross: forexCrossSymbols,
+      forexExotic: forexExoticSymbols,
+      stocks: stockSymbols
+    };
+  };
+  
+  const symbolGroups = getSymbolGroups();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -137,7 +173,7 @@ export function AlertDialog({
                   className="cursor-pointer"
                   onClick={() => onTimeframeToggle(tf)}
                 >
-                  {tf}{tf !== 'D' && tf !== 'W' ? 'm' : ''}
+                  {tf === 'D' ? '1d' : tf === 'W' ? '1w' : `${tf}m`}
                 </Badge>
               ))}
             </div>
@@ -145,17 +181,88 @@ export function AlertDialog({
           
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("symbols")}</label>
-            <div className="flex flex-wrap gap-2">
-              {availableSymbols.map((symbol) => (
-                <Badge 
-                  key={symbol}
-                  variant={currentAlert.symbols.includes(symbol) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => onSymbolToggle(symbol)}
-                >
-                  {symbol.split(':')[1]}
-                </Badge>
-              ))}
+            <div className="border rounded-md p-2 max-h-[200px] overflow-y-auto">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Criptomoedas</p>
+                  <div className="flex flex-wrap gap-2">
+                    {symbolGroups.crypto.map((symbol) => (
+                      <Badge 
+                        key={symbol}
+                        variant={currentAlert.symbols.includes(symbol) ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={() => onSymbolToggle(symbol)}
+                      >
+                        {symbol.split(':')[1]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Forex - Major</p>
+                  <div className="flex flex-wrap gap-2">
+                    {symbolGroups.forexMajor.map((symbol) => (
+                      <Badge 
+                        key={symbol}
+                        variant={currentAlert.symbols.includes(symbol) ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={() => onSymbolToggle(symbol)}
+                      >
+                        {symbol.split(':')[1]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Forex - Cross</p>
+                  <div className="flex flex-wrap gap-2">
+                    {symbolGroups.forexCross.map((symbol) => (
+                      <Badge 
+                        key={symbol}
+                        variant={currentAlert.symbols.includes(symbol) ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={() => onSymbolToggle(symbol)}
+                      >
+                        {symbol.split(':')[1]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Forex - Exóticos</p>
+                  <div className="flex flex-wrap gap-2">
+                    {symbolGroups.forexExotic.map((symbol) => (
+                      <Badge 
+                        key={symbol}
+                        variant={currentAlert.symbols.includes(symbol) ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={() => onSymbolToggle(symbol)}
+                      >
+                        {symbol.split(':')[1]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Ações</p>
+                  <div className="flex flex-wrap gap-2">
+                    {symbolGroups.stocks.map((symbol) => (
+                      <Badge 
+                        key={symbol}
+                        variant={currentAlert.symbols.includes(symbol) ? "default" : "outline"}
+                        className="cursor-pointer"
+                        onClick={() => onSymbolToggle(symbol)}
+                      >
+                        {symbol.split(':')[1]}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
