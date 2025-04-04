@@ -20,7 +20,7 @@ export interface TimeframePerformance {
 }
 
 export interface UseAIStrategyOptimizerReturn {
-  optimizeStrategy: (symbol: string, minSampleSize?: number) => StrategyOptimizationResult | null;
+  optimizeStrategy: (symbol: string) => StrategyOptimizationResult | null;
   enhanceAnalysisWithAI: (analysis: MultiTimeframeAnalysisResult | null) => MultiTimeframeAnalysisResult | null;
   isOptimizing: boolean;
   optimizationResult: StrategyOptimizationResult | null;

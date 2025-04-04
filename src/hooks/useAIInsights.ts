@@ -41,7 +41,7 @@ export function useAIInsights(symbol: string) {
       
       // Run AI optimization if not already done
       if (!optimizationResult) {
-        // Pass only the symbol parameter (minSampleSize will use the default value)
+        // Only pass the symbol parameter
         optimizeStrategy(symbol);
       }
       
