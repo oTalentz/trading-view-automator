@@ -5,7 +5,7 @@ import { optimizeStrategySelection } from '@/utils/ml/strategyOptimizer';
 import { SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
 import { StrategyWithDetails } from './types';
 import { loadStrategyPerformanceHistory } from './history/strategyPerformanceHistory';
-import { getStrategyWithDetails } from './utils/strategyDetailsUtils';
+import { getStrategyWithDetails, getStrategyName } from './utils/strategyDetailsUtils';
 import { ADVANCED_STRATEGIES } from './data/advancedStrategies';
 import { getCachedStrategy, generateStrategySelectionCacheKey, cacheStrategy } from './cache/strategyCacheUtils';
 import { selectTraditionalStrategy } from './traditional/traditionalStrategySelector';
@@ -114,5 +114,3 @@ export const selectStrategy = (
   return topStrategy;
 };
 
-// Re-export utility functions that might be needed
-export { getStrategyName } from './utils/strategyDetailsUtils';
