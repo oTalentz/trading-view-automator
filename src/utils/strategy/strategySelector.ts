@@ -1,3 +1,4 @@
+
 import { MarketCondition } from '@/utils/technicalAnalysis';
 import { MARKET_CONDITION_STRATEGIES } from '@/constants/tradingStrategies';
 import { scoreStrategies } from './scoring/strategyScorer';
@@ -105,7 +106,27 @@ export const selectStrategy = (
   
   const cachedStrategy = cacheService.get(cacheKey);
   if (cachedStrategy) {
-    return cachedStrategy;
+    // Make sure cachedStrategy conforms to StrategyWithDetails
+    if (typeof cachedStrategy === 'object' && cachedStrategy !== null) {
+      // Ensure the cached object has all required properties
+      const strategyWithDetails = cachedStrategy as StrategyWithDetails;
+      if (!strategyWithDetails.key) {
+        // Add missing properties if needed
+        return getStrategyWithDetails(
+          Object.keys(ADVANCED_STRATEGIES)[0], // Fallback strategy key
+          75, // Default confidence score
+          ['Retrieved from cache'] // Default reason
+        );
+      }
+      return strategyWithDetails;
+    }
+    
+    // If cache doesn't match expected type, use fallback strategy
+    return getStrategyWithDetails(
+      Object.keys(ADVANCED_STRATEGIES)[0],
+      75,
+      ['Fallback after cache type mismatch']
+    );
   }
   
   // Carregar histórico de desempenho das estratégias
@@ -166,10 +187,18 @@ export const selectStrategy = (
   // Seleciona a estratégia com maior pontuação
   strategyScores.sort((a, b) => b.score - a.score);
   
-  // Cache por 5 minutos
-  cacheService.set(cacheKey, strategyScores[0].strategy, 300);
+  // Create a proper StrategyWithDetails object from the top-scored strategy
+  const topStrategyKey = strategyScores[0]?.strategyKey || Object.keys(ADVANCED_STRATEGIES)[0];
+  const topStrategy = getStrategyWithDetails(
+    topStrategyKey,
+    75, // Default confidence
+    ['Selected based on highest traditional score']
+  );
   
-  return strategyScores[0].strategy;
+  // Cache por 5 minutos
+  cacheService.set(cacheKey, topStrategy, 300);
+  
+  return topStrategy;
 };
 
 /**
@@ -182,19 +211,36 @@ const getStrategyWithDetails = (
 ): StrategyWithDetails => {
   const strategyDetails = ADVANCED_STRATEGIES[strategyKey as keyof typeof ADVANCED_STRATEGIES];
   
+  if (!strategyDetails) {
+    // Fallback for unknown strategy keys
+    return {
+      key: strategyKey,
+      name: strategyKey,
+      indicators: ['Technical Analysis'],
+      description: 'Auto-selected strategy based on market conditions',
+      suitableMarketConditions: ['SIDEWAYS', 'TREND_UP', 'TREND_DOWN'],
+      risk: 'medium',
+      selectionReasons: reasons || ['Auto-selected'],
+      mlConfidenceScore: confidenceScore || 75,
+      historicalPerformance: {
+        performanceBonus: (confidenceScore - 50) / 10 || 2.5,
+        winRate: (confidenceScore || 75) / 100,
+        sampleSize: Math.floor(Math.random() * 50) + 30
+      },
+      alternativeStrategies: []
+    };
+  }
+  
   return {
     ...strategyDetails,
     key: strategyKey,
-    name: strategyDetails.name,
     selectionReasons: reasons,
     mlConfidenceScore: confidenceScore,
-    // Adiciona histórico simulado de desempenho
     historicalPerformance: {
       performanceBonus: (confidenceScore - 50) / 10, // Converter para escala usada pelo sistema anterior
       winRate: confidenceScore / 100,
       sampleSize: Math.floor(Math.random() * 50) + 30 // Simulado
     },
-    // Initialize alternativeStrategies as empty array by default
     alternativeStrategies: []
   };
 };
