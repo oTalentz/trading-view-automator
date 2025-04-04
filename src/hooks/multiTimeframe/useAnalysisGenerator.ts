@@ -8,6 +8,7 @@ import { saveSignalToHistory } from '@/utils/signalHistoryUtils';
 import { sendNotification, getNotificationSettings } from '@/utils/pushNotificationUtils';
 import { cacheService } from '@/utils/cacheSystem';
 import { MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
+import { useAIStrategyOptimizer } from './useAIStrategyOptimizer';
 
 export function useAnalysisGenerator(
   symbol: string, 
@@ -15,6 +16,7 @@ export function useAnalysisGenerator(
 ) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { t } = useLanguage();
+  const { optimizeStrategy, enhanceAnalysisWithAI } = useAIStrategyOptimizer();
   
   const generateAnalysis = () => {
     // Verificar cache primeiro
@@ -22,6 +24,11 @@ export function useAnalysisGenerator(
     const cachedResult = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
     
     if (cachedResult) {
+      // Apply AI optimizations to cached result if available
+      const optimizationResult = optimizeStrategy(symbol);
+      if (optimizationResult) {
+        return enhanceAnalysisWithAI(cachedResult, optimizationResult);
+      }
       return cachedResult;
     }
     
@@ -30,7 +37,22 @@ export function useAnalysisGenerator(
     
     try {
       // Gera nova análise
-      const result = analyzeAllTimeframes(symbol, interval);
+      let result = analyzeAllTimeframes(symbol, interval);
+      
+      // Apply AI optimizations if available
+      const optimizationResult = optimizeStrategy(symbol);
+      if (optimizationResult) {
+        const enhancedResult = enhanceAnalysisWithAI(result, optimizationResult);
+        if (enhancedResult) {
+          result = enhancedResult;
+          
+          // Add AI enhancement indicator to toast
+          toast.info(t("aiEnhancedSignal"), {
+            description: t("signalOptimizedByAI"),
+            duration: 3000,
+          });
+        }
+      }
       
       // Notifica o usuário sobre o sinal com informação de confluência
       const confidenceText = result.confluenceDirection === result.primarySignal.direction ? 

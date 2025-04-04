@@ -2,11 +2,15 @@
 import { cacheService } from '@/utils/cacheSystem';
 import { analyzeAllTimeframes } from '@/utils/confluence';
 import { MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
+import { useAIStrategyOptimizer } from './useAIStrategyOptimizer';
 
 /**
  * Hook to handle realtime updates of signals and analysis data
+ * with AI-enhanced strategy optimization
  */
 export function useRealtimeUpdates() {
+  const { enhanceAnalysisWithAI, optimizeStrategy } = useAIStrategyOptimizer();
+  
   /**
    * Updates analysis data in realtime for more precision
    * @param symbol The trading symbol (e.g. EUR/USD)
@@ -28,6 +32,23 @@ export function useRealtimeUpdates() {
     
     // If cached data exists, use it to update the analysis
     if (cachedUpdate) {
+      // Get AI optimization data
+      const optimizationResult = optimizeStrategy(symbol);
+      
+      // Apply AI optimization to the cached update if available
+      if (optimizationResult) {
+        return enhanceAnalysisWithAI(
+          {
+            ...analysis,
+            overallConfluence: cachedUpdate.overallConfluence,
+            confluenceDirection: cachedUpdate.confluenceDirection,
+            timeframes: cachedUpdate.timeframes,
+          },
+          optimizationResult
+        );
+      }
+      
+      // Return regular update if no AI optimization
       return {
         ...analysis,
         overallConfluence: cachedUpdate.overallConfluence,
@@ -40,7 +61,11 @@ export function useRealtimeUpdates() {
       // Get fresh analysis data without changing the primary signal
       const updatedResult = analyzeAllTimeframes(symbol, interval, true);
       if (updatedResult) {
-        const newAnalysis = {
+        // Get AI optimization data
+        const optimizationResult = optimizeStrategy(symbol);
+        
+        // Create base updated analysis
+        const baseNewAnalysis = {
           ...analysis,
           overallConfluence: updatedResult.overallConfluence,
           confluenceDirection: updatedResult.confluenceDirection,
@@ -50,7 +75,12 @@ export function useRealtimeUpdates() {
         // Cache the updated result for 5 seconds to reduce API calls
         cacheService.set(cacheKey, updatedResult, 5);
         
-        return newAnalysis;
+        // Apply AI optimization if available
+        if (optimizationResult) {
+          return enhanceAnalysisWithAI(baseNewAnalysis, optimizationResult);
+        }
+        
+        return baseNewAnalysis;
       }
     } catch (error) {
       console.error('Error updating analysis:', error);
