@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { getSignalHistory } from '@/utils/signalHistoryUtils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MarketCondition } from '@/utils/technicalAnalysis';
 
 // Import our components
 import { EmptyState } from './dashboard/EmptyState';
@@ -159,7 +160,7 @@ export function DashboardSummary() {
       strategy: "Multi-Timeframe Confluence",
       indicators: ["RSI", "MACD", "Bollinger Bands"],
       trendStrength: 65,
-      marketCondition: 'UPTREND' as 'UPTREND' | 'DOWNTREND' | 'SIDEWAYS' | 'CHOPPY',
+      marketCondition: MarketCondition.STRONG_TREND_UP,
       supportResistance: {
         support: 100,
         resistance: 110
@@ -176,10 +177,38 @@ export function DashboardSummary() {
     overallConfluence: 78,
     confluenceDirection: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL',
     timeframes: [
-      { label: '1m', confidence: 65, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 60 },
-      { label: '5m', confidence: 82, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 75 },
-      { label: '15m', confidence: 75, direction: 'NEUTRAL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 65 },
-      { label: '1h', confidence: 90, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 85 },
+      { 
+        label: '1m', 
+        timeframe: '1', 
+        confidence: 65, 
+        direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', 
+        strength: 60,
+        marketCondition: MarketCondition.TREND_UP 
+      },
+      { 
+        label: '5m', 
+        timeframe: '5', 
+        confidence: 82, 
+        direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', 
+        strength: 75,
+        marketCondition: MarketCondition.STRONG_TREND_UP
+      },
+      { 
+        label: '15m', 
+        timeframe: '15', 
+        confidence: 75, 
+        direction: 'NEUTRAL' as 'CALL' | 'PUT' | 'NEUTRAL', 
+        strength: 65,
+        marketCondition: MarketCondition.SIDEWAYS 
+      },
+      { 
+        label: '1h', 
+        timeframe: '60', 
+        confidence: 90, 
+        direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', 
+        strength: 85,
+        marketCondition: MarketCondition.STRONG_TREND_UP
+      },
     ],
     countdown: 60
   };
