@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { getSignalHistory } from '@/utils/signalHistoryUtils';
@@ -147,16 +148,40 @@ export function DashboardSummary() {
   
   const confidenceData = getWinRateByConfidence();
   
-  // For ConfluenceHeatmap component
+  // For ConfluenceHeatmap component - fixed to include all required properties
   const mockAnalysis = {
+    primarySignal: {
+      direction: 'CALL' as 'CALL' | 'PUT',
+      confidence: 78,
+      timestamp: new Date().toISOString(),
+      entryTime: new Date().toISOString(),
+      expiryTime: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      strategy: "Multi-Timeframe Confluence",
+      indicators: ["RSI", "MACD", "Bollinger Bands"],
+      trendStrength: 65,
+      marketCondition: 'UPTREND' as 'UPTREND' | 'DOWNTREND' | 'SIDEWAYS' | 'CHOPPY',
+      supportResistance: {
+        support: 100,
+        resistance: 110
+      },
+      technicalScores: {
+        rsi: 70,
+        macd: 65,
+        bollingerBands: 75,
+        volumeTrend: 60,
+        priceAction: 80,
+        overallScore: 70
+      }
+    },
     overallConfluence: 78,
     confluenceDirection: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL',
     timeframes: [
-      { label: '1m', confidence: 65, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL' },
-      { label: '5m', confidence: 82, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL' },
-      { label: '15m', confidence: 75, direction: 'NEUTRAL' as 'CALL' | 'PUT' | 'NEUTRAL' },
-      { label: '1h', confidence: 90, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL' },
-    ]
+      { label: '1m', confidence: 65, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 60 },
+      { label: '5m', confidence: 82, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 75 },
+      { label: '15m', confidence: 75, direction: 'NEUTRAL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 65 },
+      { label: '1h', confidence: 90, direction: 'CALL' as 'CALL' | 'PUT' | 'NEUTRAL', strength: 85 },
+    ],
+    countdown: 60
   };
   
   // If no signals, show empty state
@@ -196,15 +221,7 @@ export function DashboardSummary() {
           
           <div className="grid grid-cols-2 gap-4 mt-6">
             <TimeframeConfluence 
-              timeframes={
-                mockAnalysis.timeframes.map(t => ({
-                  timeframe: t.label,
-                  label: t.label,
-                  confidence: t.confidence,
-                  direction: t.direction,
-                  marketCondition: 'UPTREND'
-                }))
-              } 
+              timeframes={mockAnalysis.timeframes}
               overallConfluence={mockAnalysis.overallConfluence}
               confluenceDirection={mockAnalysis.confluenceDirection}
               currentTimeframe="5m"
