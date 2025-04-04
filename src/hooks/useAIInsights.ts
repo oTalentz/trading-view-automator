@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
@@ -41,6 +40,7 @@ export function useAIInsights(symbol: string) {
       
       // Run AI optimization if not already done
       if (!optimizationResult) {
+        // Pass only the symbol parameter (minSampleSize will use the default value)
         optimizeStrategy(symbol);
       }
       
