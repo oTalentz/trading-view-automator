@@ -84,7 +84,13 @@ const translations: Translations = {
     "upcomingEvents": "Upcoming Events",
     "marketEventsAndCalendar": "Market events and economic calendar",
     "economicCalendarIntegration": "Economic calendar integration",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    // New translations for AI insights
+    "trendAnalysis": "Trend Analysis",
+    "volumePattern": "Volume Pattern",
+    "nearbyResistanceLevel": "Nearby Resistance Level",
+    "volatilityAlert": "Volatility Alert",
+    "configuration": "Configuration"
   },
   "pt-br": {
     "appTitle": "Automatizador TradingView",
@@ -159,7 +165,13 @@ const translations: Translations = {
     "upcomingEvents": "Próximos Eventos",
     "marketEventsAndCalendar": "Eventos de mercado e calendário econômico",
     "economicCalendarIntegration": "Integração com calendário econômico",
-    "comingSoon": "Em breve"
+    "comingSoon": "Em breve",
+    // Novas traduções para insights de IA
+    "trendAnalysis": "Análise de Tendência",
+    "volumePattern": "Padrão de Volume",
+    "nearbyResistanceLevel": "Nível de Resistência Próximo",
+    "volatilityAlert": "Alerta de Volatilidade",
+    "configuration": "Configuração"
   }
 } as const;
 
