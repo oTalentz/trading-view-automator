@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { ConfluenceHeatmap } from '@/components/ConfluenceHeatmap';
-import { TimeframeConfluence } from '@/components/TimeframeConfluence';
 import { MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
 import { Card, CardContent } from "@/components/ui/card";
 import { Grid2X2, BarChart3 } from 'lucide-react';
@@ -24,7 +23,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
             </div>
             <div className="text-sm space-y-3">
               <p className="pb-2 border-b border-gray-700">
-                <span className="font-medium">Estratégia:</span> {mockAnalysis.strategy}
+                <span className="font-medium">Estratégia:</span> {mockAnalysis.primarySignal.strategy}
               </p>
               <p className="pb-2 border-b border-gray-700">
                 <span className="font-medium">Confiança:</span> {mockAnalysis.overallConfluence}%
@@ -33,7 +32,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
                 <span className="font-medium">Direção:</span> {mockAnalysis.confluenceDirection}
               </p>
               <p>
-                <span className="font-medium">Força da Tendência:</span> {mockAnalysis.trendStrength || 'Média'}
+                <span className="font-medium">Força da Tendência:</span> {mockAnalysis.primarySignal.trendStrength || 'Média'}
               </p>
             </div>
           </CardContent>
@@ -49,7 +48,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
             </div>
             <p className="text-sm">
               Os indicadores sugerem uma zona de suporte próxima
-              localizada em {mockAnalysis.supportResistance?.support || '—'}.
+              localizada em {mockAnalysis.primarySignal.supportResistance?.support || '—'}.
               Esta é uma área onde o preço tende a encontrar pressão de compra.
             </p>
           </CardContent>
@@ -63,7 +62,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
             </div>
             <p className="text-sm">
               Os indicadores sugerem uma zona de resistência próxima  
-              localizada em {mockAnalysis.supportResistance?.resistance || '—'}.
+              localizada em {mockAnalysis.primarySignal.supportResistance?.resistance || '—'}.
               Esta é uma área onde o preço tende a encontrar pressão de venda.
             </p>
           </CardContent>
