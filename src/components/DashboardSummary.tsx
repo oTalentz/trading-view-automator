@@ -81,7 +81,7 @@ export function DashboardSummary() {
   }
   
   return (
-    <>
+    <div className="space-y-6">
       <DashboardHeader timeRange={timeRange} setTimeRange={setTimeRange} />
       
       <SummaryCards 
@@ -94,13 +94,17 @@ export function DashboardSummary() {
         putSignalsPercentage={putSignalsPercentage}
       />
       
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
           <ConfluenceSection mockAnalysis={mockAnalysis} />
         </div>
         <div>
           <MLStrategySelector symbol={selectedSymbol} interval="1" />
         </div>
+      </div>
+      
+      <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
+        <UpcomingEventsCard />
       </div>
       
       <AnalyticsTabs 
@@ -109,6 +113,6 @@ export function DashboardSummary() {
         timeSeriesData={timeSeriesData}
         confidenceData={confidenceData}
       />
-    </>
+    </div>
   );
 }
