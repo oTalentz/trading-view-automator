@@ -9,6 +9,7 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { ConfluenceSection } from './dashboard/ConfluenceSection';
 import { AnalyticsTabs } from './dashboard/AnalyticsTabs';
 import { MLStrategySelector } from './MLStrategySelector';
+import { SentimentAnalysis } from './SentimentAnalysis';
 import { 
   filterSignalsByTimeRange, 
   getWinRateByConfidence, 
@@ -98,21 +99,25 @@ export function DashboardSummary() {
         <div className="lg:col-span-2">
           <ConfluenceSection mockAnalysis={mockAnalysis} />
         </div>
-        <div>
-          <MLStrategySelector symbol={selectedSymbol} interval="1" />
+        <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
+          <UpcomingEventsCard />
         </div>
       </div>
       
-      <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
-        <UpcomingEventsCard />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <AnalyticsTabs 
+            resultData={resultData}
+            timeframeData={timeframeData}
+            timeSeriesData={timeSeriesData}
+            confidenceData={confidenceData}
+          />
+        </div>
+        <div className="space-y-6">
+          <MLStrategySelector symbol={selectedSymbol} interval="1" />
+          <SentimentAnalysis symbol={selectedSymbol} />
+        </div>
       </div>
-      
-      <AnalyticsTabs 
-        resultData={resultData}
-        timeframeData={timeframeData}
-        timeSeriesData={timeSeriesData}
-        confidenceData={confidenceData}
-      />
     </div>
   );
 }
