@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MachineLearningInsights } from './MachineLearningInsights';
 import { AIStrategyInsights } from './AIStrategyInsights';
 import { CorrelationAnalysis } from './CorrelationAnalysis';
+import { MLStrategySelector } from './MLStrategySelector';
 
 // Lazy load components for better performance
 const CustomAlerts = lazy(() => import('./alerts/CustomAlerts').then(mod => ({ default: mod.CustomAlerts })));
@@ -80,9 +81,14 @@ export function TradingViewWidget({
       
       {analysis && (
         <>
-          {/* ConfluenceHeatmap - First */}
-          <div className="mt-6">
-            <ConfluenceHeatmap analysis={analysis} />
+          {/* ML Strategy Selector & Sentiment Analysis - Novo componente */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="md:col-span-2">
+              <ConfluenceHeatmap analysis={analysis} />
+            </div>
+            <div>
+              <MLStrategySelector symbol={symbol} interval={interval} />
+            </div>
           </div>
           
           {/* Correlation Analysis - New */}

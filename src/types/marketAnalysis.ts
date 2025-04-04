@@ -1,28 +1,6 @@
 
 import { MarketCondition } from '@/utils/technical/enums';
 
-export interface TechnicalScores {
-  rsi: number;
-  macd: number;
-  bollingerBands: number;
-  volumeTrend: number;
-  priceAction: number;
-  overallScore: number;
-}
-
-export interface SupportResistance {
-  support: number;
-  resistance: number;
-  supportLevels?: Array<{ price: number; strength: number }>;
-  resistanceLevels?: Array<{ price: number; strength: number }>;
-}
-
-export interface ValidationDetails {
-  reasons: string[];
-  warningLevel: 'none' | 'low' | 'medium' | 'high';
-  isValid: boolean;
-}
-
 export interface MarketAnalysisResult {
   direction: 'CALL' | 'PUT';
   confidence: number;
@@ -33,8 +11,36 @@ export interface MarketAnalysisResult {
   indicators: string[];
   trendStrength: number;
   marketCondition: MarketCondition;
-  supportResistance: SupportResistance;
-  technicalScores: TechnicalScores;
+  supportResistance: {
+    support: number;
+    resistance: number;
+  };
+  technicalScores: {
+    rsi: number;
+    macd: number;
+    bollingerBands: number;
+    priceAction: number;
+    volumeTrend: number;
+    overallScore: number;
+  };
   countdownSeconds: number;
-  validationDetails?: ValidationDetails;
+  validationDetails: {
+    reasons: string[];
+    warningLevel: 'none' | 'low' | 'medium' | 'high';
+    isValid: boolean;
+  };
+  // Campos adicionados para a integração de sentimento e ML
+  sentimentData?: {
+    score: number;
+    impact: 'high' | 'medium' | 'low' | 'neutral';
+    keywords: {word: string, count: number}[];
+    lastUpdate: string;
+  };
+  // Campos adicionados para seleção dinâmica de estratégia com ML
+  mlConfidenceScore?: number;
+  selectionReasons?: string[];
+  alternativeStrategies?: {
+    name: string;
+    confidenceScore: number;
+  }[];
 }

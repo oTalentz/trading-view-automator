@@ -1,18 +1,19 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
 import { analyzeMarket } from '@/utils/analysis/marketAnalyzer';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
 import { cacheService } from '@/utils/cacheSystem';
+import { useSentimentAnalysis } from '@/hooks/useSentimentAnalysis';
 
 export function useMarketAnalysis(symbol: string, interval: string = '1') {
   const [analysis, setAnalysis] = useState<MarketAnalysisResult | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
   const { t } = useLanguage();
+  const { sentimentData, getSentimentAnalysis } = useSentimentAnalysis(symbol);
   
   // Função para analisar o mercado e gerar sinais de alta precisão
-  const handleAnalyzeMarket = useCallback(() => {
+  const handleAnalyzeMarket = useCallback(async () => {
     // Verificar cache primeiro
     const cacheKey = cacheService.generateKey('market-analysis', { symbol, interval });
     const cachedResult = cacheService.get<MarketAnalysisResult>(cacheKey);
@@ -24,8 +25,19 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
     }
     
     try {
-      // Gerar análise de mercado
-      const result = analyzeMarket(symbol, interval);
+      // Obter dados de sentimento antes da análise de mercado
+      let sentimentDataToUse = sentimentData;
+      if (!sentimentDataToUse) {
+        try {
+          sentimentDataToUse = await getSentimentAnalysis();
+        } catch (error) {
+          console.error("Error fetching sentiment data:", error);
+          // Continua sem dados de sentimento
+        }
+      }
+      
+      // Gerar análise de mercado com dados de sentimento
+      const result = analyzeMarket(symbol, interval, sentimentDataToUse);
       
       // Atualizar estado
       setAnalysis(result);
@@ -62,6 +74,19 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
         }
       );
       
+      // Mostrar influência de sentimento, se relevante
+      if (sentimentDataToUse && Math.abs(sentimentDataToUse.overallScore) > 30) {
+        const sentimentDirection = sentimentDataToUse.overallScore > 0 ? t("positive") : t("negative");
+        
+        toast.info(
+          t("sentimentInfluence"),
+          {
+            description: `${t("marketSentiment")}: ${sentimentDirection} (${sentimentDataToUse.overallScore > 0 ? '+' : ''}${sentimentDataToUse.overallScore}) - ${symbol}`,
+            duration: 4000,
+          }
+        );
+      }
+      
       // Armazenar no cache por 2 minutos
       cacheService.set(cacheKey, result, 120);
       
@@ -79,7 +104,7 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
       
       return null;
     }
-  }, [symbol, interval, t]);
+  }, [symbol, interval, t, sentimentData, getSentimentAnalysis]);
   
   // Inicia o contador regressivo e atualiza a cada segundo
   useEffect(() => {
