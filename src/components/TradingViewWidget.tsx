@@ -9,6 +9,7 @@ import { ConfluenceHeatmap } from './ConfluenceHeatmap';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MachineLearningInsights } from './MachineLearningInsights';
 import { AIStrategyInsights } from './AIStrategyInsights';
+import { CorrelationAnalysis } from './CorrelationAnalysis';
 
 // Lazy load components for better performance
 const CustomAlerts = lazy(() => import('./alerts/CustomAlerts').then(mod => ({ default: mod.CustomAlerts })));
@@ -84,7 +85,12 @@ export function TradingViewWidget({
             <ConfluenceHeatmap analysis={analysis} />
           </div>
           
-          {/* Machine Learning and AI Strategy Insights - After ConfluenceHeatmap */}
+          {/* Correlation Analysis - New */}
+          <div className="mt-6">
+            <CorrelationAnalysis symbol={symbol} />
+          </div>
+          
+          {/* Machine Learning and AI Strategy Insights */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <MachineLearningInsights symbol={symbol} interval={interval} />
             <AIStrategyInsights symbol={symbol} />

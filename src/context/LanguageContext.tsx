@@ -1,17 +1,18 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+// Defina os tipos de linguagem disponíveis
+export type LanguageType = 'en' | 'pt-br';
 
-type Language = "en" | "pt-br";
+// Define o tipo do contexto de linguagem
+interface LanguageContextType {
+  language: LanguageType;
+  setLanguage: (language: LanguageType) => void;
+  t: (key: string) => string;
+}
 
-type Translations = {
-  [key in Language]: {
-    [key: string]: string;
-  };
-};
-
-// Translations for the app
-const translations: Translations = {
-  "en": {
+// Traduções
+const translations: Record<LanguageType, Record<string, string>> = {
+  'en': {
     "appTitle": "TradingView Automator",
     "tradingViewAutomator": "TradingView Automator",
     "tradingMadeSimple": "Trading made simple",
@@ -85,14 +86,24 @@ const translations: Translations = {
     "marketEventsAndCalendar": "Market events and economic calendar",
     "economicCalendarIntegration": "Economic calendar integration",
     "comingSoon": "Coming soon",
-    // New translations for AI insights
     "trendAnalysis": "Trend Analysis",
     "volumePattern": "Volume Pattern",
     "nearbyResistanceLevel": "Nearby Resistance Level",
     "volatilityAlert": "Volatility Alert",
-    "configuration": "Configuration"
+    "configuration": "Configuration",
+    "assetCorrelation": "Asset Correlation",
+    "correlationInsights": "Correlation Insights",
+    "highestCorrelation": "Highest Correlation",
+    "lastUpdated": "Last Updated",
+    "noCorrelationData": "No correlation data available",
+    "noCorrelationsFound": "No correlations found",
+    "strongPositive": "Strong Positive",
+    "moderatePositive": "Moderate Positive",
+    "weak": "Weak",
+    "moderateNegative": "Moderate Negative",
+    "strongNegative": "Strong Negative"
   },
-  "pt-br": {
+  'pt-br': {
     "appTitle": "Automatizador TradingView",
     "tradingViewAutomator": "Automatizador TradingView",
     "tradingMadeSimple": "Trading simplificado",
@@ -166,33 +177,31 @@ const translations: Translations = {
     "marketEventsAndCalendar": "Eventos de mercado e calendário econômico",
     "economicCalendarIntegration": "Integração com calendário econômico",
     "comingSoon": "Em breve",
-    // Novas traduções para insights de IA
     "trendAnalysis": "Análise de Tendência",
     "volumePattern": "Padrão de Volume",
     "nearbyResistanceLevel": "Nível de Resistência Próximo",
     "volatilityAlert": "Alerta de Volatilidade",
-    "configuration": "Configuração"
+    "configuration": "Configuração",
+    "assetCorrelation": "Correlação de Ativos",
+    "correlationInsights": "Insights de Correlação",
+    "highestCorrelation": "Maior Correlação",
+    "lastUpdated": "Última Atualização",
+    "noCorrelationData": "Nenhum dado de correlação disponível",
+    "noCorrelationsFound": "Nenhuma correlação encontrada",
+    "strongPositive": "Forte Positiva",
+    "moderatePositive": "Moderada Positiva",
+    "weak": "Fraca",
+    "moderateNegative": "Moderada Negativa",
+    "strongNegative": "Forte Negativa"
   }
 } as const;
 
-interface LanguageContextProps {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
-}
+// Criar o contexto
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const LanguageContext = createContext<LanguageContextProps | null>(null);
-
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
-  }
-  return context;
-};
-
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>("en");
+// Provider para o contexto de linguagem
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const [language, setLanguage] = useState<LanguageType>('en');
 
   // Translation function
   const t = (key: string): string => {
@@ -205,3 +214,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     </LanguageContext.Provider>
   );
 };
+
+// Hook personalizado para usar o contexto de linguagem
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error("useLanguage must be used within a LanguageProvider");
+  }
+  return context;
+};
+
+export default LanguageContext;
