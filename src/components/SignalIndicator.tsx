@@ -79,19 +79,25 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
     direction: trendStrengthDirection
   };
 
+  // Filter primary signal direction type before passing it to components
+  const signalDirection = primarySignal.direction === 'NEUTRAL' ? 'CALL' : primarySignal.direction;
+
   return (
     <div className="space-y-4">
       <Card className={`shadow-lg overflow-hidden border-t-4 ${
-        primarySignal.direction === 'CALL' 
+        signalDirection === 'CALL' 
           ? 'border-t-green-500 dark:border-t-green-600' 
           : 'border-t-red-500 dark:border-t-red-600'
       }`}>
         <CardContent className="p-4 relative">
-          <SignalHeader direction={primarySignal.direction} />
+          <SignalHeader direction={signalDirection} />
           
           <SignalDetails 
             symbol={symbol}
-            primarySignal={primarySignal}
+            primarySignal={{
+              ...primarySignal,
+              direction: signalDirection
+            }}
             countdown={countdown}
             overallConfluence={analysis.overallConfluence} 
           />
