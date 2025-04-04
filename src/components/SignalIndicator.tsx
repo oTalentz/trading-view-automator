@@ -39,15 +39,37 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
 
   // Extrair o sinal principal da análise
   const { primarySignal } = analysis;
+  
+  // Convertendo o formato das pontuações técnicas para compatibilidade
+  const technicalScores = {
+    overall: primarySignal.technicalScores.overallScore || 0,
+    trend: primarySignal.technicalScores.priceAction || 0,
+    momentum: primarySignal.technicalScores.macd || 0,
+    volatility: primarySignal.technicalScores.volumeTrend || 0
+  };
+  
+  // Convertendo o formato da força da tendência para compatibilidade
+  const trendStrength = {
+    value: typeof primarySignal.trendStrength === 'number' 
+      ? primarySignal.trendStrength 
+      : primarySignal.trendStrength?.value || 0,
+    direction: typeof primarySignal.trendStrength === 'object' && primarySignal.trendStrength?.direction
+      ? primarySignal.trendStrength.direction 
+      : primarySignal.trendStrength > 60 
+        ? 'bullish' 
+        : primarySignal.trendStrength < 40 
+          ? 'bearish' 
+          : 'neutral'
+  } as { value: number; direction: 'bullish' | 'bearish' | 'neutral' };
 
   return (
     <div className="space-y-4">
-      <Card className={`shadow-md overflow-hidden border-t-4 ${
+      <Card className={`shadow-lg overflow-hidden border-t-4 ${
         primarySignal.direction === 'CALL' 
           ? 'border-t-green-500 dark:border-t-green-600' 
           : 'border-t-red-500 dark:border-t-red-600'
       }`}>
-        <CardContent className="p-4 md:p-6">
+        <CardContent className="p-4 relative">
           <SignalHeader direction={primarySignal.direction} />
           
           <SignalDetails 
@@ -57,18 +79,16 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
             overallConfluence={analysis.overallConfluence} 
           />
 
-          <div className="border-t pt-4 mt-4">
-            <StrategyInfo 
-              strategy={primarySignal.strategy}
-              indicators={primarySignal.indicators}
-              supportResistance={primarySignal.supportResistance}
-            />
-            
-            <TechnicalAnalysis 
-              technicalScores={primarySignal.technicalScores}
-              trendStrength={primarySignal.trendStrength}
-            />
-          </div>
+          <StrategyInfo 
+            strategy={primarySignal.strategy}
+            indicators={primarySignal.indicators}
+            supportResistance={primarySignal.supportResistance}
+          />
+          
+          <TechnicalAnalysis 
+            technicalScores={technicalScores}
+            trendStrength={trendStrength}
+          />
 
           <DisclaimerFooter />
         </CardContent>
@@ -76,7 +96,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
       
       {/* Componente de confluência de timeframes */}
       <Card className="shadow-sm overflow-hidden">
-        <CardContent className="p-4 md:p-6">
+        <CardContent className="p-4">
           <TimeframeConfluence 
             timeframes={analysis.timeframes}
             overallConfluence={analysis.overallConfluence}
@@ -88,7 +108,7 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
       
       {/* Card de Insights de IA */}
       <Card className="shadow-sm border-t-4 border-t-indigo-400 dark:border-t-indigo-600">
-        <CardContent className="p-4 md:p-6">
+        <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-indigo-500" />
@@ -117,10 +137,10 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
                 <div 
                   key={insight.key} 
                   className={`p-3 rounded-lg ${
-                    insight.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300' : 
-                    insight.type === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300' : 
-                    insight.type === 'error' ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300' : 
-                    'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300'
+                    insight.type === 'success' ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-100 dark:border-green-900/20' : 
+                    insight.type === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 border border-amber-100 dark:border-amber-900/20' : 
+                    insight.type === 'error' ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-100 dark:border-red-900/20' : 
+                    'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-900/20'
                   }`}
                 >
                   <h4 className="font-medium mb-1">{insight.title}</h4>

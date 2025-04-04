@@ -65,118 +65,111 @@ export function SignalDetails({
   const getMarketConditionColor = (condition: MarketCondition): {bg: string, text: string} => {
     switch (condition) {
       case MarketCondition.STRONG_TREND_UP:
-        return {bg: 'bg-green-100 dark:bg-green-900/20', text: 'text-green-800 dark:text-green-300'};
+        return {bg: 'bg-green-500/20', text: 'text-green-400'};
       case MarketCondition.TREND_UP:
-        return {bg: 'bg-emerald-100 dark:bg-emerald-900/20', text: 'text-emerald-800 dark:text-emerald-300'};
+        return {bg: 'bg-emerald-500/20', text: 'text-emerald-400'};
       case MarketCondition.SIDEWAYS:
-        return {bg: 'bg-blue-100 dark:bg-blue-900/20', text: 'text-blue-800 dark:text-blue-300'};
+        return {bg: 'bg-blue-500/20', text: 'text-blue-400'};
       case MarketCondition.TREND_DOWN:
-        return {bg: 'bg-amber-100 dark:bg-amber-900/20', text: 'text-amber-800 dark:text-amber-300'};
+        return {bg: 'bg-amber-500/20', text: 'text-amber-400'};
       case MarketCondition.STRONG_TREND_DOWN:
-        return {bg: 'bg-red-100 dark:bg-red-900/20', text: 'text-red-800 dark:text-red-300'};
+        return {bg: 'bg-red-500/20', text: 'text-red-400'};
       case MarketCondition.VOLATILE:
-        return {bg: 'bg-purple-100 dark:bg-purple-900/20', text: 'text-purple-800 dark:text-purple-300'};
+        return {bg: 'bg-purple-500/20', text: 'text-purple-400'};
       default:
-        return {bg: 'bg-gray-100 dark:bg-gray-900/20', text: 'text-gray-800 dark:text-gray-300'};
+        return {bg: 'bg-gray-500/20', text: 'text-gray-400'};
     }
   };
   
   const marketConditionStyle = getMarketConditionColor(primarySignal.marketCondition);
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">{t("symbol")}</span>
+    <div className="flex flex-col gap-4 mb-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800/50">
+          <Activity className="h-4 w-4 text-blue-500" />
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("symbol")}</span>
           <span className="font-medium ml-auto">{symbol.split(':')[1]}</span>
         </div>
         
-        <div className="space-y-1">
-          <div className="flex justify-between items-center mb-1">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <Percent className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">{t("confidence")}</span>
+              <Percent className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("confidence")}</span>
             </div>
             <span className={`font-medium ${
-              primarySignal.confidence > 90 ? 'text-green-600 dark:text-green-400' : 
-              primarySignal.confidence > 80 ? 'text-emerald-600 dark:text-emerald-400' : 
-              primarySignal.confidence > 70 ? 'text-yellow-600 dark:text-yellow-400' : 
-              'text-orange-600 dark:text-orange-400'
+              primarySignal.confidence > 90 ? 'text-green-500' : 
+              primarySignal.confidence > 80 ? 'text-emerald-500' : 
+              primarySignal.confidence > 70 ? 'text-yellow-500' : 
+              'text-orange-500'
             }`}>{primarySignal.confidence}%</span>
           </div>
           <Progress 
             value={primarySignal.confidence} 
-            className={
-              primarySignal.confidence > 90 ? 'bg-green-100 dark:bg-green-900/20' : 
-              primarySignal.confidence > 80 ? 'bg-emerald-100 dark:bg-emerald-900/20' : 
-              primarySignal.confidence > 70 ? 'bg-yellow-100 dark:bg-yellow-900/20' : 
-              'bg-orange-100 dark:bg-orange-900/20'
-            }
+            className="h-2 bg-gray-200 dark:bg-gray-700"
           />
         </div>
         
-        <div className="space-y-1">
-          <div className="flex justify-between items-center mb-1">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <BarChart className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">{t("confluenceScore")}</span>
+              <BarChart className="h-4 w-4 text-indigo-500" />
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("confluenceScore")}</span>
             </div>
             <span className={`font-medium ${
-              overallConfluence > 80 ? 'text-green-600 dark:text-green-400' :
-              overallConfluence > 50 ? 'text-amber-600 dark:text-amber-400' :
-              'text-gray-600 dark:text-gray-400'
+              overallConfluence > 80 ? 'text-green-500' :
+              overallConfluence > 50 ? 'text-amber-500' :
+              'text-gray-500'
             }`}>{overallConfluence}%</span>
           </div>
           <Progress 
             value={overallConfluence} 
-            className={
-              overallConfluence > 80 ? 'bg-green-100 dark:bg-green-900/20' : 
-              overallConfluence > 50 ? 'bg-amber-100 dark:bg-amber-900/20' : 
-              'bg-gray-100 dark:bg-gray-900/20'
-            }
+            className="h-2 bg-gray-200 dark:bg-gray-700"
           />
         </div>
         
-        <div className={`p-2 rounded-lg ${marketConditionStyle.bg}`}>
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-muted-foreground">{t("marketCondition")}</span>
-            <span className={`ml-auto font-medium ${marketConditionStyle.text}`}>{getMarketConditionDisplay(primarySignal.marketCondition)}</span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-blue-500" />
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{t("entryTime")}</span>
+            </div>
+            <span className="font-mono text-sm font-bold text-center">{formatTime(primarySignal.entryTime)}</span>
+          </div>
+          
+          <div className="flex flex-col gap-2 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-purple-500" />
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{t("expiryTime")}</span>
+            </div>
+            <span className="font-mono text-sm font-bold text-center">{formatTime(primarySignal.expiryTime)}</span>
           </div>
         </div>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/10 rounded-lg">
-          <Clock className="h-5 w-5 text-blue-500" />
-          <span className="text-sm font-medium">{t("entryTime")}</span>
-          <span className="ml-auto font-mono">{formatTime(primarySignal.entryTime)}</span>
-        </div>
         
-        <div className="flex items-center">
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-          <ArrowRight className="h-4 w-4 mx-2 text-muted-foreground" />
-          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-        </div>
-        
-        <div className="flex items-center gap-2 p-2 bg-indigo-50 dark:bg-indigo-900/10 rounded-lg">
-          <Clock className="h-5 w-5 text-indigo-500" />
-          <span className="text-sm font-medium">{t("expiryTime")}</span>
-          <span className="ml-auto font-mono">{formatTime(primarySignal.expiryTime)}</span>
-        </div>
-        
-        <div className={`flex items-center gap-2 p-2 ${
-          countdown <= 10 
-            ? 'bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-300 animate-pulse' 
-            : 'bg-amber-50 dark:bg-amber-900/10'
-        } rounded-lg`}>
-          <TimerIcon className={`h-5 w-5 ${
-            countdown <= 10 ? 'text-red-500' : 'text-amber-500'
-          }`} />
-          <span className="text-sm font-medium">{t("timeLeft")}</span>
-          <span className="ml-auto font-mono font-bold">
-            {countdown}s
-          </span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className={`p-3 rounded-lg flex flex-col ${marketConditionStyle.bg}`}>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{t("marketCondition")}</span>
+            <span className={`text-sm font-bold ${marketConditionStyle.text}`}>
+              {getMarketConditionDisplay(primarySignal.marketCondition)}
+            </span>
+          </div>
+          
+          <div className={`flex flex-col p-3 rounded-lg ${
+            countdown <= 10 
+              ? 'bg-red-500/20 border border-red-500/30 animate-pulse' 
+              : 'bg-amber-500/10 border border-amber-500/20'
+          }`}>
+            <div className="flex items-center gap-2 mb-1">
+              <TimerIcon className={`h-4 w-4 ${countdown <= 10 ? 'text-red-500' : 'text-amber-500'}`} />
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{t("timeLeft")}</span>
+            </div>
+            <span className={`text-center font-mono text-sm font-bold ${
+              countdown <= 10 ? 'text-red-500' : 'text-amber-500'
+            }`}>
+              {countdown}s
+            </span>
+          </div>
         </div>
       </div>
     </div>
