@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { MultiTimeframeAnalysisResult, TimeframeAnalysis } from '@/types/timeframeAnalysis';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
-import { analyzeAllTimeframes } from '@/utils/confluence'; // Updated import path
+import { analyzeAllTimeframes } from '@/utils/confluence'; 
 import { playAlertSound } from '@/utils/audioUtils';
 import { saveSignalToHistory } from '@/utils/signalHistoryUtils';
 import { sendNotification } from '@/utils/pushNotificationUtils';
 import { getNotificationSettings } from '@/utils/pushNotificationUtils';
+import { cacheService } from '@/utils/cacheSystem';
 
 // Fix: Change re-exports to use 'export type' syntax
 export type { TimeframeAnalysis, MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
@@ -19,6 +20,16 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
   const { t } = useLanguage();
   
   const generateAnalysis = () => {
+    // Verificar cache primeiro
+    const cacheKey = cacheService.static.generateKey('analysis', { symbol, interval });
+    const cachedResult = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
+    
+    if (cachedResult) {
+      setAnalysis(cachedResult);
+      setCountdown(cachedResult.countdown);
+      return;
+    }
+    
     // Define loading state
     setIsLoading(true);
     
@@ -70,6 +81,10 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
         timeframe: interval,
         strategy: result.primarySignal.strategy || 'Multi-Timeframe Confluence'
       });
+      
+      // Armazena no cache por 2 minutos
+      cacheService.set(cacheKey, result, 120);
+      
     } catch (error) {
       console.error('Error generating analysis:', error);
       toast.error(t("analysisError"), {
@@ -83,6 +98,24 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
   // Realiza pequenas atualizações do sinal a cada 1 segundo para maior precisão
   const updateAnalysisInRealtime = () => {
     if (!analysis) return;
+    
+    // Verificar cache para atualizações em tempo real
+    const cacheKey = cacheService.static.generateKey('realtime-update', { symbol, interval });
+    const cachedUpdate = cacheService.get<MultiTimeframeAnalysisResult>(cacheKey);
+    
+    if (cachedUpdate) {
+      setAnalysis(prevAnalysis => {
+        if (!prevAnalysis) return cachedUpdate;
+        
+        return {
+          ...prevAnalysis,
+          overallConfluence: cachedUpdate.overallConfluence,
+          confluenceDirection: cachedUpdate.confluenceDirection,
+          timeframes: cachedUpdate.timeframes,
+        };
+      });
+      return;
+    }
     
     try {
       // Atualiza somente a confluência sem alterar o sinal principal
@@ -98,6 +131,9 @@ export function useMultiTimeframeAnalysis(symbol: string, interval: string = '1'
             timeframes: updatedResult.timeframes,
           };
         });
+        
+        // Cache para atualizações em tempo real (5 segundos)
+        cacheService.set(cacheKey, updatedResult, 5);
       }
     } catch (error) {
       console.error('Error updating analysis:', error);

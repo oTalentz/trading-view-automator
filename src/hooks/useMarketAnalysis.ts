@@ -4,6 +4,7 @@ import { MarketAnalysisResult } from '@/types/marketAnalysis';
 import { analyzeMarket } from '@/utils/analysis/marketAnalyzer';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
+import { cacheService } from '@/utils/cacheSystem';
 
 export function useMarketAnalysis(symbol: string, interval: string = '1') {
   const [analysis, setAnalysis] = useState<MarketAnalysisResult | null>(null);
@@ -12,6 +13,16 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
   
   // Função para analisar o mercado e gerar sinais de alta precisão
   const handleAnalyzeMarket = useCallback(() => {
+    // Verificar cache primeiro
+    const cacheKey = cacheService.static.generateKey('market-analysis', { symbol, interval });
+    const cachedResult = cacheService.get<MarketAnalysisResult>(cacheKey);
+    
+    if (cachedResult) {
+      setAnalysis(cachedResult);
+      setCountdown(cachedResult.countdownSeconds);
+      return cachedResult;
+    }
+    
     try {
       // Gerar análise de mercado
       const result = analyzeMarket(symbol, interval);
@@ -30,6 +41,9 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
           duration: 5000,
         }
       );
+      
+      // Armazenar no cache por 2 minutos
+      cacheService.set(cacheKey, result, 120);
       
       return result;
     } catch (error) {
