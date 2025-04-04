@@ -12,7 +12,7 @@ export interface TimeframeAnalysis {
 
 export interface MultiTimeframeAnalysisResult {
   primarySignal: {
-    direction: 'CALL' | 'PUT';
+    direction: 'CALL' | 'PUT' | 'NEUTRAL';
     confidence: number;
     timestamp: string;
     entryTime: string;

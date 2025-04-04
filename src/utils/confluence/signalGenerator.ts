@@ -15,7 +15,7 @@ import { calculateExpiryMinutes } from './timeframeAnalyzer';
 // Enhanced utility function to generate signal details consistently
 export const generateSignalDetails = (
   symbol: string,
-  direction: 'CALL' | 'PUT',
+  direction: 'CALL' | 'PUT' | 'NEUTRAL',
   interval: string,
   overallConfluence: number,
   selectedAnalysis: TimeframeAnalysis,
