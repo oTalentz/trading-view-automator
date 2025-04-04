@@ -2,7 +2,7 @@
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingDown, TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp, LineChart, Clock, Trophy, BarChart3 } from 'lucide-react';
 
 type SummaryCardsProps = {
   totalSignals: number;
@@ -29,12 +29,18 @@ export function SummaryCards({
   const putSignalsCount = Math.round((putSignalsPercentage / 100) * totalSignals);
   const callDominant = callSignalsCount > putSignalsCount;
   
+  // Calculate average signals per day
+  const avgSignalsPerDay = Math.round(totalSignals / (totalSignals > 30 ? 30 : Math.max(1, totalSignals / 3)));
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardHeader className="pb-2">
           <CardDescription>{t("totalSignals")}</CardDescription>
-          <CardTitle className="text-3xl">{totalSignals}</CardTitle>
+          <CardTitle className="text-3xl flex items-center gap-2">
+            <LineChart className="h-5 w-5 text-primary" />
+            {totalSignals}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-xs text-muted-foreground">
@@ -43,10 +49,13 @@ export function SummaryCards({
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardHeader className="pb-2">
           <CardDescription>{t("winRate")}</CardDescription>
-          <CardTitle className="text-3xl">{winRate}%</CardTitle>
+          <CardTitle className="text-3xl flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-amber-500" />
+            {winRate}%
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-xs text-muted-foreground">
@@ -55,10 +64,11 @@ export function SummaryCards({
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardHeader className="pb-2">
           <CardDescription>{t("bestTimeframe")}</CardDescription>
-          <CardTitle className="text-3xl">
+          <CardTitle className="text-3xl flex items-center gap-2">
+            <Clock className="h-5 w-5 text-blue-500" />
             {timeframeData.length > 0 ? timeframeData[0].timeframe : '-'}
           </CardTitle>
         </CardHeader>
@@ -69,18 +79,18 @@ export function SummaryCards({
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="hover:shadow-md transition-shadow">
         <CardHeader className="pb-2">
           <CardDescription>{t("direction")}</CardDescription>
           <CardTitle className="text-3xl flex items-center gap-2">
             {callDominant ? (
               <>
-                <TrendingUp className="h-6 w-6 text-green-500" /> 
+                <TrendingUp className="h-5 w-5 text-green-500" /> 
                 CALL
               </>
             ) : (
               <>
-                <TrendingDown className="h-6 w-6 text-red-500" /> 
+                <TrendingDown className="h-5 w-5 text-red-500" /> 
                 PUT
               </>
             )}
@@ -89,6 +99,28 @@ export function SummaryCards({
         <CardContent>
           <div className="text-xs text-muted-foreground">
             {callSignalsPercentage}% CALL / {putSignalsPercentage}% PUT
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* New card to fill the empty space - Average Signals per Day */}
+      <Card className="hover:shadow-md transition-shadow lg:col-span-4">
+        <CardHeader className="pb-2">
+          <CardDescription>{t("averageActivity")}</CardDescription>
+          <CardTitle className="text-xl flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-purple-500" />
+            {avgSignalsPerDay} {t("signalsPerDay")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-xs text-muted-foreground">
+            {t("basedOnRecentActivity")}
+          </div>
+          <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full mt-2">
+            <div 
+              className="h-full bg-purple-500 rounded-full" 
+              style={{ width: `${Math.min(100, avgSignalsPerDay * 10)}%` }}
+            ></div>
           </div>
         </CardContent>
       </Card>
