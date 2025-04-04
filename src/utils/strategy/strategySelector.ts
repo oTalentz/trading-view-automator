@@ -1,4 +1,3 @@
-
 import { MarketCondition } from '@/utils/technicalAnalysis';
 import { MARKET_CONDITION_STRATEGIES, ADVANCED_STRATEGIES } from '@/constants/tradingStrategies';
 import { findSupportResistanceLevels, calculateTrendStrength } from '@/utils/technicalAnalysis';
@@ -118,7 +117,8 @@ export const selectStrategy = (
     
     // Trend following scoring with momentum confirmation
     if (strategyKey === "TREND_FOLLOWING") {
-      const { value: trendStrength, direction } = calculateTrendStrength(prices, volume);
+      const trendStrengthResult = calculateTrendStrength(prices, volume);
+      const trendStrength = trendStrengthResult.value;
       
       // Base score from trend strength
       score += trendStrength / 2;
@@ -127,11 +127,14 @@ export const selectStrategy = (
       const recentPrices = prices.slice(-5);
       let consistentDirection = true;
       
+      // Determine direction from recent price movements
+      const priceDirection = recentPrices[recentPrices.length - 1] > recentPrices[0] ? 'bullish' : 'bearish';
+      
       for (let i = 1; i < recentPrices.length; i++) {
-        if (direction === 'bullish' && recentPrices[i] < recentPrices[i-1]) {
+        if (priceDirection === 'bullish' && recentPrices[i] < recentPrices[i-1]) {
           consistentDirection = false;
           break;
-        } else if (direction === 'bearish' && recentPrices[i] > recentPrices[i-1]) {
+        } else if (priceDirection === 'bearish' && recentPrices[i] > recentPrices[i-1]) {
           consistentDirection = false;
           break;
         }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,6 +61,7 @@ import { formatDate } from '@/utils/dateUtils';
 import { StrategyPerformance } from './StrategyPerformance';
 import { WinRateDistribution } from './WinRateDistribution';
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { DateRange } from "react-day-picker";
 import { SummaryMetrics } from './SummaryMetrics';
 import { ConfusionMatrix } from './ConfusionMatrix';
 
@@ -72,7 +72,7 @@ export function AdvancedBacktesting() {
   const { runBacktest, backtestResults, isLoading } = useBacktestResults();
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('all');
   const [selectedStrategy, setSelectedStrategy] = useState<string>('all');
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [advancedFilters, setAdvancedFilters] = useState({
     minConfidence: 0,
     maxConfidence: 100,

@@ -16,7 +16,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 interface DateRangePickerProps {
   value: DateRange | undefined;
-  onChange: (value: DateRange) => void;
+  onChange: (value: DateRange | undefined) => void;
   align?: "start" | "center" | "end";
   className?: string;
 }
@@ -38,7 +38,7 @@ export function DateRangePicker({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal h-9",
-              !value && "text-muted-foreground"
+              !value?.from && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -62,10 +62,9 @@ export function DateRangePicker({
             mode="range"
             defaultMonth={value?.from}
             selected={value}
-            onSelect={(value) => {
-              if (value) onChange(value);
-            }}
+            onSelect={onChange}
             numberOfMonths={2}
+            className="pointer-events-auto"
           />
         </PopoverContent>
       </Popover>
