@@ -78,8 +78,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
               <h3 className="text-xl font-bold">{t("marketVolatility")}</h3>
             </div>
             <p className="text-sm">
-              A volatilidade atual do mercado está {mockAnalysis.primarySignal.volatility?.level || 'média'}.
-              {mockAnalysis.primarySignal.volatility?.value ? ` (${mockAnalysis.primarySignal.volatility.value}%)` : ''}
+              A volatilidade atual do mercado está média.
               Mantenha-se atento à possíveis movimentos rápidos de preço.
             </p>
           </CardContent>
@@ -133,7 +132,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
               <p className="font-medium text-green-600 dark:text-green-400">Suporte Forte</p>
-              <p className="text-xl font-bold">{mockAnalysis.primarySignal.supportResistance?.strongSupport || '—'}</p>
+              <p className="text-xl font-bold">{mockAnalysis.primarySignal.supportResistance?.support ? (mockAnalysis.primarySignal.supportResistance.support * 0.99).toFixed(2) : '—'}</p>
             </div>
             <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/10">
               <p className="font-medium text-green-600 dark:text-green-400">Suporte Fraco</p>
@@ -145,7 +144,7 @@ export function ConfluenceSection({ mockAnalysis }: ConfluenceSectionProps) {
             </div>
             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
               <p className="font-medium text-red-600 dark:text-red-400">Resistência Forte</p>
-              <p className="text-xl font-bold">{mockAnalysis.primarySignal.supportResistance?.strongResistance || '—'}</p>
+              <p className="text-xl font-bold">{mockAnalysis.primarySignal.supportResistance?.resistance ? (mockAnalysis.primarySignal.supportResistance.resistance * 1.01).toFixed(2) : '—'}</p>
             </div>
           </div>
         </CardContent>
