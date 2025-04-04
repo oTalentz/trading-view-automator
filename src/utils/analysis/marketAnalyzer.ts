@@ -17,28 +17,30 @@ import { determineSignalDirection } from '@/utils/signals/signalDirectionUtils';
 import { calculateTechnicalScores } from '@/utils/analysis/technicalScoreUtils';
 import { calculateOptimalEntryTiming, calculateExpiryMinutes } from '@/utils/timing/entryTimingUtils';
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
+import { validateSignal } from '@/utils/signals/signalValidator';
 
 /**
- * Comprehensive market analysis function that combines all technical indicators
- * and strategies to provide trading signals
+ * Análise de mercado abrangente que combina todos os indicadores técnicos
+ * e estratégias para fornecer sinais de negociação com maior precisão
  */
 export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisResult => {
-  // Get simulated market data
-  const { prices, volume } = generateSimulatedMarketData(symbol, 100);
+  // Obter dados simulados do mercado com mais pontos para análise precisa
+  const { prices, volume } = generateSimulatedMarketData(symbol, 150);
   
-  // Comprehensive market analysis
+  // Análise abrangente do mercado
   const marketCondition = determineMarketCondition(prices, volume);
   const { value: trendStrengthValue } = calculateTrendStrength(prices, volume);
   const supportResistance = findSupportResistanceLevels(prices);
   const rsiValue = calculateRSI(prices);
+  const volatility = calculateVolatility(prices);
   
-  // Calculate MACD for current data point
+  // Calcular MACD para o ponto de dados atual
   const currentMacd = calculateMACD(prices);
   
-  // Calculate MACD for previous data point using prices without the last element
+  // Calcular MACD para o ponto de dados anterior
   const previousMacd = calculateMACD(prices.slice(0, -1));
   
-  // Create an extended MACD data object that includes the previous histogram
+  // Criar um objeto MACD estendido que inclui o histograma anterior
   const macdData: MACDData = {
     macdLine: currentMacd.macdLine,
     signalLine: currentMacd.signalLine,
@@ -47,9 +49,8 @@ export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisR
   };
   
   const bbands = calculateBollingerBands(prices);
-  const volatility = calculateVolatility(prices);
   
-  // Select optimal strategy based on current market conditions
+  // Selecionar estratégia ideal com base nas condições atuais do mercado
   const selectedStrategy = selectStrategy(
     marketCondition, 
     prices, 
@@ -60,7 +61,7 @@ export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisR
     volatility
   );
   
-  // Determine signal direction with enhanced analysis
+  // Determinar direção do sinal com análise aprimorada
   const direction = determineSignalDirection(
     marketCondition,
     prices,
@@ -71,7 +72,36 @@ export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisR
     trendStrengthValue
   );
   
-  // Enhanced technical scores calculation
+  // Validar sinal usando o novo sistema de validação aprimorado
+  const validationResult = validateSignal(
+    direction,
+    prices,
+    volume,
+    rsiValue,
+    macdData,
+    marketCondition,
+    trendStrengthValue,
+    volatility
+  );
+  
+  // Calcular a qualidade do sinal
+  const signalQuality = calculateSignalQuality(prices, direction, marketCondition, trendStrengthValue);
+  
+  // Cálculo de confiança com mais fatores e validação
+  let confidence = validationResult.isValid ? validationResult.confidence : Math.max(validationResult.confidence - 15, 50);
+  
+  // Calcular timing de entrada ótimo
+  const secondsToNextMinute = calculateOptimalEntryTiming();
+  const now = new Date();
+  const entryTimeMillis = now.getTime() + (secondsToNextMinute * 1000);
+  const entryTime = new Date(entryTimeMillis);
+  
+  // Calcular tempo de expiração ótimo com base na volatilidade e intervalo
+  const expiryMinutes = calculateExpiryMinutes(interval);
+  const expiryTimeMillis = entryTimeMillis + (expiryMinutes * 60 * 1000);
+  const expiryTime = new Date(expiryTimeMillis);
+  
+  // Calcular escores técnicos aprimorados
   const technicalScores = calculateTechnicalScores(
     rsiValue,
     macdData,
@@ -81,29 +111,7 @@ export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisR
     trendStrengthValue
   );
   
-  // Signal quality assessment
-  const signalQuality = calculateSignalQuality(prices, direction, marketCondition, trendStrengthValue);
-  
-  // Confidence calculation with more factors
-  const baseConfidence = (selectedStrategy.minConfidence + selectedStrategy.maxConfidence) / 2;
-  const confidenceAdjustment = (signalQuality - 60) / 2;
-  const technicalAdjustment = (technicalScores.overallScore - 50) / 4;
-  const confidence = Math.round(
-    Math.min(Math.max(baseConfidence + confidenceAdjustment + technicalAdjustment, 70), 98)
-  );
-  
-  // Calculate optimal entry timing
-  const secondsToNextMinute = calculateOptimalEntryTiming();
-  const now = new Date();
-  const entryTimeMillis = now.getTime() + (secondsToNextMinute * 1000);
-  const entryTime = new Date(entryTimeMillis);
-  
-  // Calculate expiry time
-  const expiryMinutes = calculateExpiryMinutes(interval);
-  const expiryTimeMillis = entryTimeMillis + (expiryMinutes * 60 * 1000);
-  const expiryTime = new Date(expiryTimeMillis);
-  
-  // Build and return the analysis result
+  // Construir resultado detalhado da análise
   return {
     direction,
     confidence,
@@ -119,6 +127,12 @@ export const analyzeMarket = (symbol: string, interval: string): MarketAnalysisR
       resistance: Math.round(supportResistance.resistance * 100) / 100
     },
     technicalScores,
-    countdownSeconds: secondsToNextMinute
+    countdownSeconds: secondsToNextMinute,
+    // Novos campos para validação aprimorada
+    validationDetails: {
+      reasons: validationResult.reasons,
+      warningLevel: validationResult.warningLevel,
+      isValid: validationResult.isValid
+    }
   };
 };

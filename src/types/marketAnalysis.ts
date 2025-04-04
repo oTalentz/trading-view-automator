@@ -1,5 +1,27 @@
 
-import { MarketCondition } from '@/utils/technicalAnalysis';
+import { MarketCondition } from '@/utils/technical/enums';
+
+export interface TechnicalScores {
+  rsi: number;
+  macd: number;
+  bollingerBands: number;
+  volumeTrend: number;
+  priceAction: number;
+  overallScore: number;
+}
+
+export interface SupportResistance {
+  support: number;
+  resistance: number;
+  supportLevels?: Array<{ price: number; strength: number }>;
+  resistanceLevels?: Array<{ price: number; strength: number }>;
+}
+
+export interface ValidationDetails {
+  reasons: string[];
+  warningLevel: 'none' | 'low' | 'medium' | 'high';
+  isValid: boolean;
+}
 
 export interface MarketAnalysisResult {
   direction: 'CALL' | 'PUT';
@@ -11,31 +33,8 @@ export interface MarketAnalysisResult {
   indicators: string[];
   trendStrength: number;
   marketCondition: MarketCondition;
-  supportResistance: {
-    support: number;
-    resistance: number;
-  };
-  technicalScores: {
-    rsi: number;
-    macd: number;
-    bollingerBands: number;
-    volumeTrend: number;
-    priceAction: number;
-    overallScore: number;
-  };
+  supportResistance: SupportResistance;
+  technicalScores: TechnicalScores;
   countdownSeconds: number;
-}
-
-// Extended option to include strategy details for educational purposes
-export interface ExtendedMarketAnalysisResult extends MarketAnalysisResult {
-  strategyDetails?: {
-    description: string;
-    bestMarketConditions: string[];
-    recommendedTimeframes: string[];
-  };
-  alternativeStrategies?: Array<{
-    name: string;
-    confidence: number;
-    direction: 'CALL' | 'PUT';
-  }>;
+  validationDetails?: ValidationDetails;
 }

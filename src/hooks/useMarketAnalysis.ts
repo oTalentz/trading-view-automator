@@ -31,14 +31,34 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
       setAnalysis(result);
       setCountdown(result.countdownSeconds);
       
-      // Notifica o usuário com um toast
-      toast.success(
+      // Determinar cor do toast baseada no nível de validação
+      const toastType = 
+        !result.validationDetails?.isValid ? toast.warning :
+        result.validationDetails?.warningLevel === 'high' ? toast.warning :
+        result.validationDetails?.warningLevel === 'medium' ? toast.info :
+        toast.success;
+      
+      // Notifica o usuário com um toast avançado
+      toastType(
         result.direction === 'CALL' 
           ? t("signalCallGenerated") 
           : t("signalPutGenerated"), 
         {
           description: `${t("confidence")}: ${result.confidence}% - ${symbol} - ${t("entryIn")}: ${result.countdownSeconds}s`,
           duration: 5000,
+          // Adicionar primeiro motivo da validação como informação adicional
+          action: result.validationDetails?.reasons && result.validationDetails.reasons.length > 0 ? {
+            label: t("viewDetails"),
+            onClick: () => {
+              toast.info(
+                t("validationDetails"),
+                {
+                  description: result.validationDetails?.reasons.slice(0, 3).join('. '),
+                  duration: 8000,
+                }
+              );
+            }
+          } : undefined
         }
       );
       
@@ -72,11 +92,32 @@ export function useMarketAnalysis(symbol: string, interval: string = '1') {
           
           // Quando chega a zero, notifica que é hora da entrada
           if (analysis) {
-            toast.info(
+            // Determinar tipo de toast baseado na validação
+            const toastType = 
+              analysis.validationDetails?.warningLevel === 'high' ? toast.warning :
+              analysis.validationDetails?.warningLevel === 'medium' ? toast.info :
+              toast.success;
+            
+            toastType(
               analysis.direction === 'CALL' 
                 ? `${t("executeCall")} ${symbol}` 
                 : `${t("executePut")} ${symbol}`,
-              { description: t("preciseEntryNow") }
+              { 
+                description: t("preciseEntryNow"),
+                // Adicionar primeiro motivo da validação como informação adicional
+                action: analysis.validationDetails?.reasons && analysis.validationDetails.reasons.length > 0 ? {
+                  label: t("viewReason"),
+                  onClick: () => {
+                    toast.info(
+                      t("validationDetails"),
+                      {
+                        description: analysis.validationDetails?.reasons[0],
+                        duration: 5000,
+                      }
+                    );
+                  }
+                } : undefined
+              }
             );
           }
           
