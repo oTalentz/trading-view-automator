@@ -1,25 +1,18 @@
+
 import { useState } from 'react';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
-import { getSignalHistory, SignalHistoryEntry } from '@/utils/signalHistoryUtils';
+import { getSignalHistory } from '@/utils/signalHistoryUtils';
 import { cacheService } from '@/utils/cacheSystem';
 import { MultiTimeframeAnalysisResult } from '@/types/timeframeAnalysis';
-
-interface StrategyOptimizationResult {
-  confidenceAdjustment: number;
-  recommendedTimeframes: string[];
-  volatilityThreshold: number;
-  entryTimingAdjustment: number;
-  expiryMinutesAdjustment: number;
-  preferredMarketConditions: string[];
-  avoidedMarketConditions: string[];
-  lastUpdated: string;
-}
+import { analyzePatterns } from './utils/patternAnalyzer';
+import { enhanceAnalysisWithAI as enhanceAnalysis } from './utils/analysisEnhancer';
+import { StrategyOptimizationResult, UseAIStrategyOptimizerReturn } from './types/strategyTypes';
 
 /**
  * Hook that uses AI to analyze past performance and optimize trading strategies
  */
-export function useAIStrategyOptimizer() {
+export function useAIStrategyOptimizer(): UseAIStrategyOptimizerReturn {
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
   const [optimizationResult, setOptimizationResult] = useState<StrategyOptimizationResult | null>(null);
   const { t } = useLanguage();
@@ -93,111 +86,7 @@ export function useAIStrategyOptimizer() {
   const enhanceAnalysisWithAI = (
     analysis: MultiTimeframeAnalysisResult | null
   ): MultiTimeframeAnalysisResult | null => {
-    if (!analysis || !optimizationResult) return analysis;
-
-    // Clone the analysis to avoid mutating the original
-    const enhancedAnalysis = JSON.parse(JSON.stringify(analysis)) as MultiTimeframeAnalysisResult;
-    
-    // Apply confidence adjustment based on AI optimization
-    const adjustedConfidence = Math.min(
-      Math.max(
-        enhancedAnalysis.primarySignal.confidence + optimizationResult.confidenceAdjustment,
-        60
-      ),
-      96
-    );
-    
-    enhancedAnalysis.primarySignal.confidence = Math.round(adjustedConfidence);
-    
-    // Apply entry timing adjustment (adjust countdown)
-    if (optimizationResult.entryTimingAdjustment !== 0) {
-      const adjustedCountdown = Math.max(enhancedAnalysis.countdown + optimizationResult.entryTimingAdjustment, 1);
-      enhancedAnalysis.countdown = adjustedCountdown;
-      
-      // Recalculate entry time
-      const now = new Date();
-      const entryTimeMillis = now.getTime() + (adjustedCountdown * 1000);
-      enhancedAnalysis.primarySignal.entryTime = new Date(entryTimeMillis).toISOString();
-      
-      // Recalculate expiry time with adjustment
-      const expiryMinutes = parseInt(enhancedAnalysis.primarySignal.expiryTime) + optimizationResult.expiryMinutesAdjustment;
-      const expiryTimeMillis = entryTimeMillis + (expiryMinutes * 60 * 1000);
-      enhancedAnalysis.primarySignal.expiryTime = new Date(expiryTimeMillis).toISOString();
-    }
-    
-    // Add AI optimization indicator
-    if (!enhancedAnalysis.primarySignal.indicators.includes('AI Optimization')) {
-      enhancedAnalysis.primarySignal.indicators.push('AI Optimization');
-    }
-    
-    return enhancedAnalysis;
-  };
-
-  /**
-   * Analyzes patterns in historical data to find optimal strategy parameters
-   * @param winningSignals Array of winning signals
-   * @param losingSignals Array of losing signals
-   * @param winRate Overall win rate
-   * @returns Optimized strategy parameters
-   */
-  const analyzePatterns = (
-    winningSignals: SignalHistoryEntry[],
-    losingSignals: SignalHistoryEntry[],
-    winRate: number
-  ): StrategyOptimizationResult => {
-    // Find optimal timeframes based on win rate per timeframe
-    const timeframePerformance: Record<string, { wins: number; total: number }> = {};
-    
-    // Analyze winning signals by timeframe
-    winningSignals.forEach(signal => {
-      if (!timeframePerformance[signal.timeframe]) {
-        timeframePerformance[signal.timeframe] = { wins: 0, total: 0 };
-      }
-      timeframePerformance[signal.timeframe].wins += 1;
-      timeframePerformance[signal.timeframe].total += 1;
-    });
-    
-    // Analyze losing signals by timeframe
-    losingSignals.forEach(signal => {
-      if (!timeframePerformance[signal.timeframe]) {
-        timeframePerformance[signal.timeframe] = { wins: 0, total: 0 };
-      }
-      timeframePerformance[signal.timeframe].total += 1;
-    });
-    
-    // Calculate win rate by timeframe and find the best performing ones
-    const timeframeWinRates = Object.entries(timeframePerformance)
-      .map(([timeframe, data]) => ({
-        timeframe,
-        winRate: (data.wins / data.total) * 100,
-        sampleSize: data.total
-      }))
-      .filter(item => item.sampleSize >= 5) // Only consider timeframes with enough samples
-      .sort((a, b) => b.winRate - a.winRate);
-    
-    // Select top performing timeframes
-    const recommendedTimeframes = timeframeWinRates
-      .slice(0, 3)
-      .map(item => item.timeframe);
-    
-    // Calculate confidence adjustment based on performance
-    const confidenceAdjustment = winRate >= 65 ? 5 : winRate >= 50 ? 0 : -5;
-    
-    // Analyze market conditions (simplified implementation)
-    const preferredMarketConditions = ['TRENDING', 'BREAKOUT'];
-    const avoidedMarketConditions = ['CHOPPY', 'RANGING'];
-    
-    // Return optimized strategy parameters
-    return {
-      confidenceAdjustment,
-      recommendedTimeframes,
-      volatilityThreshold: 0.015, // Default value
-      entryTimingAdjustment: winRate >= 60 ? 0 : 2, // Adjust entry timing for lower win rates
-      expiryMinutesAdjustment: winRate >= 65 ? 1 : 0, // Extend expiry for high win rates
-      preferredMarketConditions,
-      avoidedMarketConditions,
-      lastUpdated: new Date().toISOString()
-    };
+    return enhanceAnalysis(analysis, optimizationResult);
   };
 
   return {
