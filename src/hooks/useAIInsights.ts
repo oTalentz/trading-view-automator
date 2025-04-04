@@ -41,7 +41,7 @@ export function useAIInsights(symbol: string) {
       
       // Run AI optimization if not already done
       if (!optimizationResult) {
-        // Only pass the symbol parameter
+        // Corrigido para passar apenas o símbolo
         optimizeStrategy(symbol);
       }
       
