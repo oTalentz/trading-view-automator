@@ -37,15 +37,12 @@ export function useRealtimeUpdates() {
       
       // Apply AI optimization to the cached update if available
       if (optimizationResult) {
-        return enhanceAnalysisWithAI(
-          {
-            ...analysis,
-            overallConfluence: cachedUpdate.overallConfluence,
-            confluenceDirection: cachedUpdate.confluenceDirection,
-            timeframes: cachedUpdate.timeframes,
-          },
-          optimizationResult
-        );
+        return enhanceAnalysisWithAI({
+          ...analysis,
+          overallConfluence: cachedUpdate.overallConfluence,
+          confluenceDirection: cachedUpdate.confluenceDirection,
+          timeframes: cachedUpdate.timeframes,
+        });
       }
       
       // Return regular update if no AI optimization
@@ -77,7 +74,7 @@ export function useRealtimeUpdates() {
         
         // Apply AI optimization if available
         if (optimizationResult) {
-          return enhanceAnalysisWithAI(baseNewAnalysis, optimizationResult);
+          return enhanceAnalysisWithAI(baseNewAnalysis);
         }
         
         return baseNewAnalysis;
