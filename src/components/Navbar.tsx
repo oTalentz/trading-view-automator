@@ -1,8 +1,10 @@
 
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Home } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   const { t } = useLanguage();
@@ -18,6 +20,12 @@ export function Navbar() {
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
+            <Link to="/">
+              <Button variant="outline" size="icon" className="mr-2" aria-label="Return to home">
+                <Home className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">{t("returnToHome")}</span>
+              </Button>
+            </Link>
             <LanguageToggle />
             <ThemeToggle />
           </nav>
