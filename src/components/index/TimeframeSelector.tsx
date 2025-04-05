@@ -3,7 +3,7 @@ import React from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Define the timeframes data (moved from Index.tsx)
+// Define the timeframes data with the new 1m and 5m options
 const timeframes = [
   { value: "1", label: "1 Minuto" },
   { value: "5", label: "5 Minutos" },

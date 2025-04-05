@@ -10,7 +10,10 @@ type ConfluenceHeatmapProps = {
 export function ConfluenceHeatmap({ analysis }: ConfluenceHeatmapProps) {
   const { t } = useLanguage();
   
+  // Updated timeframe analysis to include 1m and 5m timeframes
   const timeframeAnalysis = [
+    { timeframe: '1m', bullish: 55, bearish: 45 },
+    { timeframe: '5m', bullish: 58, bearish: 42 },
     { timeframe: '15m', bullish: 60, bearish: 40 },
     { timeframe: '30m', bullish: 70, bearish: 30 },
     { timeframe: '1h', bullish: 55, bearish: 45 },
@@ -38,21 +41,21 @@ export function ConfluenceHeatmap({ analysis }: ConfluenceHeatmapProps) {
                 <tr key={index} className="border-b border-gray-700 last:border-none hover:bg-gray-800/50 transition-colors transform hover:scale-[1.02] hover:rotate-y-1">
                   <td className="py-2 text-sm">{tf.timeframe}</td>
                   <td className="py-2 text-sm">
-                    <div className="w-full bg-green-900/50 rounded-full h-2 relative overflow-hidden shadow-inner transform hover:scale-105 transition-transform cursor-pointer">
+                    <div className="w-full bg-green-900/30 rounded-full h-4 relative overflow-hidden shadow-inner transform hover:scale-105 transition-transform cursor-pointer">
                       <div 
-                        className="absolute top-0 left-0 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.7)]"
+                        className="absolute top-0 left-0 h-4 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.7)]"
                         style={{ width: `${tf.bullish}%` }}
                       />
-                      <span className="absolute top-0 left-2 text-white text-xs">{tf.bullish}%</span>
+                      <span className="absolute top-1/2 -translate-y-1/2 left-2 text-white text-xs font-medium z-10">{tf.bullish}%</span>
                     </div>
                   </td>
                   <td className="py-2 text-sm">
-                    <div className="w-full bg-red-900/50 rounded-full h-2 relative overflow-hidden shadow-inner transform hover:scale-105 transition-transform cursor-pointer">
+                    <div className="w-full bg-red-900/30 rounded-full h-4 relative overflow-hidden shadow-inner transform hover:scale-105 transition-transform cursor-pointer">
                       <div 
-                        className="absolute top-0 left-0 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.7)]"
+                        className="absolute top-0 left-0 h-4 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.7)]"
                         style={{ width: `${tf.bearish}%` }}
                       />
-                      <span className="absolute top-0 left-2 text-white text-xs">{tf.bearish}%</span>
+                      <span className="absolute top-1/2 -translate-y-1/2 left-2 text-white text-xs font-medium z-10">{tf.bearish}%</span>
                     </div>
                   </td>
                 </tr>

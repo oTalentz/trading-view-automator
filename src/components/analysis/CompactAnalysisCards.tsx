@@ -25,6 +25,7 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
   const [isExpanded, setIsExpanded] = useState(false);
   const mockAnalysis = createMockAnalysis();
   
+  // Updated the cards array to include the proper components
   const cards = [
     {
       id: 'confluence',
