@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAIInsights } from '@/hooks/useAIInsights';
@@ -26,8 +25,9 @@ export function AIStrategyInsights({ symbol }: AIStrategyInsightsProps) {
       duration: 2000,
     });
     
-    // Chamar a função de geração de insights com o símbolo atual
-    generateInsights(symbol);
+    // Chamar a função de geração de insights sem passar o símbolo
+    // já que o hook já tem acesso ao símbolo atual
+    generateInsights();
   };
   
   if (isLoading) {
