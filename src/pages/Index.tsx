@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLanguage } from "@/context/LanguageContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Settings } from "lucide-react";
+import { BarChart3, Settings, BrainCircuit } from "lucide-react";
+import { CompactMLInsights } from "@/components/ai/CompactMLInsights";
+import { CompactStrategySelector } from "@/components/ai/CompactStrategySelector";
 
 const symbols = [
   // Criptomoedas
@@ -70,6 +72,8 @@ const IndexContent = () => {
   const [symbol, setSymbol] = useState("BINANCE:BTCUSDT");
   const [interval, setInterval] = useState("1");
   const { t } = useLanguage();
+
+  const cleanSymbol = symbol.includes(":") ? symbol.split(":")[1] : symbol;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -193,10 +197,22 @@ const IndexContent = () => {
             </div>
             
             <TradingViewWidget symbol={symbol} interval={interval} />
+
+            <div className="mt-4">
+              <div className="flex items-center gap-2 px-1 mb-3">
+                <BrainCircuit className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-medium">{t("aiInsights")}</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <CompactStrategySelector symbol={cleanSymbol} interval={interval} />
+                <CompactMLInsights symbol={cleanSymbol} interval={interval} />
+                <SignalIndicator symbol={symbol} interval={interval} />
+              </div>
+            </div>
           </div>
           
           <div className="space-y-6">
-            <SignalIndicator symbol={symbol} interval={interval} />
           </div>
         </div>
       </main>
