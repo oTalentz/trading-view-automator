@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Brain, Zap, List, Lightbulb } from 'lucide-react';
 import { useMarketAnalysis } from '@/hooks/useMarketAnalysis';
+import { useMLPrediction } from '@/hooks/useMLPrediction';
+import { MLPredictionView } from './ai/MLPredictionView';
 
 interface MLStrategySelectorProps {
   symbol: string;
@@ -17,6 +19,7 @@ export function MLStrategySelector({
   interval = "1"
 }: MLStrategySelectorProps) {
   const { analysis } = useMarketAnalysis(symbol, interval);
+  const { prediction, isLoading } = useMLPrediction(symbol, interval);
   const { t } = useLanguage();
   
   // Strategy might not have ML details
@@ -132,6 +135,8 @@ export function MLStrategySelector({
           )}
         </CardContent>
       </Card>
+      
+      {prediction && <MLPredictionView prediction={prediction} isLoading={isLoading} />}
     </div>
   );
 }
