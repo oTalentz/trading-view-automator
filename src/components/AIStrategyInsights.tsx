@@ -16,6 +16,13 @@ export function AIStrategyInsights({ symbol }: AIStrategyInsightsProps) {
   const { insights, isLoading, generateInsights } = useAIInsights(symbol);
   const { t } = useLanguage();
   
+  React.useEffect(() => {
+    // Gerar insights iniciais quando o componente é montado
+    if (insights.length === 0 && !isLoading) {
+      generateInsights();
+    }
+  }, [insights.length, isLoading, generateInsights]);
+  
   const getIconForType = (type: 'success' | 'warning' | 'info' | 'error') => {
     switch (type) {
       case 'success':
