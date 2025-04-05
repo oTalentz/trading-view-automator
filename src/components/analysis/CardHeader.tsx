@@ -13,7 +13,7 @@ interface CardHeaderProps {
   viewMode: 'carousel' | 'split';
   selectedCards: string[];
   isExpanded: boolean;
-  setViewMode: (mode: 'carousel' | 'split') => void;
+  toggleViewMode: () => void;
   setIsExpanded: (expanded: boolean) => void;
 }
 
@@ -23,7 +23,7 @@ export function CardHeader({
   viewMode,
   selectedCards,
   isExpanded,
-  setViewMode,
+  toggleViewMode,
   setIsExpanded
 }: CardHeaderProps) {
   const { t } = useLanguage();
@@ -41,7 +41,7 @@ export function CardHeader({
         ) : (
           <>
             <Badge variant="outline" className="px-1.5 py-0 h-5 text-xs bg-primary/20 text-primary border-0">
-              {selectedCards.length}
+              {selectedCards.length}/3
             </Badge>
             <span>{t('splitView')}</span>
           </>
@@ -52,7 +52,7 @@ export function CardHeader({
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-muted-foreground"
-          onClick={() => setViewMode(viewMode === 'carousel' ? 'split' : 'carousel')}
+          onClick={toggleViewMode}
           title={viewMode === 'carousel' ? t('switchToSplitView') : t('switchToCarousel')}
         >
           {viewMode === 'carousel' 

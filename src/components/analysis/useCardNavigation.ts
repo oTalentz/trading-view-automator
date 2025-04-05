@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnalysisCard } from '@/components/analysis/types';
 
 export const useCardNavigation = (cards: AnalysisCard[]) => {
@@ -8,6 +8,13 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
   const [selectedCards, setSelectedCards] = useState<string[]>(['confluence', 'strategy']);
   const [viewMode, setViewMode] = useState<'carousel' | 'split'>('carousel');
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Ensure we always have at least one selected card
+  useEffect(() => {
+    if (selectedCards.length === 0 && cards.length > 0) {
+      setSelectedCards([cards[0].id]);
+    }
+  }, [selectedCards, cards]);
   
   const nextCard = () => {
     setActiveIndex((prev) => (prev + 1) % cards.length);
@@ -25,6 +32,24 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
   const handlePrev = () => {
     setDirection(-1);
     prevCard();
+  };
+  
+  // Add the current card to the selected cards when switching from carousel to split view
+  const toggleViewMode = () => {
+    if (viewMode === 'carousel') {
+      // When switching to split view, make sure the current card is included
+      if (!selectedCards.includes(cards[activeIndex].id)) {
+        // If we already have 3 cards, replace the last one
+        if (selectedCards.length >= 3) {
+          setSelectedCards([...selectedCards.slice(0, 2), cards[activeIndex].id]);
+        } else {
+          setSelectedCards([...selectedCards, cards[activeIndex].id]);
+        }
+      }
+      setViewMode('split');
+    } else {
+      setViewMode('carousel');
+    }
   };
   
   const toggleCardSelection = (cardId: string) => {
@@ -55,6 +80,7 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
     prevCard,
     handleNext,
     handlePrev,
-    toggleCardSelection
+    toggleCardSelection,
+    toggleViewMode
   };
 };

@@ -64,7 +64,8 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
     isExpanded,
     setIsExpanded,
     handleNext,
-    handlePrev
+    handlePrev,
+    toggleViewMode
   } = useCardNavigation(cards);
 
   return (
@@ -75,7 +76,7 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
         viewMode={viewMode}
         selectedCards={selectedCards}
         isExpanded={isExpanded}
-        setViewMode={setViewMode}
+        toggleViewMode={toggleViewMode}
         setIsExpanded={setIsExpanded}
       />
       
