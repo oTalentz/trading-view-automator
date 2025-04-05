@@ -8,9 +8,14 @@ import { Clock } from 'lucide-react';
 type TimeRangeSelectorProps = {
   timeRange: '7d' | '30d' | 'all';
   setTimeRange: (value: '7d' | '30d' | 'all') => void;
+  buttonClassName?: string;
 };
 
-export function TimeRangeSelector({ timeRange, setTimeRange }: TimeRangeSelectorProps) {
+export function TimeRangeSelector({ 
+  timeRange, 
+  setTimeRange,
+  buttonClassName = ''
+}: TimeRangeSelectorProps) {
   const { t } = useLanguage();
   
   return (
@@ -26,13 +31,13 @@ export function TimeRangeSelector({ timeRange, setTimeRange }: TimeRangeSelector
             value={timeRange} 
             onValueChange={(value) => setTimeRange(value as '7d' | '30d' | 'all')}
           >
-            <ToggleGroupItem value="7d" size="sm" className="text-xs px-2 h-6">
+            <ToggleGroupItem value="7d" size="sm" className={`text-xs px-2 h-6 ${buttonClassName}`}>
               {t("last7Days")}
             </ToggleGroupItem>
-            <ToggleGroupItem value="30d" size="sm" className="text-xs px-2 h-6">
+            <ToggleGroupItem value="30d" size="sm" className={`text-xs px-2 h-6 ${buttonClassName}`}>
               {t("last30Days")}
             </ToggleGroupItem>
-            <ToggleGroupItem value="all" size="sm" className="text-xs px-2 h-6">
+            <ToggleGroupItem value="all" size="sm" className={`text-xs px-2 h-6 ${buttonClassName}`}>
               {t("allTime")}
             </ToggleGroupItem>
           </ToggleGroup>

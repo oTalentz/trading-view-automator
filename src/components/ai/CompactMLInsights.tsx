@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Brain, TrendingUp, TrendingDown } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { useAIAnalysis } from '@/context/AIAnalysisContext';
 
 interface CompactMLInsightsProps {
   symbol: string;
@@ -13,53 +14,23 @@ interface CompactMLInsightsProps {
 
 export function CompactMLInsights({ symbol, interval, className = "" }: CompactMLInsightsProps) {
   const { t } = useLanguage();
-  const [mlPrediction, setMlPrediction] = React.useState<{
-    direction: 'CALL' | 'PUT';
-    probability: number;
-    patterns: { name: string; reliability: number }[];
-    timeframes: { timeframe: string; prediction: 'CALL' | 'PUT'; confidence: number }[];
-  } | null>(null);
+  const { mlPrediction, isLoadingPrediction, generatePrediction } = useAIAnalysis();
   
   React.useEffect(() => {
-    // Simulação de dados de previsão de ML
-    const generatePrediction = () => {
-      const probability = 65 + Math.random() * 25;
-      const direction = probability > 75 ? 'CALL' : 'PUT';
-      
-      const patterns = [
-        { 
-          name: 'Hammer Pattern', 
-          reliability: 80 + Math.random() * 10 
-        },
-        { 
-          name: 'Engulfing Pattern', 
-          reliability: 70 + Math.random() * 10 
-        },
-        { 
-          name: 'MACD Crossover', 
-          reliability: 60 + Math.random() * 10 
-        }
-      ];
-      
-      const timeframes = [
-        { timeframe: '1m', prediction: Math.random() > 0.5 ? 'CALL' : 'PUT', confidence: 65 + Math.random() * 15 },
-        { timeframe: '5m', prediction: Math.random() > 0.5 ? 'CALL' : 'PUT', confidence: 65 + Math.random() * 15 },
-        { timeframe: '15m', prediction: Math.random() > 0.5 ? 'CALL' : 'PUT', confidence: 65 + Math.random() * 15 }
-      ];
-      
-      setMlPrediction({
-        direction,
-        probability,
-        patterns,
-        timeframes
-      });
-    };
+    // Generate prediction when component mounts
+    if (symbol && interval) {
+      generatePrediction(symbol, interval);
+    }
     
-    generatePrediction();
-    const interval = setInterval(generatePrediction, 60000); // Atualizar a cada minuto
+    // Refresh prediction periodically
+    const refreshInterval = setInterval(() => {
+      if (symbol && interval) {
+        generatePrediction(symbol, interval);
+      }
+    }, 60000); // Refresh every minute
     
-    return () => clearInterval(interval);
-  }, [symbol, interval]);
+    return () => clearInterval(refreshInterval);
+  }, [symbol, interval, generatePrediction]);
   
   if (!mlPrediction) return null;
   
@@ -141,7 +112,7 @@ export function CompactMLInsights({ symbol, interval, className = "" }: CompactM
                   } text-white text-xs`}>
                   {tf.prediction}
                 </Badge>
-                <div className="text-xs mt-1">{tf.confidence}%</div>
+                <div className="text-xs mt-1">{Math.round(tf.confidence)}%</div>
               </div>
             ))}
           </div>

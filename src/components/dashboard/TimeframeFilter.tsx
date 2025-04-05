@@ -9,17 +9,19 @@ type TimeframeFilterProps = {
   timeframeFilter: string;
   setTimeframeFilter: (value: string) => void;
   timeframeOptions: string[];
+  className?: string;
 };
 
 export function TimeframeFilter({ 
   timeframeFilter, 
   setTimeframeFilter, 
-  timeframeOptions 
+  timeframeOptions,
+  className = ''
 }: TimeframeFilterProps) {
   const { t } = useLanguage();
   
   return (
-    <Card className="border-muted bg-background/60">
+    <Card className={`border-muted bg-background/60 ${className}`}>
       <CardContent className="p-2">
         <div className="flex flex-col gap-2">
           <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
