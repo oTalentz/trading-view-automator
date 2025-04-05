@@ -14,6 +14,7 @@ import { calculateRSI } from './technical/indicators/rsi';
 import { calculateMACD } from './technical/indicators/macd';
 import type { MACDData } from './technical/indicators/macd';
 import { calculateBollingerBands } from './technical/indicators/bollingerBands';
+import type { BollingerBands } from './technical/indicators/bollingerBands';
 
 // Analysis utilities
 import { findSupportResistanceLevels } from './technical/supportResistance';
@@ -42,6 +43,7 @@ export {
   // Types
   // Use export type for re-exporting types when isolatedModules is enabled
   type MACDData,
+  type BollingerBands,
   
   // Analysis utilities
   findSupportResistanceLevels,

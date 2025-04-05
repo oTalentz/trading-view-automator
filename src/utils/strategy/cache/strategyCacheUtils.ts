@@ -2,7 +2,7 @@
 import { 
   MarketCondition, 
   MACDData, 
-  BollingerBands 
+  type BollingerBands 
 } from '@/utils/technicalAnalysis';
 import { StrategyWithDetails } from '../types';
 import { cacheService } from '../../cacheSystem';

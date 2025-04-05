@@ -31,7 +31,7 @@ export const selectTraditionalStrategy = (
   strategyScores.sort((a, b) => b.score - a.score);
   
   // Create a proper StrategyWithDetails object from the top-scored strategy
-  const topStrategyKey = strategyScores[0]?.key || Object.keys(strategyScores)[0];
+  const topStrategyKey = strategyScores[0]?.key || compatibleStrategies[0];
   const topStrategy = getStrategyWithDetails(
     topStrategyKey,
     75, // Default confidence

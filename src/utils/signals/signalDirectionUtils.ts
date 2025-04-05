@@ -1,5 +1,5 @@
 
-import { MarketCondition, MACDData, BollingerBands } from '@/utils/technicalAnalysis';
+import { MarketCondition, MACDData, type BollingerBands } from '@/utils/technicalAnalysis';
 
 /**
  * Determina a direção do sinal (CALL ou PUT) com base em múltiplos indicadores técnicos
@@ -13,15 +13,15 @@ export const determineSignalDirection = (
   rsi: number,
   macd: MACDData,
   trendStrength: number,
-  sentimentScore?: number // Changed from required to optional
+  sentimentScore?: number
 ): 'CALL' | 'PUT' => {
   let bullishSignals = 0;
   let bearishSignals = 0;
   
   // 1. Analisar condição geral do mercado (peso 2)
-  if (marketCondition === 'Strong Bullish' || marketCondition === 'Bullish') {
+  if (marketCondition === MarketCondition.STRONG_TREND_UP || marketCondition === MarketCondition.TREND_UP) {
     bullishSignals += 2;
-  } else if (marketCondition === 'Strong Bearish' || marketCondition === 'Bearish') {
+  } else if (marketCondition === MarketCondition.STRONG_TREND_DOWN || marketCondition === MarketCondition.TREND_DOWN) {
     bearishSignals += 2;
   }
   
@@ -62,9 +62,9 @@ export const determineSignalDirection = (
   // 5. Analisar força da tendência (peso 1.5)
   if (trendStrength > 70) {
     // Tendência forte - mais peso para a direção atual
-    if (marketCondition === 'Strong Bullish' || marketCondition === 'Bullish') {
+    if (marketCondition === MarketCondition.STRONG_TREND_UP || marketCondition === MarketCondition.TREND_UP) {
       bullishSignals += 1.5;
-    } else if (marketCondition === 'Strong Bearish' || marketCondition === 'Bearish') {
+    } else if (marketCondition === MarketCondition.STRONG_TREND_DOWN || marketCondition === MarketCondition.TREND_DOWN) {
       bearishSignals += 1.5;
     }
   }

@@ -2,9 +2,9 @@
 import { 
   MarketCondition, 
   MACDData, 
-  BollingerBands 
+  type BollingerBands 
 } from '@/utils/technicalAnalysis';
-import { traditionalStrategySelector } from './traditional/traditionalStrategySelector';
+import { selectTraditionalStrategy } from './traditional/traditionalStrategySelector';
 import { StrategyWithDetails } from './types';
 import { getMLStrategySelection } from '@/utils/ml/strategyOptimizer';
 
@@ -21,7 +21,7 @@ export const selectStrategy = (
   bollingerBands: BollingerBands,
   volatility: number,
   trendStrength: number,
-  sentimentData: null = null, // Modifying to accept null instead of SentimentAnalysisResult
+  sentimentData: null = null,
   useML: boolean = false
 ): StrategyWithDetails => {
   // Se o modelo de ML estiver disponível e ativado, usar para seleção de estratégia
@@ -43,15 +43,25 @@ export const selectStrategy = (
     }
   }
   
+  // Lista de estratégias para o seletor tradicional considerar
+  const compatibleStrategies = [
+    'RSI_DIVERGENCE', 
+    'MACD_CROSSOVER', 
+    'BOLLINGER_BREAKOUT', 
+    'SUPPORT_RESISTANCE', 
+    'TREND_FOLLOWING', 
+    'FIBONACCI_RETRACEMENT', 
+    'ICHIMOKU_CLOUD'
+  ];
+  
   // Fallback para seleção tradicional baseada em regras
-  return traditionalStrategySelector(
-    marketCondition,
+  return selectTraditionalStrategy(
+    compatibleStrategies,
     prices,
     volume,
     rsi,
     macd,
     bollingerBands,
-    volatility,
-    trendStrength
+    volatility
   );
 };

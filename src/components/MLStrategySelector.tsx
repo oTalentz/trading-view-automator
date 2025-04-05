@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Brain, Zap, List, Lightbulb } from 'lucide-react';
 import { useMarketAnalysis } from '@/hooks/useMarketAnalysis';
-import { SentimentAnalysis } from './SentimentAnalysis';
 
 interface MLStrategySelectorProps {
   symbol: string;
@@ -133,9 +132,6 @@ export function MLStrategySelector({
           )}
         </CardContent>
       </Card>
-      
-      {/* Componente de análise de sentimento */}
-      <SentimentAnalysis symbol={symbol} />
     </div>
   );
 }
