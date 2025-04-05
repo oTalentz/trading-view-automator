@@ -1,3 +1,4 @@
+
 import { 
   MarketCondition, 
   calculateRSI, 
@@ -17,7 +18,6 @@ import { calculateTechnicalScores } from '@/utils/analysis/technicalScoreUtils';
 import { calculateOptimalEntryTiming, calculateExpiryMinutes } from '@/utils/timing/entryTimingUtils';
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
 import { validateSignal } from '@/utils/signals/signalValidator';
-import { SentimentAnalysisResult } from '@/utils/sentiment/types';
 import { StrategyWithDetails } from '@/utils/strategy/types';
 
 /**
@@ -26,8 +26,7 @@ import { StrategyWithDetails } from '@/utils/strategy/types';
  */
 export const analyzeMarket = (
   symbol: string, 
-  interval: string, 
-  sentimentData: SentimentAnalysisResult | null = null
+  interval: string
 ): MarketAnalysisResult => {
   // Obter dados simulados do mercado com mais pontos para análise precisa
   const { prices, volume } = generateSimulatedMarketData(symbol, 150);
@@ -55,7 +54,7 @@ export const analyzeMarket = (
   
   const bbands = calculateBollingerBands(prices);
   
-  // Selecionar estratégia ideal com base nas condições atuais do mercado e sentimento
+  // Selecionar estratégia ideal com base nas condições atuais do mercado
   const selectedStrategy: StrategyWithDetails = selectStrategy(
     marketCondition, 
     prices, 
@@ -65,12 +64,11 @@ export const analyzeMarket = (
     bbands,
     volatility,
     trendStrengthValue,
-    sentimentData,
+    null, // Remove sentiment data parameter
     true // Usar ML para seleção de estratégia
   );
   
   // Determinar direção do sinal com análise aprimorada
-  // Incluindo influência de sentimento, se disponível
   const direction = determineSignalDirection(
     marketCondition,
     prices,
@@ -79,7 +77,7 @@ export const analyzeMarket = (
     rsiValue,
     macdData,
     trendStrengthValue,
-    sentimentData?.overallScore
+    undefined // Remove sentiment score parameter
   );
   
   // Validar sinal usando o sistema de validação aprimorado
@@ -99,22 +97,6 @@ export const analyzeMarket = (
   
   // Cálculo de confiança com mais fatores e validação
   let confidence = validationResult.isValid ? validationResult.confidence : Math.max(validationResult.confidence - 15, 50);
-  
-  // Ajustar confiança com base no sentimento, se disponível
-  if (sentimentData && Math.abs(sentimentData.overallScore) > 20) {
-    const sentimentInfluence = Math.min(Math.abs(sentimentData.overallScore) / 10, 8);
-    
-    // Aumentar confiança se sentimento estiver alinhado com direção
-    if ((direction === 'CALL' && sentimentData.overallScore > 0) || 
-        (direction === 'PUT' && sentimentData.overallScore < 0)) {
-      confidence = Math.min(confidence + sentimentInfluence, 96);
-    } 
-    // Diminuir confiança se sentimento for contrário à direção
-    else if ((direction === 'CALL' && sentimentData.overallScore < -20) || 
-             (direction === 'PUT' && sentimentData.overallScore > 20)) {
-      confidence = Math.max(confidence - sentimentInfluence, 50);
-    }
-  }
   
   // Calcular timing de entrada ótimo
   const secondsToNextMinute = calculateOptimalEntryTiming();
@@ -162,33 +144,12 @@ export const analyzeMarket = (
     }
   };
   
-  // Adicionar dados de sentimento, se disponíveis
-  if (sentimentData) {
-    result.sentimentData = {
-      score: sentimentData.overallScore,
-      impact: sentimentData.marketImpact,
-      keywords: sentimentData.keywords.slice(0, 5),
-      lastUpdate: sentimentData.latestUpdate
-    };
-    
-    // Adicionar indicador de sentimento à lista
-    result.indicators.push('Market Sentiment');
-    
-    // Adicionar razões de sentimento
-    if (Math.abs(sentimentData.overallScore) > 30) {
-      const direction = sentimentData.overallScore > 0 ? 'positivo' : 'negativo';
-      result.validationDetails.reasons.push(
-        `Sentimento de mercado ${direction} (${sentimentData.overallScore})`
-      );
-    }
-    
-    // Adicionar razões de ML, se disponíveis
-    if (selectedStrategy.selectionReasons) {
-      result.validationDetails.reasons = [
-        ...result.validationDetails.reasons,
-        ...selectedStrategy.selectionReasons
-      ];
-    }
+  // Adicionar razões de ML, se disponíveis
+  if (selectedStrategy.selectionReasons) {
+    result.validationDetails.reasons = [
+      ...result.validationDetails.reasons,
+      ...selectedStrategy.selectionReasons
+    ];
   }
   
   return result;

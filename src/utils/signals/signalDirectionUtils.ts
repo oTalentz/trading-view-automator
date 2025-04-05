@@ -1,118 +1,109 @@
 
-import { MarketCondition } from '@/utils/technical/enums';
-import { findIntersectionPatterns } from '@/utils/technical/intersectionPatterns';
+import { MarketCondition, MACDData, BollingerBands } from '@/utils/technicalAnalysis';
 
 /**
  * Determina a direção do sinal (CALL ou PUT) com base em múltiplos indicadores técnicos
- * e dados de sentimento, se disponíveis, para uma análise mais abrangente
+ * e análise de sentimento (opcional)
  */
 export const determineSignalDirection = (
   marketCondition: MarketCondition,
   prices: number[],
-  volume: number[],
-  bollingerBands: any,
-  rsiValue: number,
-  macdData: { macdLine: number; signalLine: number; histogram: number; previousHistogram?: number },
+  volumes: number[],
+  bollingerBands: BollingerBands,
+  rsi: number,
+  macd: MACDData,
   trendStrength: number,
-  sentimentScore?: number | null
+  sentimentScore?: number // Changed from required to optional
 ): 'CALL' | 'PUT' => {
-  let callSignals = 0;
-  let putSignals = 0;
+  let bullishSignals = 0;
+  let bearishSignals = 0;
   
-  // 1. Análise de tendência de mercado
-  if (marketCondition === MarketCondition.STRONG_TREND_UP || marketCondition === MarketCondition.TREND_UP) {
-    callSignals += 2;
-  } else if (marketCondition === MarketCondition.STRONG_TREND_DOWN || marketCondition === MarketCondition.TREND_DOWN) {
-    putSignals += 2;
+  // 1. Analisar condição geral do mercado (peso 2)
+  if (marketCondition === 'Strong Bullish' || marketCondition === 'Bullish') {
+    bullishSignals += 2;
+  } else if (marketCondition === 'Strong Bearish' || marketCondition === 'Bearish') {
+    bearishSignals += 2;
   }
   
-  // 2. Análise de preço em relação às Bandas de Bollinger
+  // 2. Analisar RSI (peso 1)
+  if (rsi > 50 && rsi < 70) {
+    bullishSignals += 1;
+  } else if (rsi >= 70) {
+    bearishSignals += 0.5; // Sobrecomprado pode indicar reversão
+  } else if (rsi < 50 && rsi > 30) {
+    bearishSignals += 1;
+  } else if (rsi <= 30) {
+    bullishSignals += 0.5; // Sobrevendido pode indicar reversão
+  }
+  
+  // 3. Analisar MACD (peso 1.5)
+  if (macd.histogram > 0 && macd.histogram > macd.previousHistogram) {
+    bullishSignals += 1.5; // Histograma positivo e crescente
+  } else if (macd.histogram < 0 && macd.histogram < macd.previousHistogram) {
+    bearishSignals += 1.5; // Histograma negativo e decrescente
+  } else if (macd.histogram > 0) {
+    bullishSignals += 0.7; // Histograma positivo apenas
+  } else if (macd.histogram < 0) {
+    bearishSignals += 0.7; // Histograma negativo apenas
+  }
+  
+  // 4. Analisar Bollinger Bands (peso 1.5)
   const currentPrice = prices[prices.length - 1];
-  const previousPrice = prices[prices.length - 2];
-  
-  if (currentPrice < bollingerBands.lower && previousPrice < currentPrice) {
-    callSignals += 2; // Possível reversão de baixa para alta próximo à banda inferior
-  } else if (currentPrice > bollingerBands.upper && previousPrice > currentPrice) {
-    putSignals += 2; // Possível reversão de alta para baixa próximo à banda superior
+  if (bollingerBands.percentB > 0.8) {
+    bearishSignals += 0.8; // Preço próximo à banda superior - possível sobrecompra
+  } else if (bollingerBands.percentB < 0.2) {
+    bullishSignals += 0.8; // Preço próximo à banda inferior - possível sobrevenda
+  } else if (bollingerBands.percentB > 0.5 && bollingerBands.percentB < 0.8) {
+    bullishSignals += 1.2; // Preço acima da média mas não sobrecomprado
+  } else if (bollingerBands.percentB < 0.5 && bollingerBands.percentB > 0.2) {
+    bearishSignals += 1.2; // Preço abaixo da média mas não sobrevendido
   }
   
-  // 3. Análise de RSI
-  if (rsiValue < 30) {
-    callSignals += 1; // Condição de sobrevenda
-  } else if (rsiValue > 70) {
-    putSignals += 1; // Condição de sobrecompra
-  }
-  
-  // 4. Análise de MACD
-  if (macdData.macdLine > macdData.signalLine && macdData.histogram > 0) {
-    callSignals += 1;
-  } else if (macdData.macdLine < macdData.signalLine && macdData.histogram < 0) {
-    putSignals += 1;
-  }
-  
-  // Verificar se o histograma está aumentando (mais positivo ou menos negativo)
-  if (macdData.previousHistogram !== undefined) {
-    if (macdData.histogram > macdData.previousHistogram) {
-      callSignals += 1;
-    } else if (macdData.histogram < macdData.previousHistogram) {
-      putSignals += 1;
-    }
-  }
-  
-  // 5. Padrões de interseção
-  const intersectionPatterns = findIntersectionPatterns(prices);
-  if (intersectionPatterns.bullishPatterns > intersectionPatterns.bearishPatterns) {
-    callSignals += intersectionPatterns.bullishPatterns;
-  } else if (intersectionPatterns.bearishPatterns > intersectionPatterns.bullishPatterns) {
-    putSignals += intersectionPatterns.bearishPatterns;
-  }
-  
-  // 6. Força da tendência
+  // 5. Analisar força da tendência (peso 1.5)
   if (trendStrength > 70) {
-    // Tendência forte: reforçar sinais na direção da tendência
-    if (callSignals > putSignals) {
-      callSignals += 1;
-    } else if (putSignals > callSignals) {
-      putSignals += 1;
+    // Tendência forte - mais peso para a direção atual
+    if (marketCondition === 'Strong Bullish' || marketCondition === 'Bullish') {
+      bullishSignals += 1.5;
+    } else if (marketCondition === 'Strong Bearish' || marketCondition === 'Bearish') {
+      bearishSignals += 1.5;
     }
   }
   
-  // 7. Análise de volume
-  const volumeIncreasing = volume[volume.length - 1] > volume[volume.length - 2];
-  if (volumeIncreasing && currentPrice > previousPrice) {
-    callSignals += 1; // Volume crescente em alta de preço confirma tendência de alta
-  } else if (volumeIncreasing && currentPrice < previousPrice) {
-    putSignals += 1; // Volume crescente em queda de preço confirma tendência de baixa
+  // 6. Análise de velas (peso 1)
+  // Verifica formações de reversão ou continuação
+  const priceChange = prices[prices.length - 1] - prices[prices.length - 2];
+  const priceChangePercent = priceChange / prices[prices.length - 2] * 100;
+  
+  if (priceChangePercent > 1) {
+    bullishSignals += 1; // Vela de alta significativa
+  } else if (priceChangePercent < -1) {
+    bearishSignals += 1; // Vela de baixa significativa
   }
   
-  // 8. Incorporação de dados de sentimento de mercado
-  if (sentimentScore !== undefined && sentimentScore !== null) {
-    // Sentimento positivo forte contribui para sinal de CALL
-    if (sentimentScore > 40) {
-      callSignals += 1;
-    }
-    // Sentimento positivo muito forte
-    else if (sentimentScore > 70) {
-      callSignals += 2;
-    }
-    // Sentimento negativo forte contribui para sinal de PUT
-    else if (sentimentScore < -40) {
-      putSignals += 1;
-    }
-    // Sentimento negativo muito forte
-    else if (sentimentScore < -70) {
-      putSignals += 2;
+  // 7. Análise de volume (peso 1)
+  const currentVolume = volumes[volumes.length - 1];
+  const previousVolume = volumes[volumes.length - 2];
+  const avgVolume = volumes.slice(-5).reduce((sum, vol) => sum + vol, 0) / 5;
+  
+  if (priceChange > 0 && currentVolume > avgVolume) {
+    bullishSignals += 1; // Alta com volume acima da média
+  } else if (priceChange < 0 && currentVolume > avgVolume) {
+    bearishSignals += 1; // Queda com volume acima da média
+  }
+  
+  // 8. Incluir influência do sentimento, se disponível (peso 1)
+  if (typeof sentimentScore === 'number') {
+    if (sentimentScore > 30) {
+      bullishSignals += 1;
+    } else if (sentimentScore < -30) {
+      bearishSignals += 1;
+    } else if (sentimentScore > 0) {
+      bullishSignals += sentimentScore / 50; // Proporcional ao score
+    } else if (sentimentScore < 0) {
+      bearishSignals += Math.abs(sentimentScore) / 50; // Proporcional ao score
     }
   }
   
-  // Determinar direção com base na quantidade de sinais
-  if (callSignals > putSignals) {
-    return 'CALL';
-  } else if (putSignals > callSignals) {
-    return 'PUT';
-  } else {
-    // Em caso de empate, usar tendência recente como desempate
-    const shortTermTrend = prices[prices.length - 1] > prices[prices.length - 5] ? 'CALL' : 'PUT';
-    return shortTermTrend;
-  }
+  // Determinar direção com base na pontuação total
+  return bullishSignals > bearishSignals ? 'CALL' : 'PUT';
 };

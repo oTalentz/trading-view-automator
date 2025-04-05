@@ -1,116 +1,57 @@
 
-import { MarketCondition } from '@/utils/technicalAnalysis';
-import { MARKET_CONDITION_STRATEGIES } from '@/constants/tradingStrategies';
-import { optimizeStrategySelection } from '@/utils/ml/strategyOptimizer';
-import { SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
+import { 
+  MarketCondition, 
+  MACDData, 
+  BollingerBands 
+} from '@/utils/technicalAnalysis';
+import { traditionalStrategySelector } from './traditional/traditionalStrategySelector';
 import { StrategyWithDetails } from './types';
-import { loadStrategyPerformanceHistory } from './history/strategyPerformanceHistory';
-import { getStrategyWithDetails, getStrategyName } from './utils/strategyDetailsUtils';
-import { ADVANCED_STRATEGIES } from './data/advancedStrategies';
-import { getCachedStrategy, generateStrategySelectionCacheKey, cacheStrategy } from './cache/strategyCacheUtils';
-import { selectTraditionalStrategy } from './traditional/traditionalStrategySelector';
+import { getMLStrategySelection } from '@/utils/ml/strategyOptimizer';
 
 /**
- * Seleciona a estratégia de trading ideal com base nas condições atuais de mercado,
- * indicadores técnicos, histórico de desempenho e análise de sentimento
+ * Seleciona a estratégia mais adequada com base nas condições do mercado e indicadores técnicos
+ * Pode usar aprendizado de máquina para decisões mais inteligentes se useML = true
  */
 export const selectStrategy = (
-  marketCondition: MarketCondition, 
-  prices: number[], 
+  marketCondition: MarketCondition,
+  prices: number[],
   volume: number[],
-  rsiValue: number, 
-  macdData: any,
-  bbands: any,
+  rsi: number,
+  macd: MACDData,
+  bollingerBands: BollingerBands,
   volatility: number,
-  trendStrength: number = 50,
-  sentimentData: SentimentAnalysisResult | null = null,
-  useML: boolean = true
+  trendStrength: number,
+  sentimentData: null = null, // Modifying to accept null instead of SentimentAnalysisResult
+  useML: boolean = false
 ): StrategyWithDetails => {
-  // Obtem estratégias compatíveis para a condição atual de mercado
-  const compatibleStrategies = MARKET_CONDITION_STRATEGIES[marketCondition] || 
-    MARKET_CONDITION_STRATEGIES.SIDEWAYS; // Default para lateral se condição não encontrada
-  
-  // Verificar cache primeiro para evitar cálculos repetidos
-  const cacheKey = generateStrategySelectionCacheKey(
-    marketCondition, 
-    rsiValue, 
-    macdData, 
-    volatility, 
-    sentimentData
-  );
-  
-  const cachedStrategy = getCachedStrategy(
-    marketCondition, 
-    rsiValue, 
-    macdData, 
-    volatility, 
-    sentimentData
-  );
-  
-  if (cachedStrategy) {
-    return cachedStrategy;
-  }
-  
-  // Carregar histórico de desempenho das estratégias
-  const historicalPerformance = loadStrategyPerformanceHistory();
-  
+  // Se o modelo de ML estiver disponível e ativado, usar para seleção de estratégia
   if (useML) {
-    try {
-      // Usar otimizador de ML para seleção de estratégia
-      const optimizedSelection = optimizeStrategySelection(
-        compatibleStrategies,
-        prices,
-        volume,
-        rsiValue,
-        macdData,
-        bbands,
-        volatility,
-        trendStrength,
-        marketCondition,
-        sentimentData,
-        historicalPerformance
-      );
-      
-      // Obter estratégia a partir da chave otimizada
-      const strategyKey = optimizedSelection.strategyKey;
-      const strategy = getStrategyWithDetails(
-        strategyKey, 
-        optimizedSelection.confidenceScore, 
-        optimizedSelection.reasons
-      );
-      
-      // Adicionar estratégias alternativas
-      if (strategy.alternativeStrategies && optimizedSelection.alternativeStrategies) {
-        strategy.alternativeStrategies = optimizedSelection.alternativeStrategies.map(alt => ({
-          name: getStrategyName(alt.strategyKey),
-          confidenceScore: alt.confidenceScore
-        }));
-      }
-      
-      // Cache por 5 minutos
-      cacheStrategy(cacheKey, strategy, 300);
-      
-      return strategy;
-    } catch (error) {
-      console.error("Error using ML strategy optimizer:", error);
-      // Fallback para método tradicional
+    const mlStrategy = getMLStrategySelection(
+      marketCondition,
+      prices,
+      volume,
+      rsi,
+      macd,
+      bollingerBands,
+      volatility,
+      trendStrength,
+      sentimentData
+    );
+    
+    if (mlStrategy) {
+      return mlStrategy;
     }
   }
   
-  // Método tradicional de fallback (sem ML)
-  const topStrategy = selectTraditionalStrategy(
-    compatibleStrategies,
+  // Fallback para seleção tradicional baseada em regras
+  return traditionalStrategySelector(
+    marketCondition,
     prices,
     volume,
-    rsiValue,
-    macdData,
-    bbands,
-    volatility
+    rsi,
+    macd,
+    bollingerBands,
+    volatility,
+    trendStrength
   );
-  
-  // Cache por 5 minutos
-  cacheStrategy(cacheKey, topStrategy, 300);
-  
-  return topStrategy;
 };
-

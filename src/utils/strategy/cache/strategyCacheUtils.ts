@@ -1,71 +1,57 @@
 
-import { cacheService } from '@/utils/cacheSystem';
+import { 
+  MarketCondition, 
+  MACDData, 
+  BollingerBands 
+} from '@/utils/technicalAnalysis';
 import { StrategyWithDetails } from '../types';
-import { MarketCondition } from '@/utils/technicalAnalysis';
-import { SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
-import { getStrategyWithDetails } from '../utils/strategyDetailsUtils';
+import { cacheService } from '../../cacheSystem';
 
 /**
- * Attempts to retrieve a cached strategy based on market conditions
+ * Gera uma chave de cache para estratégias
  */
-export const getCachedStrategy = (
+export function generateStrategyCacheKey(
   marketCondition: MarketCondition,
-  rsiValue: number,
-  macdData: any,
+  prices: number[],
+  volume: number[],
+  rsi: number,
+  macd: MACDData,
+  bollingerBands: BollingerBands,
   volatility: number,
-  sentimentData: SentimentAnalysisResult | null
-): StrategyWithDetails | null => {
-  // Generate cache key from input parameters
-  const cacheKey = cacheService.generateKey('strategy-selection', { 
-    marketCondition, 
-    rsiValue: Math.round(rsiValue), 
-    macdHistogram: Math.round(macdData.histogram * 1000) / 1000,
-    volatility: Math.round(volatility * 1000) / 1000,
-    hasSentiment: sentimentData !== null,
-    sentimentScore: sentimentData ? Math.round(sentimentData.overallScore / 5) * 5 : null
+  trendStrength: number,
+  sentimentScore: number | undefined = undefined
+): string {
+  // Criar um hash de parâmetros relevantes
+  return cacheService.generateKey('strategy-selection', {
+    market: marketCondition,
+    rsi: Math.round(rsi),
+    macd: Math.round(macd.histogram * 100) / 100,
+    bb: {
+      width: Math.round(bollingerBands.width * 100) / 100,
+      percentB: Math.round(bollingerBands.percentB * 100) / 100
+    },
+    volatility: Math.round(volatility * 100) / 100,
+    trend: Math.round(trendStrength * 100) / 100,
+    sentiment: sentimentScore ? Math.round(sentimentScore) : undefined,
+    lastPrice: prices[prices.length - 1],
+    lastVolume: volume[volume.length - 1]
   });
-  
-  const cachedStrategy = cacheService.get(cacheKey);
-  
-  // Ensure the cached object is valid
-  if (cachedStrategy && typeof cachedStrategy === 'object' && cachedStrategy !== null) {
-    // Ensure the cached object has the required properties
-    const strategyWithDetails = cachedStrategy as StrategyWithDetails;
-    if (strategyWithDetails.key) {
-      return strategyWithDetails;
-    }
-  }
-  
-  return null;
-};
+}
 
 /**
- * Caches a strategy
+ * Armazena uma estratégia em cache
  */
-export const cacheStrategy = (
-  cacheKey: string,
+export function cacheStrategy(
+  key: string,
   strategy: StrategyWithDetails,
-  ttlSeconds: number = 300
-): void => {
-  cacheService.set(cacheKey, strategy, ttlSeconds);
-};
+  ttl: number = 300 // 5 minutes default
+): void {
+  cacheService.set(key, strategy, ttl);
+}
 
 /**
- * Generates the cache key for strategy selection
+ * Recupera uma estratégia do cache
  */
-export const generateStrategySelectionCacheKey = (
-  marketCondition: MarketCondition,
-  rsiValue: number,
-  macdData: any,
-  volatility: number,
-  sentimentData: SentimentAnalysisResult | null
-): string => {
-  return cacheService.generateKey('strategy-selection', { 
-    marketCondition, 
-    rsiValue: Math.round(rsiValue), 
-    macdHistogram: Math.round(macdData.histogram * 1000) / 1000,
-    volatility: Math.round(volatility * 1000) / 1000,
-    hasSentiment: sentimentData !== null,
-    sentimentScore: sentimentData ? Math.round(sentimentData.overallScore / 5) * 5 : null
-  });
-};
+export function getCachedStrategy(key: string): StrategyWithDetails | null {
+  return cacheService.get<StrategyWithDetails>(key);
+}

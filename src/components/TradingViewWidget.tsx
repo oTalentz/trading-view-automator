@@ -81,7 +81,7 @@ export function TradingViewWidget({
       
       {analysis && (
         <>
-          {/* ML Strategy Selector & Sentiment Analysis - Novo componente */}
+          {/* ML Strategy Selector */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <div className="md:col-span-2">
               <ConfluenceHeatmap analysis={analysis} />
@@ -91,7 +91,7 @@ export function TradingViewWidget({
             </div>
           </div>
           
-          {/* Correlation Analysis - New */}
+          {/* Correlation Analysis */}
           <div className="mt-6">
             <CorrelationAnalysis symbol={symbol} />
           </div>
@@ -102,7 +102,7 @@ export function TradingViewWidget({
             <AIStrategyInsights symbol={symbol} />
           </div>
           
-          {/* CustomAlerts - Last */}
+          {/* CustomAlerts */}
           <div className="mt-6">
             <Suspense fallback={<AnalyticsSkeleton />}>
               <CustomAlerts symbol={symbol} interval={interval} />
