@@ -2,8 +2,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from '@/context/LanguageContext';
-import { Brain, TrendingUp, TrendingDown, CandlestickChart } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 
 interface MachineLearningInsightsProps {
   symbol: string;
@@ -27,23 +28,23 @@ export function MachineLearningInsights({ symbol, interval }: MachineLearningIns
       
       const patterns = [
         { 
-          name: Math.random() > 0.5 ? 'Hammer' : 'Doji', 
-          reliability: 60 + Math.random() * 30 
+          name: 'Hammer Pattern', 
+          reliability: 80 + Math.random() * 10 
         },
         { 
-          name: Math.random() > 0.5 ? 'Engulfing' : 'Morning Star', 
-          reliability: 60 + Math.random() * 30 
+          name: 'Engulfing Pattern', 
+          reliability: 70 + Math.random() * 10 
         },
         { 
-          name: Math.random() > 0.5 ? 'RSI Divergence' : 'MACD Crossover', 
-          reliability: 60 + Math.random() * 30 
+          name: 'MACD Crossover', 
+          reliability: 60 + Math.random() * 10 
         }
       ];
       
       const timeframes = [
-        { timeframe: '1m', prediction: Math.random() > 0.5 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 30 },
-        { timeframe: '5m', prediction: Math.random() > 0.5 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 30 },
-        { timeframe: '15m', prediction: Math.random() > 0.5 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 30 }
+        { timeframe: '1m', prediction: Math.random() > 0.7 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 20 },
+        { timeframe: '5m', prediction: Math.random() > 0.7 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 20 },
+        { timeframe: '15m', prediction: Math.random() > 0.7 ? 'CALL' as const : 'PUT' as const, confidence: 60 + Math.random() * 20 }
       ];
       
       setMlPrediction({
@@ -63,14 +64,13 @@ export function MachineLearningInsights({ symbol, interval }: MachineLearningIns
   if (!mlPrediction) return null;
   
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="bg-card border-border shadow-sm">
+      <CardHeader className="py-3 px-4">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Brain className="h-4 w-4" /> {t("machineLearningInsights")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 space-y-4">
-        {/* Previsão principal */}
+      <CardContent className="pt-0 px-4 pb-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {mlPrediction.direction === 'CALL' ? (
@@ -93,30 +93,29 @@ export function MachineLearningInsights({ symbol, interval }: MachineLearningIns
           <Progress value={mlPrediction.probability} className="h-1.5" />
         </div>
         
-        {/* Padrões detectados */}
         <div>
           <h4 className="text-xs font-medium mb-2">{t("detectedPatterns")}</h4>
           <div className="space-y-2">
             {mlPrediction.patterns.map((pattern, idx) => (
               <div key={idx} className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="flex items-center">
-                    <CandlestickChart className="h-3 w-3 mr-1" />
-                    {pattern.name}
-                  </span>
+                  <span>{pattern.name}</span>
                   <span>{Math.round(pattern.reliability)}%</span>
                 </div>
                 <Progress 
                   value={pattern.reliability} 
                   className="h-1.5" 
-                  indicatorClassName={pattern.reliability > 80 ? "bg-green-500" : pattern.reliability > 65 ? "bg-amber-500" : "bg-gray-500"}
+                  indicatorClassName={
+                    pattern.reliability > 80 ? "bg-green-500" : 
+                    pattern.reliability > 70 ? "bg-amber-500" : 
+                    "bg-slate-500"
+                  }
                 />
               </div>
             ))}
           </div>
         </div>
         
-        {/* Previsões por timeframe */}
         <div>
           <h4 className="text-xs font-medium mb-2">{t("predictionsAcrossTimeframes")}</h4>
           <div className="grid grid-cols-3 gap-2">

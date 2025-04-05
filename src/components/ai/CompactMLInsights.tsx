@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from '@/context/LanguageContext';
-import { Brain, TrendingUp, TrendingDown, CandlestickChart, ArrowRight } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,10 @@ import { Link } from "react-router-dom";
 interface CompactMLInsightsProps {
   symbol: string;
   interval: string;
+  className?: string;
 }
 
-export function CompactMLInsights({ symbol, interval }: CompactMLInsightsProps) {
+export function CompactMLInsights({ symbol, interval, className = "" }: CompactMLInsightsProps) {
   const { t } = useLanguage();
   const [mlPrediction, setMlPrediction] = React.useState<{
     direction: 'CALL' | 'PUT';
@@ -29,12 +30,16 @@ export function CompactMLInsights({ symbol, interval }: CompactMLInsightsProps) 
       
       const patterns = [
         { 
-          name: Math.random() > 0.5 ? 'Hammer' : 'Doji', 
-          reliability: 60 + Math.random() * 30 
+          name: 'Hammer Pattern', 
+          reliability: 80 + Math.random() * 10 
         },
         { 
-          name: Math.random() > 0.5 ? 'Engulfing' : 'Morning Star', 
-          reliability: 60 + Math.random() * 30 
+          name: 'Engulfing Pattern', 
+          reliability: 70 + Math.random() * 10 
+        },
+        { 
+          name: 'MACD Crossover', 
+          reliability: 60 + Math.random() * 10 
         }
       ];
       
@@ -54,7 +59,7 @@ export function CompactMLInsights({ symbol, interval }: CompactMLInsightsProps) 
   if (!mlPrediction) return null;
   
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className={`hover:shadow-md transition-shadow ${className}`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Brain className="h-4 w-4 text-primary" /> {t("machineLearningInsights")}
@@ -68,31 +73,45 @@ export function CompactMLInsights({ symbol, interval }: CompactMLInsightsProps) 
             ) : (
               <TrendingDown className="h-4 w-4 text-red-500" />
             )}
-            <span className="font-medium text-sm">{symbol}</span>
+            <span className="font-medium">{t("mlPrediction")}</span>
           </div>
-          <Badge className={mlPrediction.direction === 'CALL' ? 'bg-green-500' : 'bg-red-500'}>
+          <Badge className={`${mlPrediction.direction === 'CALL' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
             {mlPrediction.direction}
           </Badge>
         </div>
         
         <div className="space-y-1">
           <div className="flex justify-between text-xs">
-            <span>{t("confidence")}</span>
+            <span>{t("predictionConfidence")}</span>
             <span>{Math.round(mlPrediction.probability)}%</span>
           </div>
           <Progress 
             value={mlPrediction.probability} 
             className="h-1.5" 
-            indicatorClassName={mlPrediction.probability > 80 ? "bg-green-500" : mlPrediction.probability > 65 ? "bg-amber-500" : "bg-red-500"}
           />
         </div>
         
-        <div className="flex flex-wrap gap-1.5">
-          {mlPrediction.patterns.map((pattern, idx) => (
-            <Badge key={idx} variant="outline" className="text-xs">
-              {pattern.name}
-            </Badge>
-          ))}
+        <div>
+          <h4 className="text-xs font-medium mb-2">{t("detectedPatterns")}</h4>
+          <div className="space-y-1.5">
+            {mlPrediction.patterns.map((pattern, idx) => (
+              <div key={idx} className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span>{pattern.name}</span>
+                  <span>{Math.round(pattern.reliability)}%</span>
+                </div>
+                <Progress 
+                  value={pattern.reliability} 
+                  className="h-1.5" 
+                  indicatorClassName={
+                    pattern.reliability > 80 ? "bg-green-500" : 
+                    pattern.reliability > 70 ? "bg-amber-500" : 
+                    "bg-slate-500"
+                  }
+                />
+              </div>
+            ))}
+          </div>
         </div>
         
         <div className="text-right">

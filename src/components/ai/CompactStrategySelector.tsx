@@ -44,12 +44,12 @@ export function CompactStrategySelector({
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Brain className="h-4 w-4 text-primary" />
-          {t("recommendedStrategy")}
+          {t("mlStrategySelector")}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium">{analysis.strategy}</h3>
+          <h3 className="text-sm font-medium">{analysis.strategy}</h3>
           <Badge className="bg-primary/20 text-primary border-0 text-xs">
             {analysis.mlConfidenceScore || Math.round(analysis.confidence / 1.2)}%
           </Badge>
