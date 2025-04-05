@@ -62,12 +62,12 @@ export const analyzePatterns = (
   // Simulação de análise de padrões com IA
   const result: PatternAnalysisResult = {
     patterns: [
-      { name: 'Doji', confidence: 75 + Math.random() * 15, action: Math.random() > 0.5 ? 'BUY' as const : (Math.random() > 0.5 ? 'SELL' as const : 'HOLD' as const) },
-      { name: 'Engulfing', confidence: 65 + Math.random() * 20, action: Math.random() > 0.5 ? 'BUY' as const : (Math.random() > 0.5 ? 'SELL' as const : 'HOLD' as const) },
-      { name: 'Three Soldiers', confidence: 60 + Math.random() * 25, action: Math.random() > 0.5 ? 'BUY' as const : (Math.random() > 0.5 ? 'SELL' as const : 'HOLD' as const) }
+      { name: 'Doji', confidence: 75 + Math.random() * 15, action: Math.random() > 0.5 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD') },
+      { name: 'Engulfing', confidence: 65 + Math.random() * 20, action: Math.random() > 0.5 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD') },
+      { name: 'Three Soldiers', confidence: 60 + Math.random() * 25, action: Math.random() > 0.5 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD') }
     ].filter(p => p.confidence > threshold),
     overallConfidence: 60 + Math.random() * 25,
-    recommendedAction: Math.random() > 0.6 ? 'BUY' as const : (Math.random() > 0.5 ? 'SELL' as const : 'HOLD' as const)
+    recommendedAction: Math.random() > 0.6 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD')
   };
   
   // Armazenar no cache por 5 minutos
