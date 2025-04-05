@@ -15,12 +15,24 @@ import {
   getTimeSeriesData,
   createMockAnalysis
 } from '@/utils/dashboard/dashboardDataUtils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, ChevronDown, ChevronUp, BarChart2 } from 'lucide-react';
 
 export function DashboardSummary() {
   const { t } = useLanguage();
   const signals = getSignalHistory();
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('all');
   const [selectedSymbol, setSelectedSymbol] = useState<string>("BTCUSDT");
+  const [expandedSections, setExpandedSections] = useState<{
+    metrics: boolean;
+    confluence: boolean;
+    analytics: boolean;
+  }>({
+    metrics: true,
+    confluence: false,
+    analytics: true,
+  });
   
   // Filter signals by time range
   const filteredSignals = filterSignalsByTimeRange(signals, timeRange);
@@ -75,6 +87,14 @@ export function DashboardSummary() {
   // Mock analysis for the ConfluenceHeatmap component
   const mockAnalysis = createMockAnalysis();
   
+  // Toggle expansion of sections
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+  
   // If no signals, show empty state
   if (totalSignals === 0) {
     return <EmptyState />;
@@ -84,35 +104,83 @@ export function DashboardSummary() {
     <div className="space-y-6">
       <DashboardHeader timeRange={timeRange} setTimeRange={setTimeRange} />
       
-      <SummaryCards 
-        totalSignals={totalSignals}
-        completedSignals={completedSignals.length}
-        winningSignals={winningSignals.length}
-        winRate={winRate}
-        timeframeData={timeframeData}
-        callSignalsPercentage={callSignalsPercentage}
-        putSignalsPercentage={putSignalsPercentage}
-      />
+      {/* Collapsible Metrics Section */}
+      <Card className="overflow-hidden">
+        <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50" 
+          onClick={() => toggleSection('metrics')}>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <BarChart2 className="h-5 w-5 text-primary" />
+            {t("performanceMetrics")}
+          </CardTitle>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            {expandedSections.metrics ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        </CardHeader>
+        {expandedSections.metrics && (
+          <CardContent className="p-4">
+            <SummaryCards 
+              totalSignals={totalSignals}
+              completedSignals={completedSignals.length}
+              winningSignals={winningSignals.length}
+              winRate={winRate}
+              timeframeData={timeframeData}
+              callSignalsPercentage={callSignalsPercentage}
+              putSignalsPercentage={putSignalsPercentage}
+            />
+          </CardContent>
+        )}
+      </Card>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <ConfluenceSection mockAnalysis={mockAnalysis} />
+      {/* Responsive Grid Layout for Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Confluence Section - takes 8 columns on large screens */}
+        <div className="lg:col-span-8 space-y-4">
+          <Card className="overflow-hidden">
+            <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50"
+              onClick={() => toggleSection('confluence')}>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ExternalLink className="h-5 w-5 text-primary" />
+                {t("marketConfluence")}
+              </CardTitle>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {expandedSections.confluence ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </CardHeader>
+            {expandedSections.confluence && (
+              <CardContent className="p-4">
+                <ConfluenceSection mockAnalysis={mockAnalysis} />
+              </CardContent>
+            )}
+          </Card>
+          
+          {/* Analytics Section */}
+          <Card className="overflow-hidden">
+            <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50"
+              onClick={() => toggleSection('analytics')}>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <BarChart2 className="h-5 w-5 text-primary" />
+                {t("analyticsInsights")}
+              </CardTitle>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {expandedSections.analytics ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </CardHeader>
+            {expandedSections.analytics && (
+              <CardContent className="p-4">
+                <AnalyticsTabs 
+                  resultData={resultData}
+                  timeframeData={timeframeData}
+                  timeSeriesData={timeSeriesData}
+                  confidenceData={confidenceData}
+                />
+              </CardContent>
+            )}
+          </Card>
         </div>
-        <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg">
+        
+        {/* Sidebar - takes 4 columns on large screens */}
+        <div className="lg:col-span-4 space-y-4">
           <UpcomingEventsCard />
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <AnalyticsTabs 
-            resultData={resultData}
-            timeframeData={timeframeData}
-            timeSeriesData={timeSeriesData}
-            confidenceData={confidenceData}
-          />
-        </div>
-        <div className="space-y-6">
           <MLStrategySelector symbol={selectedSymbol} interval="1" />
         </div>
       </div>

@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useMultiTimeframeAnalysis } from '@/hooks/useMultiTimeframeAnalysis';
 import { TimeframeConfluence } from '@/components/TimeframeConfluence';
-import { Card, CardContent } from '@/components/ui/card';
-import { Sparkles, AlertTriangle, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Sparkles, AlertTriangle, Loader2, ChevronDown, ChevronUp, Scale, BarChart, AreaChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAIInsights } from '@/hooks/useAIInsights';
 
@@ -24,6 +24,19 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
   const { analysis, countdown } = useMultiTimeframeAnalysis(symbol, interval);
   const { insights, isLoading: insightsLoading, generateInsights } = useAIInsights(symbol);
   const { t } = useLanguage();
+  const [expandedSections, setExpandedSections] = useState({
+    details: true,
+    strategy: false,
+    technical: true,
+    confluence: false
+  });
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   // If no analysis, show a loading indicator
   if (!analysis) {
@@ -89,44 +102,119 @@ export function SignalIndicator({ symbol, interval = "1" }: SignalIndicatorProps
           ? 'border-t-green-500 dark:border-t-green-600' 
           : 'border-t-red-500 dark:border-t-red-600'
       }`}>
-        <CardContent className="p-4 relative">
-          <SignalHeader direction={signalDirection} />
+        <CardContent className="p-0 relative">
+          {/* Signal Header - Always visible */}
+          <div className="p-4 pb-2">
+            <SignalHeader direction={signalDirection} />
+          </div>
           
-          <SignalDetails 
-            symbol={symbol}
-            primarySignal={{
-              ...primarySignal,
-              direction: signalDirection
-            }}
-            countdown={countdown}
-            overallConfluence={analysis.overallConfluence} 
-          />
-
-          <StrategyInfo 
-            strategy={primarySignal.strategy}
-            indicators={primarySignal.indicators}
-            supportResistance={primarySignal.supportResistance}
-          />
+          {/* Signal Details Section - Collapsible */}
+          <div className="border-t border-b border-gray-100 dark:border-gray-800">
+            <div 
+              className="p-4 flex justify-between items-center cursor-pointer bg-gray-50 dark:bg-gray-900/50"
+              onClick={() => toggleSection('details')}
+            >
+              <div className="flex items-center gap-2 font-medium">
+                <AreaChart className="h-4 w-4 text-primary" />
+                {t("signalDetails")}
+              </div>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {expandedSections.details ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+            {expandedSections.details && (
+              <div className="p-4">
+                <SignalDetails 
+                  symbol={symbol}
+                  primarySignal={{
+                    ...primarySignal,
+                    direction: signalDirection
+                  }}
+                  countdown={countdown}
+                  overallConfluence={analysis.overallConfluence} 
+                />
+              </div>
+            )}
+          </div>
           
-          <TechnicalAnalysis 
-            technicalScores={technicalScores}
-            trendStrength={trendStrength}
-          />
-
-          <DisclaimerFooter />
+          {/* Strategy Info Section - Collapsible */}
+          <div className="border-b border-gray-100 dark:border-gray-800">
+            <div 
+              className="p-4 flex justify-between items-center cursor-pointer bg-gray-50 dark:bg-gray-900/50"
+              onClick={() => toggleSection('strategy')}
+            >
+              <div className="flex items-center gap-2 font-medium">
+                <Scale className="h-4 w-4 text-primary" />
+                {t("strategyInformation")}
+              </div>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {expandedSections.strategy ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+            {expandedSections.strategy && (
+              <div className="p-4">
+                <StrategyInfo 
+                  strategy={primarySignal.strategy}
+                  indicators={primarySignal.indicators}
+                  supportResistance={primarySignal.supportResistance}
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Technical Analysis Section - Collapsible */}
+          <div className="border-b border-gray-100 dark:border-gray-800">
+            <div 
+              className="p-4 flex justify-between items-center cursor-pointer bg-gray-50 dark:bg-gray-900/50"
+              onClick={() => toggleSection('technical')}
+            >
+              <div className="flex items-center gap-2 font-medium">
+                <BarChart className="h-4 w-4 text-primary" />
+                {t("technicalAnalysis")}
+              </div>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                {expandedSections.technical ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+            {expandedSections.technical && (
+              <div className="p-4">
+                <TechnicalAnalysis 
+                  technicalScores={technicalScores}
+                  trendStrength={trendStrength}
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Disclaimer Footer - Always visible */}
+          <div className="p-4 pt-2">
+            <DisclaimerFooter />
+          </div>
         </CardContent>
       </Card>
       
-      {/* Multi-timeframe confluence component */}
+      {/* Multi-timeframe confluence component - Collapsible */}
       <Card className="shadow-sm overflow-hidden">
-        <CardContent className="p-4">
-          <TimeframeConfluence 
-            timeframes={analysis.timeframes}
-            overallConfluence={analysis.overallConfluence}
-            confluenceDirection={analysis.confluenceDirection}
-            currentTimeframe={interval}
-          />
-        </CardContent>
+        <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50"
+          onClick={() => toggleSection('confluence')}>
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-amber-500" />
+            {t("timeframeConfluence")}
+          </CardTitle>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            {expandedSections.confluence ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        </CardHeader>
+        {expandedSections.confluence && (
+          <CardContent className="p-4">
+            <TimeframeConfluence 
+              timeframes={analysis.timeframes}
+              overallConfluence={analysis.overallConfluence}
+              confluenceDirection={analysis.confluenceDirection}
+              currentTimeframe={interval}
+            />
+          </CardContent>
+        )}
       </Card>
     </div>
   );

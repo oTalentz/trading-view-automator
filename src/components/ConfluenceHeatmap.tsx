@@ -30,6 +30,11 @@ export function ConfluenceHeatmap({ analysis }: ConfluenceHeatmapProps) {
     return "text-red-500";
   };
   
+  // Show only 3 most important timeframes to avoid overloading with information
+  const prioritizedTimeframes = [...timeframes]
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 3);
+  
   return (
     <Card className="bg-gray-900 border-gray-800 text-white">
       <CardHeader className="pb-2 pt-3 px-4">
@@ -48,7 +53,7 @@ export function ConfluenceHeatmap({ analysis }: ConfluenceHeatmapProps) {
         <div className="flex flex-col space-y-2">
           {/* Overall confluence */}
           <div className="flex items-center justify-between gap-2 p-2 bg-gray-800/50 rounded-md">
-            <div className="text-sm font-medium">Geral</div>
+            <div className="text-sm font-medium">{t("overall")}</div>
             <div className="flex items-center gap-2">
               {getConfidenceIcon(overallConfluence)}
               <span className={`text-sm font-medium ${getConfidenceColor(overallConfluence)}`}>
@@ -57,8 +62,8 @@ export function ConfluenceHeatmap({ analysis }: ConfluenceHeatmapProps) {
             </div>
           </div>
           
-          {/* Timeframe specific confluences */}
-          {timeframes.map((tf, idx) => (
+          {/* Timeframe specific confluences - show only top 3 */}
+          {prioritizedTimeframes.map((tf, idx) => (
             <div 
               key={idx} 
               className="flex items-center justify-between gap-2 p-2 bg-gray-800/50 rounded-md"
@@ -72,6 +77,13 @@ export function ConfluenceHeatmap({ analysis }: ConfluenceHeatmapProps) {
               </div>
             </div>
           ))}
+          
+          {/* Indicator to show there are more timeframes */}
+          {timeframes.length > 3 && (
+            <div className="text-xs text-center text-gray-400 mt-1">
+              {t("andXMoreTimeframes", { count: timeframes.length - 3 })}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
