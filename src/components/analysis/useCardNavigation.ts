@@ -7,8 +7,8 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
   const [direction, setDirection] = useState(0);
   const [selectedCards, setSelectedCards] = useState<string[]>(['confluence', 'strategy']);
   const [viewMode, setViewMode] = useState<'carousel' | 'split'>('carousel');
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [splitLayout, setSplitLayout] = useState<'vertical' | 'horizontal' | 'grid'>('vertical');
+  const [isExpanded, setIsExpanded] = useState(true); // Default to expanded view
+  const [splitLayout, setSplitLayout] = useState<'vertical' | 'horizontal' | 'grid'>('grid'); // Default to grid for better visibility
   
   // Ensure we always have at least one selected card
   useEffect(() => {
@@ -21,8 +21,6 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
   useEffect(() => {
     if (selectedCards.length > 2) {
       setSplitLayout('grid');
-    } else {
-      setSplitLayout('vertical');
     }
   }, [selectedCards.length]);
   

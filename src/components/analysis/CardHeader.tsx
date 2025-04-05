@@ -41,30 +41,30 @@ export function CardHeader({
   };
   
   return (
-    <div className="py-2 px-3 flex flex-row items-center justify-between bg-gradient-to-r from-gray-800 to-gray-900">
-      <CardTitle className="text-sm font-medium flex items-center gap-2">
+    <div className="py-3 px-4 flex flex-row items-center justify-between bg-gradient-to-r from-gray-900 to-gray-800 border-b border-gray-700">
+      <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
         {viewMode === 'carousel' ? (
           <>
-            <Badge variant="outline" className="px-1.5 py-0 h-5 text-xs bg-primary/20 text-primary border-0">
+            <Badge variant="outline" className="px-2 py-0.5 h-6 text-sm bg-primary/20 text-primary border-primary/30">
               {activeIndex + 1}/{cards.length}
             </Badge>
             <span>{cards[activeIndex].title}</span>
           </>
         ) : (
           <>
-            <Badge variant="outline" className="px-1.5 py-0 h-5 text-xs bg-primary/20 text-primary border-0">
+            <Badge variant="outline" className="px-2 py-0.5 h-6 text-sm bg-primary/20 text-primary border-primary/30">
               {selectedCards.length}/3
             </Badge>
-            <span>{t('splitView')}</span>
+            <span className="text-white">{t('splitView')}</span>
           </>
         )}
       </CardTitle>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         {viewMode === 'split' && cycleSplitLayout && (
           <Button
             variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-muted-foreground"
+            size="sm"
+            className="h-8 text-gray-300 hover:text-white hover:bg-gray-700"
             onClick={cycleSplitLayout}
             title={t('changeLayout')}
           >
@@ -73,25 +73,25 @@ export function CardHeader({
         )}
         <Button
           variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-muted-foreground"
+          size="sm"
+          className="h-8 text-gray-300 hover:text-white hover:bg-gray-700"
           onClick={toggleViewMode}
           title={viewMode === 'carousel' ? t('switchToSplitView') : t('switchToCarousel')}
         >
           {viewMode === 'carousel' 
-            ? <SplitSquareVertical className="h-3.5 w-3.5" /> 
-            : <LayoutGrid className="h-3.5 w-3.5" />}
+            ? <SplitSquareVertical className="h-4 w-4" /> 
+            : <LayoutGrid className="h-4 w-4" />}
         </Button>
         <Button
           variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-muted-foreground"
+          size="sm"
+          className="h-8 text-gray-300 hover:text-white hover:bg-gray-700"
           onClick={() => setIsExpanded(!isExpanded)}
           title={isExpanded ? t('minimize') : t('maximize')}
         >
           {isExpanded 
-            ? <Minimize2 className="h-3.5 w-3.5" /> 
-            : <Maximize2 className="h-3.5 w-3.5" />}
+            ? <Minimize2 className="h-4 w-4" /> 
+            : <Maximize2 className="h-4 w-4" />}
         </Button>
       </div>
     </div>

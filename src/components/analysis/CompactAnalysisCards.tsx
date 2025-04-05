@@ -71,7 +71,7 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
   } = useCardNavigation(cards);
 
   return (
-    <Card className={`border border-gray-800 ${className} overflow-hidden shadow-xl transform perspective-[1000px] transition-all duration-500 ${isExpanded ? 'h-[600px]' : 'h-[320px]'}`}>
+    <Card className={`border border-gray-800 ${className} overflow-hidden shadow-xl transform perspective-[1000px] transition-all duration-500 ${isExpanded ? 'h-[700px]' : 'h-[320px]'}`}>
       <CardHeader 
         activeIndex={activeIndex}
         cards={cards}
