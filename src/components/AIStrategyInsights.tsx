@@ -9,6 +9,7 @@ import { Brain, BarChart2, RefreshCw, Info } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { InsightCard } from './ai/InsightCard';
 import { RecommendationList } from './ai/RecommendationList';
+import { toast } from "sonner";
 
 interface AIStrategyInsightsProps {
   symbol: string;
@@ -17,6 +18,17 @@ interface AIStrategyInsightsProps {
 export function AIStrategyInsights({ symbol }: AIStrategyInsightsProps) {
   const { insights, isLoading, generateInsights } = useAIInsights(symbol);
   const { t } = useLanguage();
+  
+  const handleRefresh = () => {
+    // Mostrar uma notificação de atualização iniciada
+    toast.info(t("updatingInsights"), {
+      description: t("fetchingNewData"),
+      duration: 2000,
+    });
+    
+    // Chamar a função de geração de insights com o símbolo atual
+    generateInsights(symbol);
+  };
   
   if (isLoading) {
     return (
@@ -48,10 +60,11 @@ export function AIStrategyInsights({ symbol }: AIStrategyInsightsProps) {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={generateInsights}
+          onClick={handleRefresh}
           disabled={isLoading}
+          className="hover:bg-primary/10 active:scale-95 transition-all"
         >
-          <RefreshCw className="h-4 w-4 mr-1" />
+          <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
           {t("refresh")}
         </Button>
       </CardHeader>

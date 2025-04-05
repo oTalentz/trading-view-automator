@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAIAnalysis } from '@/context/AIAnalysisContext';
 
 /**
@@ -10,19 +10,27 @@ export function useAIInsights(symbol: string) {
   const { 
     insights, 
     isLoadingInsights, 
-    generateInsights 
+    generateInsights: contextGenerateInsights
   } = useAIAnalysis();
+  
+  // Função de callback para garantir que estamos chamando a função do contexto
+  // com o símbolo mais recente
+  const generateInsights = useCallback(() => {
+    if (symbol) {
+      contextGenerateInsights(symbol);
+    }
+  }, [symbol, contextGenerateInsights]);
 
   // Gerar insights automaticamente quando o símbolo mudar
   useEffect(() => {
     if (symbol) {
-      generateInsights(symbol);
+      generateInsights();
     }
   }, [symbol, generateInsights]);
   
   return {
     insights,
     isLoading: isLoadingInsights,
-    generateInsights: () => generateInsights(symbol)
+    generateInsights
   };
 }
