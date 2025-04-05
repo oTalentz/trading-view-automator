@@ -8,6 +8,7 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
   const [selectedCards, setSelectedCards] = useState<string[]>(['confluence', 'strategy']);
   const [viewMode, setViewMode] = useState<'carousel' | 'split'>('carousel');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [splitLayout, setSplitLayout] = useState<'vertical' | 'horizontal' | 'grid'>('vertical');
   
   // Ensure we always have at least one selected card
   useEffect(() => {
@@ -15,6 +16,15 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
       setSelectedCards([cards[0].id]);
     }
   }, [selectedCards, cards]);
+  
+  // Automatically adjust layout based on number of selected cards
+  useEffect(() => {
+    if (selectedCards.length > 2) {
+      setSplitLayout('grid');
+    } else {
+      setSplitLayout('vertical');
+    }
+  }, [selectedCards.length]);
   
   const nextCard = () => {
     setActiveIndex((prev) => (prev + 1) % cards.length);
@@ -53,7 +63,7 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
   };
   
   const toggleCardSelection = (cardId: string) => {
-    setSelectedCards(prev => {
+    setSelectedCards((prev) => {
       if (prev.includes(cardId)) {
         if (prev.length === 1) return prev;
         return prev.filter(id => id !== cardId);
@@ -62,6 +72,14 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
         return [...prev, cardId];
       }
       return prev;
+    });
+  };
+  
+  const cycleSplitLayout = () => {
+    setSplitLayout(prev => {
+      if (prev === 'vertical') return 'horizontal';
+      if (prev === 'horizontal') return 'grid';
+      return 'vertical';
     });
   };
   
@@ -76,11 +94,14 @@ export const useCardNavigation = (cards: AnalysisCard[]) => {
     setViewMode,
     isExpanded,
     setIsExpanded,
+    splitLayout,
+    setSplitLayout,
     nextCard,
     prevCard,
     handleNext,
     handlePrev,
     toggleCardSelection,
-    toggleViewMode
+    toggleViewMode,
+    cycleSplitLayout
   };
 };

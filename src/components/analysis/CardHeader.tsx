@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SplitSquareVertical, LayoutGrid, Maximize2, Minimize2 } from 'lucide-react';
+import { SplitSquareVertical, LayoutGrid, Maximize2, Minimize2, LayoutVertical, LayoutHorizontal } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { AnalysisCard } from '@/components/analysis/types';
 
@@ -13,8 +13,10 @@ interface CardHeaderProps {
   viewMode: 'carousel' | 'split';
   selectedCards: string[];
   isExpanded: boolean;
+  splitLayout?: 'vertical' | 'horizontal' | 'grid';
   toggleViewMode: () => void;
   setIsExpanded: (expanded: boolean) => void;
+  cycleSplitLayout?: () => void;
 }
 
 export function CardHeader({
@@ -23,10 +25,20 @@ export function CardHeader({
   viewMode,
   selectedCards,
   isExpanded,
+  splitLayout = 'vertical',
   toggleViewMode,
-  setIsExpanded
+  setIsExpanded,
+  cycleSplitLayout
 }: CardHeaderProps) {
   const { t } = useLanguage();
+  
+  const getLayoutIcon = () => {
+    switch (splitLayout) {
+      case 'vertical': return <LayoutVertical className="h-3.5 w-3.5" />;
+      case 'horizontal': return <LayoutHorizontal className="h-3.5 w-3.5" />;
+      case 'grid': return <LayoutGrid className="h-3.5 w-3.5" />;
+    }
+  };
   
   return (
     <div className="py-2 px-3 flex flex-row items-center justify-between bg-gradient-to-r from-gray-800 to-gray-900">
@@ -48,6 +60,17 @@ export function CardHeader({
         )}
       </CardTitle>
       <div className="flex items-center gap-1">
+        {viewMode === 'split' && cycleSplitLayout && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground"
+            onClick={cycleSplitLayout}
+            title={t('changeLayout')}
+          >
+            {getLayoutIcon()}
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="icon"

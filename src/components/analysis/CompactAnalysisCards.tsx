@@ -63,21 +63,25 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
     setViewMode,
     isExpanded,
     setIsExpanded,
+    splitLayout,
+    cycleSplitLayout,
     handleNext,
     handlePrev,
     toggleViewMode
   } = useCardNavigation(cards);
 
   return (
-    <Card className={`border border-gray-800 ${className} overflow-hidden shadow-xl transform perspective-[1000px] transition-all duration-500 ${isExpanded ? 'h-[500px]' : 'h-[280px]'}`}>
+    <Card className={`border border-gray-800 ${className} overflow-hidden shadow-xl transform perspective-[1000px] transition-all duration-500 ${isExpanded ? 'h-[600px]' : 'h-[320px]'}`}>
       <CardHeader 
         activeIndex={activeIndex}
         cards={cards}
         viewMode={viewMode}
         selectedCards={selectedCards}
         isExpanded={isExpanded}
+        splitLayout={splitLayout}
         toggleViewMode={toggleViewMode}
         setIsExpanded={setIsExpanded}
+        cycleSplitLayout={cycleSplitLayout}
       />
       
       <CardContent className="p-0 relative h-full overflow-hidden">
@@ -96,6 +100,8 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
             cards={cards} 
             selectedCards={selectedCards} 
             setSelectedCards={setSelectedCards}
+            splitLayout={splitLayout}
+            cycleSplitLayout={cycleSplitLayout}
           />
         )}
       </CardContent>
