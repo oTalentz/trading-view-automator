@@ -25,10 +25,10 @@ export function DashboardHeader({
   const { t } = useLanguage();
   
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 perspective-[1000px]">
+      <div className="flex items-center gap-3 transform hover:translate-z-4 transition-transform">
         <Link to="/">
-          <Button variant="outline" size="icon" className="h-8 w-8">
+          <Button variant="outline" size="icon" className="h-8 w-8 shadow-md hover:shadow-lg transition-shadow transform hover:scale-110">
             <Home className="h-4 w-4" />
           </Button>
         </Link>
@@ -40,6 +40,7 @@ export function DashboardHeader({
         timeframeFilter={timeframeFilter}
         setTimeframeFilter={setTimeframeFilter}
         timeframeOptions={timeframeOptions}
+        className="transform hover:translate-z-2 transition-transform"
       />
     </div>
   );

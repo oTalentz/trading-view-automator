@@ -11,6 +11,7 @@ import { MachineLearningInsights } from './MachineLearningInsights';
 import { AIStrategyInsights } from './AIStrategyInsights';
 import { CorrelationAnalysis } from './CorrelationAnalysis';
 import { MLStrategySelector } from './MLStrategySelector';
+import { SignalIndicator } from './SignalIndicator';
 
 // Lazy load components for better performance
 const CustomAlerts = lazy(() => import('./alerts/CustomAlerts').then(mod => ({ default: mod.CustomAlerts })));
@@ -64,7 +65,18 @@ export function TradingViewWidget({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg overflow-hidden border bg-card h-[800px]">
+      {/* Entry Signal at the top */}
+      <div className="mb-4 transform perspective-[1000px] hover:rotate-y-1 transition-all duration-500">
+        <h2 className="text-xl font-bold mb-2 flex items-center">
+          <span className="h-8 w-8 bg-primary/20 rounded-full flex items-center justify-center mr-2">
+            <span className="text-primary text-lg">🎯</span>
+          </span>
+          Entry Signal
+        </h2>
+        <SignalIndicator symbol={symbol} interval={interval} />
+      </div>
+      
+      <div className="rounded-lg overflow-hidden border bg-card h-[600px] transform perspective-[1000px] hover:rotate-y-1 transition-all duration-500 shadow-xl">
         <TradingViewChart 
           symbol={symbol} 
           interval={interval} 
@@ -81,32 +93,17 @@ export function TradingViewWidget({
       
       {analysis && (
         <>
-          {/* ML Strategy Selector */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="md:col-span-2">
-              <ConfluenceHeatmap analysis={analysis} />
-            </div>
-            <div>
-              <MLStrategySelector symbol={symbol} interval={interval} />
-            </div>
-          </div>
-          
-          {/* Correlation Analysis */}
-          <div className="mt-6">
-            <CorrelationAnalysis symbol={symbol} />
-          </div>
-          
-          {/* Machine Learning and AI Strategy Insights */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          {/* ML Strategy & Confluence Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            <ConfluenceHeatmap analysis={analysis} />
+            <MLStrategySelector symbol={symbol} interval={interval} />
             <MachineLearningInsights symbol={symbol} interval={interval} />
-            <AIStrategyInsights symbol={symbol} />
           </div>
           
-          {/* CustomAlerts */}
-          <div className="mt-6">
-            <Suspense fallback={<AnalyticsSkeleton />}>
-              <CustomAlerts symbol={symbol} interval={interval} />
-            </Suspense>
+          {/* AI & Technical Analysis Hidden by Default */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 hidden md:grid">
+            <CorrelationAnalysis symbol={symbol} />
+            <AIStrategyInsights symbol={symbol} />
           </div>
         </>
       )}

@@ -11,12 +11,20 @@ interface SignalHeaderProps {
 export function SignalHeader({ direction }: SignalHeaderProps) {
   const { t } = useLanguage();
   
+  const gradientBg = direction === 'CALL' 
+    ? 'bg-gradient-to-r from-green-900 to-green-800' 
+    : 'bg-gradient-to-r from-red-900 to-red-800';
+  
+  const glowColor = direction === 'CALL'
+    ? 'shadow-[0_0_15px_rgba(34,197,94,0.5)]'
+    : 'shadow-[0_0_15px_rgba(239,68,68,0.5)]';
+  
   return (
-    <div className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-t-lg -mx-4 -mt-4 px-4 py-3 border-b border-gray-700/50 mb-4">
+    <div className={`${gradientBg} rounded-t-lg -mx-4 -mt-4 px-4 py-3 border-b border-gray-700/50 mb-4 ${glowColor} transform perspective-[1000px] rotate-x-1`}>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xl font-bold text-white">{t("entrySignal")}</h3>
         <Badge variant={direction === 'CALL' ? 'success' : 'destructive'} 
-               className="px-4 py-1 text-sm font-bold uppercase tracking-wider">
+               className="px-4 py-1 text-sm font-bold uppercase tracking-wider transform hover:scale-110 transition-transform shadow-lg">
           {direction}
         </Badge>
       </div>
@@ -24,7 +32,7 @@ export function SignalHeader({ direction }: SignalHeaderProps) {
       <div className="flex items-center gap-2 text-white">
         {direction === 'CALL' ? (
           <>
-            <div className="bg-green-500/20 p-2 rounded-full">
+            <div className="bg-green-500/20 p-2 rounded-full transform hover:rotate-y-12 transition-transform">
               <TrendingUp className="h-5 w-5 text-green-400" />
             </div>
             <span className="font-medium text-green-400">
@@ -33,7 +41,7 @@ export function SignalHeader({ direction }: SignalHeaderProps) {
           </>
         ) : (
           <>
-            <div className="bg-red-500/20 p-2 rounded-full">
+            <div className="bg-red-500/20 p-2 rounded-full transform hover:rotate-y-12 transition-transform">
               <TrendingDown className="h-5 w-5 text-red-400" />
             </div>
             <span className="font-medium text-red-400">
