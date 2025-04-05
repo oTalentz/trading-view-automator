@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { SignalHistory } from "@/components/SignalHistory";
 import { DashboardSummary } from "@/components/DashboardSummary";
@@ -8,9 +8,11 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StrategyBacktest } from "@/components/StrategyBacktest";
+import { CompactAnalysisCards } from "@/components/analysis/CompactAnalysisCards";
 
 const DashboardContent = () => {
   const { t } = useLanguage();
+  const [selectedSymbol, setSelectedSymbol] = useState("BTCUSDT");
   
   return (
     <div className="min-h-screen flex flex-col">

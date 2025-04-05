@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TradingViewWidget } from "@/components/TradingViewWidget";
-import { SignalIndicator } from "@/components/SignalIndicator";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/context/LanguageContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Settings, BrainCircuit } from "lucide-react";
-import { CompactMLInsights } from "@/components/ai/CompactMLInsights";
-import { CompactStrategySelector } from "@/components/ai/CompactStrategySelector";
+import { BarChart3, Settings } from "lucide-react";
 
 const symbols = [
   // Criptomoedas
@@ -73,8 +70,6 @@ const IndexContent = () => {
   const [interval, setInterval] = useState("1");
   const { t } = useLanguage();
 
-  const cleanSymbol = symbol.includes(":") ? symbol.split(":")[1] : symbol;
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -98,8 +93,8 @@ const IndexContent = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mb-6">
-          <div className="xl:col-span-3 space-y-4">
+        <div className="grid grid-cols-1 gap-6 mb-6">
+          <div className="space-y-4">
             <div className="flex flex-wrap gap-3 mb-4">
               <div className="w-full sm:w-auto flex-1">
                 <Select
@@ -197,22 +192,6 @@ const IndexContent = () => {
             </div>
             
             <TradingViewWidget symbol={symbol} interval={interval} />
-
-            <div className="mt-4">
-              <div className="flex items-center gap-2 px-1 mb-3">
-                <BrainCircuit className="h-5 w-5 text-primary" />
-                <h3 className="text-lg font-medium">{t("aiInsights")}</h3>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <CompactStrategySelector symbol={cleanSymbol} interval={interval} />
-                <CompactMLInsights symbol={cleanSymbol} interval={interval} />
-                <SignalIndicator symbol={symbol} interval={interval} />
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-6">
           </div>
         </div>
       </main>

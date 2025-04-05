@@ -5,13 +5,9 @@ import { TradingViewChart } from './TradingView/TradingViewChart';
 import { SignalDrawing } from './TradingView/SignalDrawing';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ConfluenceHeatmap } from './ConfluenceHeatmap';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MachineLearningInsights } from './MachineLearningInsights';
-import { AIStrategyInsights } from './AIStrategyInsights';
-import { CorrelationAnalysis } from './CorrelationAnalysis';
-import { MLStrategySelector } from './MLStrategySelector';
 import { SignalIndicator } from './SignalIndicator';
+import { CompactAnalysisCards } from './analysis/CompactAnalysisCards';
 
 // Lazy load components for better performance
 const CustomAlerts = lazy(() => import('./alerts/CustomAlerts').then(mod => ({ default: mod.CustomAlerts })));
@@ -64,7 +60,7 @@ export function TradingViewWidget({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Entry Signal at the top */}
       <div className="mb-4 transform perspective-[1000px] hover:rotate-y-1 transition-all duration-500">
         <h2 className="text-xl font-bold mb-2 flex items-center">
@@ -92,20 +88,9 @@ export function TradingViewWidget({
       </div>
       
       {analysis && (
-        <>
-          {/* ML Strategy & Confluence Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            <ConfluenceHeatmap analysis={analysis} />
-            <MLStrategySelector symbol={symbol} interval={interval} />
-            <MachineLearningInsights symbol={symbol} interval={interval} />
-          </div>
-          
-          {/* AI & Technical Analysis Hidden by Default */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 hidden md:grid">
-            <CorrelationAnalysis symbol={symbol} />
-            <AIStrategyInsights symbol={symbol} />
-          </div>
-        </>
+        <div className="mt-3">
+          <CompactAnalysisCards symbol={symbol.split(':')[1] || symbol} interval={interval} />
+        </div>
       )}
     </div>
   );
