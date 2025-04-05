@@ -1,22 +1,23 @@
 
 import { cacheService } from '../cacheSystem';
+import { AIOptimizationResult, PatternAnalysisResult, EnhancedAnalysis } from './types';
 
 /**
  * Otimiza estratégias com base em dados históricos e análise de IA
  * @param symbol Símbolo do ativo
  * @returns Dados de otimização
  */
-export const optimizeStrategy = (symbol: string) => {
+export const optimizeStrategy = (symbol: string): AIOptimizationResult => {
   // Verificar cache
   const cacheKey = cacheService.generateKey('ai-optimization', { symbol });
-  const cachedResult = cacheService.get<any>(cacheKey);
+  const cachedResult = cacheService.get<AIOptimizationResult>(cacheKey);
   
   if (cachedResult) {
     return cachedResult;
   }
   
   // Simulação de análise de padrões com IA
-  const patterns = {
+  const patterns: AIOptimizationResult = {
     detectedPatterns: ['Hammer', 'Engulfing', 'RSI Divergence'],
     reliability: 70 + Math.random() * 15,
     recommendedTimeframes: ['5m', '15m'],
@@ -41,7 +42,11 @@ export const optimizeStrategy = (symbol: string) => {
  * @param threshold Limiar de confiança
  * @returns Análise de padrões
  */
-export const analyzePatterns = (prices: number[] = [], volume: number[] = [], threshold: number = 65) => {
+export const analyzePatterns = (
+  prices: number[] = [], 
+  volume: number[] = [], 
+  threshold: number = 65
+): PatternAnalysisResult => {
   // Verificar cache
   const cacheKey = cacheService.generateKey('pattern-analysis', { 
     priceHash: prices.length > 0 ? prices[prices.length - 1] : Math.random(),
@@ -49,13 +54,13 @@ export const analyzePatterns = (prices: number[] = [], volume: number[] = [], th
     threshold
   });
   
-  const cachedResult = cacheService.get<any>(cacheKey);
+  const cachedResult = cacheService.get<PatternAnalysisResult>(cacheKey);
   if (cachedResult) {
     return cachedResult;
   }
   
   // Simulação de análise de padrões com IA
-  const result = {
+  const result: PatternAnalysisResult = {
     patterns: [
       { name: 'Doji', confidence: 75 + Math.random() * 15, action: Math.random() > 0.5 ? 'BUY' : 'SELL' },
       { name: 'Engulfing', confidence: 65 + Math.random() * 20, action: Math.random() > 0.5 ? 'BUY' : 'SELL' },
@@ -76,21 +81,21 @@ export const analyzePatterns = (prices: number[] = [], volume: number[] = [], th
  * @param analysis Análise atual
  * @returns Análise melhorada
  */
-export const enhanceAnalysisWithAI = (analysis: any) => {
-  if (!analysis) return analysis;
+export const enhanceAnalysisWithAI = <T extends Record<string, any>>(analysis: T): T & EnhancedAnalysis => {
+  if (!analysis) return analysis as T & EnhancedAnalysis;
   
   // Verificar cache
   const cacheKey = cacheService.generateKey('enhanced-analysis', { 
     analysisId: JSON.stringify(analysis).slice(0, 100)
   });
   
-  const cachedResult = cacheService.get<any>(cacheKey);
+  const cachedResult = cacheService.get<T & EnhancedAnalysis>(cacheKey);
   if (cachedResult) {
     return cachedResult;
   }
   
   // Clonar a análise para não modificar o original
-  const enhancedAnalysis = JSON.parse(JSON.stringify(analysis));
+  const enhancedAnalysis = JSON.parse(JSON.stringify(analysis)) as T & EnhancedAnalysis;
   
   // Aumentar levemente a confiança para simular otimização de IA
   if (enhancedAnalysis.overallConfluence) {

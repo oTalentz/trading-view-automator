@@ -4,24 +4,27 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Progress } from '@/components/ui/progress';
 import { BarChart2 } from 'lucide-react';
 
-// Atualizando a interface para compatibilidade com os dados recebidos
+interface TechnicalScores {
+  overall: number;
+  trend: number;
+  momentum: number;
+  volatility: number;
+  rsi?: number;
+  macd?: number;
+  bollingerBands?: number;
+  volumeTrend?: number;
+  priceAction?: number;
+  overallScore?: number;
+}
+
+interface TrendStrength {
+  value: number;
+  direction: 'bullish' | 'bearish' | 'neutral';
+}
+
 interface TechnicalAnalysisProps {
-  technicalScores: {
-    rsi?: number;
-    macd?: number;
-    bollingerBands?: number;
-    volumeTrend?: number;
-    priceAction?: number;
-    overallScore?: number;
-    overall?: number;
-    trend?: number;
-    momentum?: number;
-    volatility?: number;
-  };
-  trendStrength: {
-    value: number;
-    direction: 'bullish' | 'bearish' | 'neutral';
-  } | number;
+  technicalScores: TechnicalScores;
+  trendStrength: TrendStrength | number;
 }
 
 export function TechnicalAnalysis({ 
@@ -101,7 +104,6 @@ export function TechnicalAnalysis({
               <Progress 
                 value={normalizedScores.overall} 
                 className="h-1.5"
-                // @ts-ignore - progressColorClass é aplicado diretamente no CSS
                 indicatorClassName={getProgressColorClass(normalizedScores.overall)}
               />
             </div>
@@ -116,7 +118,6 @@ export function TechnicalAnalysis({
               <Progress 
                 value={normalizedScores.trend} 
                 className="h-1.5"
-                // @ts-ignore - progressColorClass é aplicado diretamente no CSS
                 indicatorClassName={getProgressColorClass(normalizedScores.trend)}
               />
             </div>
@@ -131,7 +132,6 @@ export function TechnicalAnalysis({
               <Progress 
                 value={normalizedScores.momentum} 
                 className="h-1.5"
-                // @ts-ignore - progressColorClass é aplicado diretamente no CSS
                 indicatorClassName={getProgressColorClass(normalizedScores.momentum)}
               />
             </div>
@@ -148,7 +148,6 @@ export function TechnicalAnalysis({
               <Progress 
                 value={normalizedScores.volatility} 
                 className="h-1.5"
-                // @ts-ignore - progressColorClass é aplicado diretamente no CSS
                 indicatorClassName={getProgressColorClass(normalizedScores.volatility, false)}
               />
             </div>
