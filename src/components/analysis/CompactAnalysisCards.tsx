@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -216,15 +217,13 @@ export function CompactAnalysisCards({ symbol, interval, className = "" }: Compa
         ) : (
           <div className="flex flex-col h-full">
             <div className="px-2 py-1 border-b border-gray-700 bg-gray-800/50">
-              <ToggleGroup type="multiple" variant="outline" className="justify-start h-7 gap-1">
+              <ToggleGroup type="multiple" value={selectedCards} onValueChange={setSelectedCards} variant="outline" className="justify-start h-7 gap-1">
                 {cards.map(card => (
                   <ToggleGroupItem 
                     key={card.id} 
                     value={card.id}
                     size="sm"
                     className="text-xs h-6 px-2 data-[state=on]:bg-primary/20 data-[state=on]:text-primary"
-                    pressed={selectedCards.includes(card.id)}
-                    onPressedChange={() => toggleCardSelection(card.id)}
                     disabled={!selectedCards.includes(card.id) && selectedCards.length >= 3}
                   >
                     {card.title.length > 15 ? `${card.title.substring(0, 15)}...` : card.title}
