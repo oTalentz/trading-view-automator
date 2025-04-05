@@ -1,6 +1,7 @@
 
 import { useState, useCallback } from 'react';
-import { analyzeSentiment, SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
+import { analyzeSentiment } from '@/utils/sentiment/sentimentAnalyzer';
+import { SentimentAnalysisResult } from '@/utils/sentiment/types';
 import { toast } from "sonner";
 import { useLanguage } from '@/context/LanguageContext';
 import { cacheService } from '@/utils/cacheSystem';

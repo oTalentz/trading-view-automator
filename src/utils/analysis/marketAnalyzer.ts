@@ -1,4 +1,3 @@
-
 import { 
   MarketCondition, 
   calculateRSI, 
@@ -18,7 +17,7 @@ import { calculateTechnicalScores } from '@/utils/analysis/technicalScoreUtils';
 import { calculateOptimalEntryTiming, calculateExpiryMinutes } from '@/utils/timing/entryTimingUtils';
 import { MarketAnalysisResult } from '@/types/marketAnalysis';
 import { validateSignal } from '@/utils/signals/signalValidator';
-import { SentimentAnalysisResult } from '@/utils/sentiment/sentimentAnalyzer';
+import { SentimentAnalysisResult } from '@/utils/sentiment/types';
 import { StrategyWithDetails } from '@/utils/strategy/types';
 
 /**
