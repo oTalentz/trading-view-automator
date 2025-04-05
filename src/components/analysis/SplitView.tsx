@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, X, LayoutGrid, LayoutVertical, LayoutHorizontal } from "lucide-react";
+import { Check, X, LayoutGrid, PanelLeft, PanelTop } from "lucide-react";
 
 interface SplitViewProps {
   cards: AnalysisCard[];
@@ -44,8 +44,8 @@ export function SplitView({
 
   const getLayoutIcon = () => {
     switch (splitLayout) {
-      case 'vertical': return <LayoutVertical className="h-3.5 w-3.5" />;
-      case 'horizontal': return <LayoutHorizontal className="h-3.5 w-3.5" />;
+      case 'vertical': return <PanelLeft className="h-3.5 w-3.5" />;
+      case 'horizontal': return <PanelTop className="h-3.5 w-3.5" />;
       case 'grid': return <LayoutGrid className="h-3.5 w-3.5" />;
     }
   };

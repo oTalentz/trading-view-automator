@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SplitSquareVertical, LayoutGrid, Maximize2, Minimize2, LayoutVertical, LayoutHorizontal } from 'lucide-react';
+import { SplitSquareVertical, LayoutGrid, Maximize2, Minimize2, PanelLeft, PanelTop } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { AnalysisCard } from '@/components/analysis/types';
 
@@ -34,8 +34,8 @@ export function CardHeader({
   
   const getLayoutIcon = () => {
     switch (splitLayout) {
-      case 'vertical': return <LayoutVertical className="h-3.5 w-3.5" />;
-      case 'horizontal': return <LayoutHorizontal className="h-3.5 w-3.5" />;
+      case 'vertical': return <PanelLeft className="h-3.5 w-3.5" />;
+      case 'horizontal': return <PanelTop className="h-3.5 w-3.5" />;
       case 'grid': return <LayoutGrid className="h-3.5 w-3.5" />;
     }
   };
