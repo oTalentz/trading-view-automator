@@ -2,16 +2,17 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
 
-type SectionHeaderProps = {
+export interface SectionHeaderProps {
   icon: LucideIcon;
   title: string;
-};
+  className?: string;
+}
 
-export function SectionHeader({ icon: Icon, title }: SectionHeaderProps) {
+export function SectionHeader({ icon: Icon, title, className = "" }: SectionHeaderProps) {
   return (
-    <div className="flex items-center gap-2 px-1">
-      <Icon className="h-5 w-5 text-primary" />
-      <h3 className="text-lg font-medium">{title}</h3>
+    <div className={`flex items-center gap-2 mb-3 ${className}`}>
+      <Icon className="h-5 w-5" />
+      <h3 className="text-lg font-semibold">{title}</h3>
     </div>
   );
 }

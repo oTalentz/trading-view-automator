@@ -1,38 +1,41 @@
 
 import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import { TimeRangeSelector } from './TimeRangeSelector';
 import { TimeframeFilter } from './TimeframeFilter';
 
-type DashboardFiltersProps = {
+export interface DashboardFiltersProps {
   timeRange: '7d' | '30d' | 'all';
   setTimeRange: (value: '7d' | '30d' | 'all') => void;
   timeframeFilter: string;
   setTimeframeFilter: (value: string) => void;
   timeframeOptions: string[];
-};
+  className?: string;
+}
 
 export function DashboardFilters({
   timeRange,
   setTimeRange,
   timeframeFilter,
   setTimeframeFilter,
-  timeframeOptions
+  timeframeOptions,
+  className = ""
 }: DashboardFiltersProps) {
+  const { t } = useLanguage();
+  
   return (
-    <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-      {/* Timeframe Quick Filters */}
-      <div className="flex-1 md:flex-initial">
-        <TimeframeFilter 
-          timeframeFilter={timeframeFilter} 
-          setTimeframeFilter={setTimeframeFilter} 
-          timeframeOptions={timeframeOptions} 
-        />
-      </div>
-      
-      {/* Period selector */}
-      <div className="flex-1 md:flex-initial">
-        <TimeRangeSelector timeRange={timeRange} setTimeRange={setTimeRange} />
-      </div>
+    <div className={`flex flex-col xs:flex-row gap-2 items-center ${className}`}>
+      <TimeRangeSelector 
+        timeRange={timeRange}
+        setTimeRange={setTimeRange}
+        buttonClassName="h-8"
+      />
+      <TimeframeFilter
+        timeframeFilter={timeframeFilter}
+        setTimeframeFilter={setTimeframeFilter}
+        timeframeOptions={timeframeOptions}
+        className="h-8"
+      />
     </div>
   );
 }
