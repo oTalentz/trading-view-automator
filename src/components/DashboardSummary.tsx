@@ -1,35 +1,18 @@
+
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { getSignalHistory } from '@/utils/signalHistoryUtils';
 import { EmptyState } from './dashboard/EmptyState';
-import { SummaryCards } from './dashboard/SummaryCards';
-import { UpcomingEventsCard } from './dashboard/UpcomingEventsCard';
 import { DashboardHeader } from './dashboard/DashboardHeader';
-import { ConfluenceSection } from './dashboard/ConfluenceSection';
-import { AnalyticsTabs } from './dashboard/AnalyticsTabs';
-import { MLStrategySelector } from './MLStrategySelector';
+import { MetricsSection } from './dashboard/MetricsSection';
+import { MainContentSection } from './dashboard/MainContentSection';
+import { SidebarSection } from './dashboard/SidebarSection';
 import { 
   filterSignalsByTimeRange, 
   getWinRateByConfidence, 
   getTimeSeriesData,
   createMockAnalysis
 } from '@/utils/dashboard/dashboardDataUtils';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { 
-  ExternalLink, 
-  ChevronDown, 
-  ChevronUp, 
-  BarChart2,
-  LineChart,
-  BrainCircuit,
-  Settings,
-  Star,
-  Clock,
-  Filter,
-  LayoutDashboard
-} from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export function DashboardSummary() {
   const { t } = useLanguage();
@@ -48,6 +31,9 @@ export function DashboardSummary() {
   
   const [timeframeFilter, setTimeframeFilter] = useState<string>("all");
   const [favorites, setFavorites] = useState<string[]>([]);
+  
+  // Available timeframe options
+  const timeframeOptions = ['all', '1m', '5m', '15m', '1h', '4h', '1d'];
   
   // Filter signals by time range
   const filteredSignals = filterSignalsByTimeRange(signals, timeRange);
@@ -123,236 +109,51 @@ export function DashboardSummary() {
   if (totalSignals === 0) {
     return <EmptyState />;
   }
-
-  // Available timeframe options
-  const timeframeOptions = ['all', '1m', '5m', '15m', '1h', '4h', '1d'];
   
   return (
     <div className="space-y-6">
       {/* Enhanced Dashboard Header with Quick Filters */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">{t("performanceAnalytics")}</h2>
-          <p className="text-muted-foreground text-sm">{t("dashboardDescription")}</p>
-        </div>
-        
-        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-          {/* Timeframe Quick Filters */}
-          <div className="flex-1 md:flex-initial">
-            <Card className="border-muted bg-background/60">
-              <CardContent className="p-2">
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                    <Filter className="h-3 w-3" />
-                    {t("timeframeFilter")}
-                  </div>
-                  <ToggleGroup 
-                    type="single" 
-                    value={timeframeFilter} 
-                    onValueChange={(value) => setTimeframeFilter(value || 'all')}
-                    className="flex flex-wrap justify-start"
-                  >
-                    {timeframeOptions.map(tf => (
-                      <ToggleGroupItem 
-                        key={tf} 
-                        value={tf} 
-                        size="sm"
-                        className="text-xs px-2 h-6"
-                      >
-                        {tf === 'all' ? t('all') : tf}
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          {/* Period selector */}
-          <div className="flex-1 md:flex-initial">
-            <TimeRangeSelector timeRange={timeRange} setTimeRange={setTimeRange} />
-          </div>
-        </div>
-      </div>
+      <DashboardHeader
+        timeRange={timeRange}
+        setTimeRange={setTimeRange}
+        timeframeFilter={timeframeFilter}
+        setTimeframeFilter={setTimeframeFilter}
+        timeframeOptions={timeframeOptions}
+      />
       
-      {/* Category: Technical Analysis */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 px-1">
-          <BarChart2 className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-medium">{t("technicalAnalysis")}</h3>
-        </div>
-        
-        {/* Collapsible Metrics Section */}
-        <Card className="overflow-hidden">
-          <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50" 
-            onClick={() => toggleSection('metrics')}>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <LineChart className="h-5 w-5 text-primary" />
-              {t("performanceMetrics")}
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite('performanceMetrics');
-                }}
-              >
-                <Star className={`h-4 w-4 ${favorites.includes('performanceMetrics') ? 'fill-primary text-primary' : ''}`} />
-              </Button>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                {expandedSections.metrics ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </div>
-          </CardHeader>
-          {expandedSections.metrics && (
-            <CardContent className="p-4">
-              <SummaryCards 
-                totalSignals={totalSignals}
-                completedSignals={completedSignals.length}
-                winningSignals={winningSignals.length}
-                winRate={winRate}
-                timeframeData={timeframeData}
-                callSignalsPercentage={callSignalsPercentage}
-                putSignalsPercentage={putSignalsPercentage}
-              />
-            </CardContent>
-          )}
-        </Card>
-      </div>
+      {/* Performance Metrics Section */}
+      <MetricsSection
+        expanded={expandedSections.metrics}
+        toggleSection={() => toggleSection('metrics')}
+        favorites={favorites}
+        toggleFavorite={toggleFavorite}
+        totalSignals={totalSignals}
+        completedSignals={completedSignals.length}
+        winningSignals={winningSignals.length}
+        winRate={winRate}
+        timeframeData={timeframeData}
+        callSignalsPercentage={callSignalsPercentage}
+        putSignalsPercentage={putSignalsPercentage}
+      />
       
       {/* Responsive Grid Layout for Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Category: Market Signals */}
-        <div className="lg:col-span-8 space-y-3">
-          <div className="flex items-center gap-2 px-1">
-            <ExternalLink className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-medium">{t("marketSignals")}</h3>
-          </div>
-          
-          <Card className="overflow-hidden">
-            <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50"
-              onClick={() => toggleSection('confluence')}>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                {t("marketConfluence")}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite('marketConfluence');
-                  }}
-                >
-                  <Star className={`h-4 w-4 ${favorites.includes('marketConfluence') ? 'fill-primary text-primary' : ''}`} />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  {expandedSections.confluence ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </div>
-            </CardHeader>
-            {expandedSections.confluence && (
-              <CardContent className="p-4">
-                <ConfluenceSection mockAnalysis={mockAnalysis} />
-              </CardContent>
-            )}
-          </Card>
-          
-          {/* Analytics Section */}
-          <Card className="overflow-hidden">
-            <CardHeader className="py-3 px-4 flex flex-row items-center justify-between cursor-pointer bg-muted/50"
-              onClick={() => toggleSection('analytics')}>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <LayoutDashboard className="h-5 w-5 text-primary" />
-                {t("analyticsInsights")}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite('analyticsInsights');
-                  }}
-                >
-                  <Star className={`h-4 w-4 ${favorites.includes('analyticsInsights') ? 'fill-primary text-primary' : ''}`} />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  {expandedSections.analytics ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </div>
-            </CardHeader>
-            {expandedSections.analytics && (
-              <CardContent className="p-4">
-                <AnalyticsTabs 
-                  resultData={resultData}
-                  timeframeData={timeframeData}
-                  timeSeriesData={timeSeriesData}
-                  confidenceData={confidenceData}
-                />
-              </CardContent>
-            )}
-          </Card>
-        </div>
+        {/* Main Content Section */}
+        <MainContentSection
+          expandedSections={expandedSections}
+          toggleSection={toggleSection}
+          favorites={favorites}
+          toggleFavorite={toggleFavorite}
+          mockAnalysis={mockAnalysis}
+          resultData={resultData}
+          timeframeData={timeframeData}
+          timeSeriesData={timeSeriesData}
+          confidenceData={confidenceData}
+        />
         
-        {/* Category: AI Insights & Settings */}
-        <div className="lg:col-span-4 space-y-3">
-          <div className="flex items-center gap-2 px-1">
-            <BrainCircuit className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-medium">{t("aiInsights")}</h3>
-          </div>
-          
-          <UpcomingEventsCard />
-          
-          <div className="flex items-center gap-2 px-1 mt-6">
-            <Settings className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-medium">{t("configuration")}</h3>
-          </div>
-          
-          <MLStrategySelector symbol={selectedSymbol} interval="1" />
-        </div>
+        {/* Sidebar Section */}
+        <SidebarSection selectedSymbol={selectedSymbol} />
       </div>
     </div>
-  );
-}
-
-function TimeRangeSelector({ timeRange, setTimeRange }: { 
-  timeRange: '7d' | '30d' | 'all'; 
-  setTimeRange: (value: '7d' | '30d' | 'all') => void 
-}) {
-  const { t } = useLanguage();
-  
-  return (
-    <Card className="border-muted bg-background/60">
-      <CardContent className="p-2">
-        <div className="flex flex-col gap-2">
-          <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {t("period")}
-          </div>
-          <ToggleGroup 
-            type="single" 
-            value={timeRange} 
-            onValueChange={(value) => setTimeRange(value as '7d' | '30d' | 'all')}
-          >
-            <ToggleGroupItem value="7d" size="sm" className="text-xs px-2 h-6">
-              {t("last7Days")}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="30d" size="sm" className="text-xs px-2 h-6">
-              {t("last30Days")}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="all" size="sm" className="text-xs px-2 h-6">
-              {t("allTime")}
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

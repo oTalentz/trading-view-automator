@@ -1,26 +1,43 @@
 
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Clock } from 'lucide-react';
 
-type TimeRangeProps = {
+type TimeRangeSelectorProps = {
   timeRange: '7d' | '30d' | 'all';
   setTimeRange: (value: '7d' | '30d' | 'all') => void;
 };
 
-export function TimeRangeSelector({ timeRange, setTimeRange }: TimeRangeProps) {
+export function TimeRangeSelector({ timeRange, setTimeRange }: TimeRangeSelectorProps) {
   const { t } = useLanguage();
   
   return (
-    <Select value={timeRange} onValueChange={(value: '7d' | '30d' | 'all') => setTimeRange(value)}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder={t("selectTimeRange")} />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="7d">{t("last7Days")}</SelectItem>
-        <SelectItem value="30d">{t("last30Days")}</SelectItem>
-        <SelectItem value="all">{t("allTime")}</SelectItem>
-      </SelectContent>
-    </Select>
+    <Card className="border-muted bg-background/60">
+      <CardContent className="p-2">
+        <div className="flex flex-col gap-2">
+          <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {t("period")}
+          </div>
+          <ToggleGroup 
+            type="single" 
+            value={timeRange} 
+            onValueChange={(value) => setTimeRange(value as '7d' | '30d' | 'all')}
+          >
+            <ToggleGroupItem value="7d" size="sm" className="text-xs px-2 h-6">
+              {t("last7Days")}
+            </ToggleGroupItem>
+            <ToggleGroupItem value="30d" size="sm" className="text-xs px-2 h-6">
+              {t("last30Days")}
+            </ToggleGroupItem>
+            <ToggleGroupItem value="all" size="sm" className="text-xs px-2 h-6">
+              {t("allTime")}
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
