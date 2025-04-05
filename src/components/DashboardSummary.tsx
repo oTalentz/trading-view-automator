@@ -9,7 +9,6 @@ import { DashboardHeader } from './dashboard/DashboardHeader';
 import { ConfluenceSection } from './dashboard/ConfluenceSection';
 import { AnalyticsTabs } from './dashboard/AnalyticsTabs';
 import { MLStrategySelector } from './MLStrategySelector';
-import { SentimentAnalysis } from './SentimentAnalysis';
 import { 
   filterSignalsByTimeRange, 
   getWinRateByConfidence, 
@@ -115,7 +114,6 @@ export function DashboardSummary() {
         </div>
         <div className="space-y-6">
           <MLStrategySelector symbol={selectedSymbol} interval="1" />
-          <SentimentAnalysis symbol={selectedSymbol} />
         </div>
       </div>
     </div>
