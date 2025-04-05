@@ -1,6 +1,6 @@
 
 import { cacheService } from '../cacheSystem';
-import { AIOptimizationResult, PatternAnalysisResult, EnhancedAnalysis } from './types';
+import { AIOptimizationResult, PatternAnalysisResult, EnhancedAnalysis, Pattern } from './types';
 
 /**
  * Otimiza estratégias com base em dados históricos e análise de IA
@@ -62,9 +62,9 @@ export const analyzePatterns = (
   // Simulação de análise de padrões com IA
   const result: PatternAnalysisResult = {
     patterns: [
-      { name: 'Doji', confidence: 75 + Math.random() * 15, action: Math.random() > 0.5 ? 'BUY' : 'SELL' },
-      { name: 'Engulfing', confidence: 65 + Math.random() * 20, action: Math.random() > 0.5 ? 'BUY' : 'SELL' },
-      { name: 'Three Soldiers', confidence: 60 + Math.random() * 25, action: Math.random() > 0.5 ? 'BUY' : 'SELL' }
+      { name: 'Doji', confidence: 75 + Math.random() * 15, action: Math.random() > 0.5 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD') },
+      { name: 'Engulfing', confidence: 65 + Math.random() * 20, action: Math.random() > 0.5 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD') },
+      { name: 'Three Soldiers', confidence: 60 + Math.random() * 25, action: Math.random() > 0.5 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD') }
     ].filter(p => p.confidence > threshold),
     overallConfidence: 60 + Math.random() * 25,
     recommendedAction: Math.random() > 0.6 ? 'BUY' : (Math.random() > 0.5 ? 'SELL' : 'HOLD')

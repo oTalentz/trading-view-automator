@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { RecommendationList } from '../ai/RecommendationList';
 import { LanguageProvider } from '@/context/LanguageContext';
+import '@testing-library/jest-dom';
 
 describe('RecommendationList Component', () => {
   test('exibe mensagem de gerar mais sinais quando não há insights', () => {

@@ -7,6 +7,7 @@ import { useAIInsights } from '@/hooks/useAIInsights';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { AIAnalysisProvider } from '@/context/AIAnalysisContext';
 import { MarketCondition } from '@/utils/technicalAnalysis';
+import '@testing-library/jest-dom';
 
 // Mock dos hooks
 jest.mock('@/hooks/useMultiTimeframeAnalysis');
