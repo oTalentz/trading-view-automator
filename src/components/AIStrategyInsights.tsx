@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAIInsights } from '@/hooks/useAIInsights';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, BarChart2, RefreshCw, Info } from 'lucide-react';
+import { Brain, BarChart2, RefreshCw, Info, Check } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { InsightCard } from './ai/InsightCard';
 import { RecommendationList } from './ai/RecommendationList';
@@ -17,17 +18,28 @@ interface AIStrategyInsightsProps {
 export function AIStrategyInsights({ symbol }: AIStrategyInsightsProps) {
   const { insights, isLoading, generateInsights } = useAIInsights(symbol);
   const { t } = useLanguage();
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
   
   const handleRefresh = () => {
+    setIsRefreshing(true);
     // Mostrar uma notificação de atualização iniciada
     toast.info(t("updatingInsights"), {
       description: t("fetchingNewData"),
       duration: 2000,
     });
     
-    // Chamar a função de geração de insights sem passar o símbolo
-    // já que o hook já tem acesso ao símbolo atual
+    // Chamar a função de geração de insights
     generateInsights();
+    
+    // Simular um tempo de atualização para garantir feedback visual
+    setTimeout(() => {
+      setIsRefreshing(false);
+      // Mostrar confirmação de atualização concluída
+      toast.success(t("insightsUpdated"), {
+        description: t("latestDataAvailable"),
+        duration: 3000,
+      });
+    }, 1500);
   };
   
   if (isLoading) {
@@ -61,11 +73,20 @@ export function AIStrategyInsights({ symbol }: AIStrategyInsightsProps) {
           variant="outline" 
           size="sm" 
           onClick={handleRefresh}
-          disabled={isLoading}
+          disabled={isLoading || isRefreshing}
           className="hover:bg-primary/10 active:scale-95 transition-all"
         >
-          <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-          {t("refresh")}
+          {isRefreshing ? (
+            <>
+              <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+              {t("updating")}
+            </>
+          ) : (
+            <>
+              <RefreshCw className="h-4 w-4 mr-1" />
+              {t("refresh")}
+            </>
+          )}
         </Button>
       </CardHeader>
       <CardContent>

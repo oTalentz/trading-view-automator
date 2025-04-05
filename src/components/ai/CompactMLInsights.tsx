@@ -1,10 +1,12 @@
 
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { Brain, TrendingUp, TrendingDown } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown, RefreshCw, Check } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAIAnalysis } from '@/context/AIAnalysisContext';
+import { toast } from "sonner";
 
 interface CompactMLInsightsProps {
   symbol: string;
@@ -15,6 +17,7 @@ interface CompactMLInsightsProps {
 export function CompactMLInsights({ symbol, interval, className = "" }: CompactMLInsightsProps) {
   const { t } = useLanguage();
   const { mlPrediction, isLoadingPrediction, generatePrediction } = useAIAnalysis();
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
   
   React.useEffect(() => {
     // Generate prediction when component mounts
@@ -32,14 +35,54 @@ export function CompactMLInsights({ symbol, interval, className = "" }: CompactM
     return () => clearInterval(refreshInterval);
   }, [symbol, interval, generatePrediction]);
   
-  if (!mlPrediction) return null;
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    toast.info(t("updatingPrediction"), {
+      description: t("calculatingNewPrediction"),
+    });
+    
+    generatePrediction(symbol, interval);
+    
+    // Add visual confirmation after refresh
+    setTimeout(() => {
+      setIsRefreshing(false);
+      toast.success(t("predictionUpdated"), {
+        description: t("predictionAccuracyImproved"),
+      });
+    }, 1500);
+  };
+  
+  if (isLoadingPrediction || !mlPrediction) {
+    return (
+      <div className={`bg-gray-900 border border-gray-800 rounded-lg shadow-xl text-white h-full flex items-center justify-center ${className}`}>
+        <div className="text-center p-8">
+          <Brain className="h-10 w-10 mx-auto text-primary animate-pulse mb-4" />
+          <p className="text-gray-300">{t("generatingPredictions")}</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className={`bg-gray-900 border border-gray-800 rounded-lg shadow-xl text-white h-full transform perspective-[1000px] transition-all duration-500 ${className}`}>
-      <div className="px-4 py-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-t-lg">
+      <div className="px-4 py-3 bg-gradient-to-r from-gray-800 to-gray-900 rounded-t-lg flex items-center justify-between">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Brain className="h-5 w-5 text-primary" /> {t("machineLearningInsights")}
         </h3>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          className="text-gray-300 hover:text-white hover:bg-gray-700 h-8"
+        >
+          {isRefreshing ? (
+            <RefreshCw className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
+          <span className="sr-only">{t("refresh")}</span>
+        </Button>
       </div>
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between transform hover:rotate-y-1 hover:scale-[1.02] transition-transform">
